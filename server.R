@@ -203,6 +203,22 @@ function(input, output, session) {
               plot.margin = margin(t = 15, r = 15, b = 15, l = 15))
     })
   
+  output$bedPlot <- 
+    renderPlot({
+      bedPlot <- BedUtilization %>% select(-ReportingPeriod) %>%
+        gather("Month",
+               "Utilization",-ProjectID,-ProjectName,-ProjectType) %>%
+        filter(
+          ProjectName == input$providerListUtilization) %>%
+        mutate(Month = mdy(Month)) %>%
+        arrange(Month)
+      
+      ggplot(bedPlot,
+             aes(x = Month, y = Utilization, group = 1)) +
+        geom_line()
+      
+    })
+  
   output$CountyScoresText <-
     renderText(hhsServedInCounty)
   

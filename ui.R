@@ -8,8 +8,7 @@ dashboardPage(
                tabName = "providerDashboardTab"),
       menuItem("CoC Competition",
                tabName = "cocCompetitionTab"),
-      menuItem(
-        "Performance and Outcomes",
+      menuItem("Performance and Outcomes",
         menuSubItem("Bed and Unit Utilization",
                     tabName = "utilizationTab"),
         menuSubItem("Community Need (by County)",
@@ -40,7 +39,13 @@ dashboardPage(
         infoBoxOutput("currentBedUtilization")
       ),
       tabItem(tabName = "cocCompetitionTab"),
-      tabItem(tabName = "utilizationTab"),
+      tabItem(tabName = "utilizationTab",
+              pickerInput(
+                inputId = "providerListUtilization",
+                choices = c(providerids$ProjectName),
+                options = list(`live-search` = TRUE),
+                width = "100%"),
+              plotOutput("bedPlot")),
       tabItem(
         tabName = "spdatTab",
         pickerInput(
