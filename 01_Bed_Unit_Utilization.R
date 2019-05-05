@@ -236,19 +236,19 @@ BedUtilization <-
             BedNights,
             by = c("ProjectID", "ProjectName", "ProjectType")) %>%
   mutate(
-    ReportPeriod = percent(BNY / BCY, accuracy = .1),
-    Month1 = percent(BN1 / BC1, accuracy = .1),
-    Month2 = percent(BN2 / BC2, accuracy = .1),
-    Month3 = percent(BN3 / BC3, accuracy = .1),
-    Month4 = percent(BN4 / BC4, accuracy = .1),
-    Month5 = percent(BN5 / BC5, accuracy = .1),
-    Month6 = percent(BN6 / BC6, accuracy = .1),
-    Month7 = percent(BN7 / BC7, accuracy = .1),
-    Month8 = percent(BN8 / BC8, accuracy = .1),
-    Month9 = percent(BN9 / BC9, accuracy = .1),
-    Month10 = percent(BN10 / BC10, accuracy = .1),
-    Month11 = percent(BN11 / BC11, accuracy = .1),
-    Month12 = percent(BN12 / BC12, accuracy = .1)
+    ReportPeriod = BNY / BCY, accuracy = .1,
+    Month1 = BN1 / BC1, accuracy = .1,
+    Month2 = BN2 / BC2, accuracy = .1,
+    Month3 = BN3 / BC3, accuracy = .1,
+    Month4 = BN4 / BC4, accuracy = .1,
+    Month5 = BN5 / BC5, accuracy = .1,
+    Month6 = BN6 / BC6, accuracy = .1,
+    Month7 = BN7 / BC7, accuracy = .1,
+    Month8 = BN8 / BC8, accuracy = .1,
+    Month9 = BN9 / BC9, accuracy = .1,
+    Month10 = BN10 / BC10, accuracy = .1,
+    Month11 = BN11 / BC11, accuracy = .1,
+    Month12 = BN12 / BC12, accuracy = .1
   ) %>% 
   select(ProjectID, ProjectName, ProjectType, ReportPeriod, Month1, Month2, 
          Month3, Month4, Month5, Month6, Month7, Month8, Month9, Month10, 
@@ -256,20 +256,25 @@ BedUtilization <-
 
 rm(BedCapacity, BedNights)
 
-names(BedUtilization) <- 
-  c("ProjectID", "ProjectName", "ProjectType", "ReportingPeriod",
-    month.name[(month(ymd(int_start(FirstMonth))))],
-    month.name[(month(ymd(int_start(SecondMonth))))],
-    month.name[(month(ymd(int_start(ThirdMonth))))],
-    month.name[(month(ymd(int_start(FourthMonth))))],
-    month.name[(month(ymd(int_start(FifthMonth))))],
-    month.name[(month(ymd(int_start(SixthMonth))))],
-    month.name[(month(ymd(int_start(SeventhMonth))))],
-    month.name[(month(ymd(int_start(EighthMonth))))],
-    month.name[(month(ymd(int_start(NinthMonth))))],
-    month.name[(month(ymd(int_start(TenthMonth))))],
-    month.name[(month(ymd(int_start(EleventhMonth))))],
-    month.name[(month(ymd(int_start(TwelfthMonth))))])
+names(BedUtilization) <-
+  c(
+    "ProjectID",
+    "ProjectName",
+    "ProjectType",
+    "ReportingPeriod",
+    format.Date(int_start(FirstMonth), "%m%d%Y"),
+    format.Date(int_start(SecondMonth), "%m%d%Y"),
+    format.Date(int_start(ThirdMonth), "%m%d%Y"),
+    format.Date(int_start(FourthMonth), "%m%d%Y"),
+    format.Date(int_start(FifthMonth), "%m%d%Y"),
+    format.Date(int_start(SixthMonth), "%m%d%Y"),
+    format.Date(int_start(SeventhMonth), "%m%d%Y"),
+    format.Date(int_start(EighthMonth), "%m%d%Y"),
+    format.Date(int_start(NinthMonth), "%m%d%Y"),
+    format.Date(int_start(TenthMonth), "%m%d%Y"),
+    format.Date(int_start(EleventhMonth), "%m%d%Y"),
+    format.Date(int_start(TwelfthMonth), "%m%d%Y")
+  )
 
 #Inf means there were no beds but there were clients served.
 #%NaN means there were no beds and no clients served that month.
@@ -423,19 +428,19 @@ UnitUtilization <- left_join(UnitCapacity,
                             HHNights,
                             by = c("ProjectID", "ProjectName", "ProjectType")) %>%
   mutate(
-    ReportPeriod = percent(HNY / UCY, accuracy = .1),
-    Month1 = percent(HN1 / UC1, accuracy = .1),
-    Month2 = percent(HN2 / UC2, accuracy = .1),
-    Month3 = percent(HN3 / UC3, accuracy = .1),
-    Month4 = percent(HN4 / UC4, accuracy = .1),
-    Month5 = percent(HN5 / UC5, accuracy = .1),
-    Month6 = percent(HN6 / UC6, accuracy = .1),
-    Month7 = percent(HN7 / UC7, accuracy = .1),
-    Month8 = percent(HN8 / UC8, accuracy = .1),
-    Month9 = percent(HN9 / UC9, accuracy = .1),
-    Month10 = percent(HN10 / UC10, accuracy = .1),
-    Month11 = percent(HN11 / UC11, accuracy = .1),
-    Month12 = percent(HN12 / UC12, accuracy = .1)
+    ReportPeriod = HNY / UCY, accuracy = .1,
+    Month1 = HN1 / UC1, accuracy = .1,
+    Month2 = HN2 / UC2, accuracy = .1,
+    Month3 = HN3 / UC3, accuracy = .1,
+    Month4 = HN4 / UC4, accuracy = .1,
+    Month5 = HN5 / UC5, accuracy = .1,
+    Month6 = HN6 / UC6, accuracy = .1,
+    Month7 = HN7 / UC7, accuracy = .1,
+    Month8 = HN8 / UC8, accuracy = .1,
+    Month9 = HN9 / UC9, accuracy = .1,
+    Month10 = HN10 / UC10, accuracy = .1,
+    Month11 = HN11 / UC11, accuracy = .1,
+    Month12 = HN12 / UC12, accuracy = .1
   ) %>%
   select(ProjectID, ProjectName, ProjectType, ReportPeriod, Month1, Month2, 
          Month3, Month4, Month5, Month6, Month7, Month8, Month9, Month10, 
@@ -444,18 +449,18 @@ rm(UnitCapacity, HHNights, Beds, Utilizers)
 
 names(UnitUtilization) <- 
   c("ProjectID", "ProjectName", "ProjectType", "ReportingPeriod",
-    month.name[(month(ymd(int_start(FirstMonth))))],
-    month.name[(month(ymd(int_start(SecondMonth))))],
-    month.name[(month(ymd(int_start(ThirdMonth))))],
-    month.name[(month(ymd(int_start(FourthMonth))))],
-    month.name[(month(ymd(int_start(FifthMonth))))],
-    month.name[(month(ymd(int_start(SixthMonth))))],
-    month.name[(month(ymd(int_start(SeventhMonth))))],
-    month.name[(month(ymd(int_start(EighthMonth))))],
-    month.name[(month(ymd(int_start(NinthMonth))))],
-    month.name[(month(ymd(int_start(TenthMonth))))],
-    month.name[(month(ymd(int_start(EleventhMonth))))],
-    month.name[(month(ymd(int_start(TwelfthMonth))))])
+    format.Date(int_start(FirstMonth), "%m%d%Y"),
+    format.Date(int_start(SecondMonth), "%m%d%Y"),
+    format.Date(int_start(ThirdMonth), "%m%d%Y"),
+    format.Date(int_start(FourthMonth), "%m%d%Y"),
+    format.Date(int_start(FifthMonth), "%m%d%Y"),
+    format.Date(int_start(SixthMonth), "%m%d%Y"),
+    format.Date(int_start(SeventhMonth), "%m%d%Y"),
+    format.Date(int_start(EighthMonth), "%m%d%Y"),
+    format.Date(int_start(NinthMonth), "%m%d%Y"),
+    format.Date(int_start(TenthMonth), "%m%d%Y"),
+    format.Date(int_start(EleventhMonth), "%m%d%Y"),
+    format.Date(int_start(TwelfthMonth), "%m%d%Y"))
 
 rm(bed_capacity, bed_nights_per_ee, unit_capacity)
 
@@ -531,8 +536,8 @@ Utilization <-
   left_join(., Households, 
             by = c("ProjectID", "ProjectName")) %>%
   filter(ProjectType %in% c(1, 2, 3, 8, 9)) %>%
-  mutate(BedUtilization = percent(Clients/BedCount),
-         UnitUtilization = percent(Households/UnitCount))
+  mutate(BedUtilization = Clients/BedCount,
+         UnitUtilization = Households/UnitCount)
 
 rm(Households, Clients, Capacity, Enrollment, Project, Inventory, 
    SmallInventory, SmallProject)
