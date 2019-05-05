@@ -6,7 +6,7 @@ bedPlot <- BedUtilization %>% select(-ReportingPeriod) %>%
   gather("Month",
          "Utilization",-ProjectID,-ProjectName,-ProjectType) %>%
   filter(
-      ProjectName == "Sandusky - GLCAP - Homenet Permanent Housing - PSH"
+      ProjectName == "Ashland - Appleseed CMHC - Targeted RRH"
   ) %>%
   mutate(Month = mdy(Month)) %>%
   arrange(Month)
@@ -23,8 +23,7 @@ unitPlot <- UnitUtilization %>% select(-ReportingPeriod) %>%
   gather("Month",
          "Utilization",
          -ProjectID, -ProjectName, -ProjectType) %>%
-  filter(ProjectName == "Sandusky - GLCAP - Homenet Permanent Housing - PSH"
-  ) %>%
+  filter(ProjectName == "Ashland - Appleseed CMHC - Targeted RRH") %>%
   mutate(Month = mdy(Month)) %>%
   arrange(Month)
 
