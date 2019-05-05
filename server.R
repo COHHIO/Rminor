@@ -214,8 +214,12 @@ function(input, output, session) {
         arrange(Month)
       
       ggplot(bedPlot,
-             aes(x = Month, y = Utilization, group = 1)) +
-        geom_line()
+             aes(x = Month, 
+                 y = Utilization, group = 1)) +
+        geom_line() +
+        ylab("Bed Utilization") + 
+        scale_y_continuous(labels = scales::percent_format(accuracy = 1)) 
+      
       
     })
   

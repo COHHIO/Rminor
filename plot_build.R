@@ -13,7 +13,9 @@ bedPlot <- BedUtilization %>% select(-ReportingPeriod) %>%
 
 ggplot(bedPlot,
        aes(x = Month, y = Utilization, group = 1)) +
-   geom_line()
+  geom_line() +
+  ylab("Bed Utilization") + 
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1))
 
 # Unit Utilization Plot ---------------------------------------------------
 
@@ -28,4 +30,5 @@ unitPlot <- UnitUtilization %>% select(-ReportingPeriod) %>%
 
 ggplot(unitPlot,
        aes(x = Month, y = Utilization, group = 1)) +
-  geom_line()
+  geom_line() + 
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1))
