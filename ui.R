@@ -42,7 +42,7 @@ dashboardPage(
       tabItem(tabName = "utilizationTab",
               pickerInput(
                 inputId = "providerListUtilization",
-                choices = c(providerids$ProjectName),
+                choices = c(sort(BedUtilization$ProjectName)),
                 options = list(`live-search` = TRUE),
                 width = "100%"),
               plotOutput("bedPlot")),
