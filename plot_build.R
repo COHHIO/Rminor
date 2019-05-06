@@ -34,7 +34,8 @@ ggplot(unitPlot,
            color = "Unit Utilization")) +
   theme_light() + 
   geom_line() + 
-  scale_y_continuous(limits = c(0,2), labels = scales::percent_format(accuracy = 1)) +
+  scale_y_continuous(limits = c(0,2), 
+                     labels = scales::percent_format(accuracy = 1)) +
   geom_line(data = bedPlot,
             aes(x = Month, 
                 y = Utilization, 
