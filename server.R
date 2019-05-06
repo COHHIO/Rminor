@@ -208,17 +208,32 @@ function(input, output, session) {
       bedPlot <- BedUtilization %>% select(-ReportingPeriod) %>%
         gather("Month",
                "Utilization",-ProjectID,-ProjectName,-ProjectType) %>%
-        filter(
-          ProjectName == input$providerListUtilization) %>%
+        filter(ProjectName == input$providerListUtilization) %>%
         mutate(Month = mdy(Month)) %>%
         arrange(Month)
       
-      ggplot(bedPlot,
+      unitPlot <- UnitUtilization %>% select(-ReportingPeriod) %>%
+        gather("Month",
+               "Utilization",
+               -ProjectID, -ProjectName, -ProjectType) %>%
+        filter(ProjectName == input$providerListUtilization) %>%
+        mutate(Month = mdy(Month)) %>%
+        arrange(Month)
+      
+      ggplot(unitPlot,
              aes(x = Month, 
-                 y = Utilization, group = 1)) +
-        geom_line() +
-        ylab("Bed Utilization") + 
-        scale_y_continuous(labels = scales::percent_format(accuracy = 1)) 
+                 y = Utilization, 
+                 group = 1, 
+                 color = "Unit Utilization")) +
+        theme_light() + 
+        geom_line() + 
+        scale_y_continuous(limits = c(0,2), 
+                           labels = scales::percent_format(accuracy = 1)) +
+        geom_line(data = bedPlot,
+                  aes(x = Month, 
+                      y = Utilization, 
+                      group = 1, 
+                      color = "Bed Utilization")) 
       
       
     })
