@@ -282,13 +282,17 @@ names(BedUtilization) <-
 # HH Utilization of Units -------------------------------------------------
 
 HHUtilizers <- Utilizers %>%
-  mutate(EntryAdjust = case_when(
-    ProjectType %in% c(1, 2, 8) ~ EntryDate,
-    ProjectType %in% c(3, 9, 13) ~ MoveInDate),
-    ExitAdjust = if_else(is.na(ExitDate), mdy(ReportEnd), ymd(ExitDate)),
+  mutate(
+    EntryAdjust = case_when(
+      ProjectType %in% c(1, 2, 8) ~ EntryDate,
+      ProjectType %in% c(3, 9, 13) ~ MoveInDate
+    ),
+    ExitAdjust = if_else(is.na(ExitDate) & ymd(EntryAdjust) <= mdy(ReportEnd), 
+                         mdy(ReportEnd), 
+                         ymd(ExitDate)),
     ExitDate = NULL,
     StayWindow = interval(ymd(EntryAdjust), ymd(ExitAdjust))
-  ) %>%
+  ) %>% 
   filter(
     (str_detect(HouseholdID, fixed("s_")) |
        str_detect(HouseholdID, fixed("h_")) &
