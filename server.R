@@ -207,15 +207,14 @@ function(input, output, session) {
     renderPlot({
       bedPlot <- BedUtilization %>% select(-ReportingPeriod) %>%
         gather("Month",
-               "Utilization",-ProjectID,-ProjectName,-ProjectType) %>%
+               "Utilization", -ProjectID, -ProjectName, -ProjectType) %>%
         filter(ProjectName == input$providerListUtilization) %>%
         mutate(Month = mdy(Month)) %>%
         arrange(Month)
       
       unitPlot <- UnitUtilization %>% select(-ReportingPeriod) %>%
         gather("Month",
-               "Utilization",
-               -ProjectID, -ProjectName, -ProjectType) %>%
+               "Utilization", -ProjectID, -ProjectName, -ProjectType) %>%
         filter(ProjectName == input$providerListUtilization) %>%
         mutate(Month = mdy(Month)) %>%
         arrange(Month)
@@ -227,15 +226,14 @@ function(input, output, session) {
                  color = "Unit Utilization")) +
         theme_light() + 
         geom_line() + 
-        scale_y_continuous(limits = c(0,2), 
+        scale_y_continuous(limits = c(0,2),
                            labels = scales::percent_format(accuracy = 1)) +
+        scale_x_date(date_labels = "%B %Y", date_minor_breaks = "1 month") +
         geom_line(data = bedPlot,
-                  aes(x = Month, 
-                      y = Utilization, 
-                      group = 1, 
-                      color = "Bed Utilization")) 
-      
-      
+                  aes(x = Month,
+                      y = Utilization,
+                      group = 1,
+                      color = "Bed Utilization"))
     })
   
   output$CountyScoresText <-
