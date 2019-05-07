@@ -48,11 +48,12 @@ dashboardPage(
               sliderInput(
                 "utilizationDateSlider",
                 "Choose END DATE",
-                min = ymd(2018-12-01),
-                max = ymd(20190501),
-                value = ymd("2019-04-01"),
-                timeFormat = "%b-%Y"
+                min = ymd(20181201),
+                max = ymd(20190501) + months(1) - 1,
+                value = ymd(20190430),
+                timeFormat = "%b %Y"
               ),
+              verbatimTextOutput("test"),
               plotOutput("bedPlot")),
       tabItem(
         tabName = "spdatTab",
