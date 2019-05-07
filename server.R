@@ -207,6 +207,10 @@ function(input, output, session) {
   
   output$bedPlot <- 
     renderPlot({
+      ReportStart <- input$utilizationDateSlider - years(1)
+      ReportEnd <- input$utilizationDateSlider
+
+
       bedPlot <- BedUtilization %>% select(-ReportingPeriod) %>%
         gather("Month",
                "Utilization", -ProjectID, -ProjectName, -ProjectType) %>%
@@ -237,7 +241,7 @@ function(input, output, session) {
                       group = 1,
                       color = "Bed Utilization"))
     })
-  
+  # output$test <- renderPrint({})
   output$CountyScoresText <-
     renderText(hhsServedInCounty)
   
