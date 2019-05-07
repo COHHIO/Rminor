@@ -56,6 +56,12 @@ dashboardPage(
         ),
         chooseSliderSkin("Round"),
         setSliderColor("#56B4E9", c(1, 2)),
+        sliderTextInput(
+          "spdatSlider",
+          "",
+          c(unique(Sys.yearqtr() - 6/4 : Sys.yearqtr() + 1/4)),
+          selected = Sys.yearqtr() - 1/4
+        ),
         sliderInput(
           "y",
           "",
