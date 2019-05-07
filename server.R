@@ -137,16 +137,18 @@ function(input, output, session) {
 
   output$SPDATScoresByCounty <- 
     renderPlot({
-      ReportStart <- format.Date(mdy(paste0("01-01-", input$y)), "%m-%d-%Y")
-      
+      # ReportStart <- format.Date(mdy(paste0("01-01-", input$y)), "%m-%d-%Y")
+      ReportStart <- format.Date(ymd(paste0(
+        substr(input$spdatSlider, 1, 4), 
+        "-01-01")), "%m-%d-%Y")
       ReportEnd <- format.Date(mdy(paste0(
         case_when(
-          input$q == 1 ~ "03-31-",
-          input$q == 2 ~ "06-30",
-          input$q == 3 ~ "09-30-",
-          input$q == 4 ~ "12-31-"
+          substr(input$spdatSlider, 7, 7) == 1 ~ "03-31-",
+          substr(input$spdatSlider, 7, 7) == 2 ~ "06-30",
+          substr(input$spdatSlider, 7, 7) == 3 ~ "09-30-",
+          substr(input$spdatSlider, 7, 7) == 4 ~ "12-31-"
         ),
-        input$y
+        substr(input$spdatSlider, 1, 4)
       )), "%m-%d-%Y")
 # counting all households who were scored AND SERVED between the report dates
       CountyAverageScores <- CountyData %>%
