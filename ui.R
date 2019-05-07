@@ -62,22 +62,6 @@ dashboardPage(
           c(unique(Sys.yearqtr() - 6/4 : Sys.yearqtr() + 1/4)),
           selected = Sys.yearqtr() - 1/4
         ),
-        sliderInput(
-          "y",
-          "",
-          year(today()) - 2,
-          year(today()),
-          year(today()),
-          sep = "",
-          ticks = FALSE
-        ),
-        sliderInput(
-          "q", "", 1, 4,
-          if_else(quarter(today()) - 1 == 0, 1,
-                  quarter(today()) - 1),
-          ticks = FALSE,
-          pre = "Q"
-        ),
         plotOutput("SPDATScoresByCounty"),
         HTML("<br>"),
         box(textOutput("CountyScoresText"), 
