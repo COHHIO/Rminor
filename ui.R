@@ -45,6 +45,14 @@ dashboardPage(
                 choices = c(sort(BedUtilization$ProjectName)),
                 options = list(`live-search` = TRUE),
                 width = "100%"),
+              sliderInput(
+                "utilizationDateSlider",
+                "Choose END DATE",
+                min = ymd(2018-12-01),
+                max = ymd(20190501),
+                value = ymd("2019-04-01"),
+                timeFormat = "%b-%Y"
+              ),
               plotOutput("bedPlot")),
       tabItem(
         tabName = "spdatTab",
