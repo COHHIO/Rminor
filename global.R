@@ -12,5 +12,3 @@ load("data/Utilization.RData")
 
 load("data/QPR_SPDATs.RData")
 
-
-
