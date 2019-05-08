@@ -208,20 +208,22 @@ function(input, output, session) {
   output$bedPlot <- 
     renderPlot({
       ReportStart <- input$utilizationDateSlider - years(1)
-      ReportEnd <- input$utilizationDateSlider
+      ReportEnd <- input$utilizationDateSlider - days(1)
+      ReportingPeriod <- interval(ymd(ReportStart), ymd(ReportEnd))
 
-
-      bedPlot <- BedUtilization %>% select(-ReportingPeriod) %>%
+      bedPlot <- BedUtilization %>% select(-FilePeriod) %>%
         gather("Month",
                "Utilization", -ProjectID, -ProjectName, -ProjectType) %>%
-        filter(ProjectName == input$providerListUtilization) %>%
+        filter(ProjectName == input$providerListUtilization,
+               mdy(Month) %within% ReportingPeriod) %>%
         mutate(Month = mdy(Month)) %>%
         arrange(Month)
       
-      unitPlot <- UnitUtilization %>% select(-ReportingPeriod) %>%
+      unitPlot <- UnitUtilization %>% select(-FilePeriod) %>%
         gather("Month",
                "Utilization", -ProjectID, -ProjectName, -ProjectType) %>%
-        filter(ProjectName == input$providerListUtilization) %>%
+        filter(ProjectName == input$providerListUtilization,
+               mdy(Month) %within% ReportingPeriod) %>%
         mutate(Month = mdy(Month)) %>%
         arrange(Month)
       
@@ -239,9 +241,15 @@ function(input, output, session) {
                   aes(x = Month,
                       y = Utilization,
                       group = 1,
-                      color = "Bed Utilization"))
+                      color = "Bed Utilization")) +
+        xlab(input$providerListUtilization) +
+        ggtitle(paste("Date Range:", 
+                      format.Date(ReportStart, "%b %Y"), 
+                      "to", 
+                      format.Date(ReportEnd, "%b %Y"))) 
+        
     })
-  # output$test <- renderPrint({})
+  
   output$CountyScoresText <-
     renderText(hhsServedInCounty)
   

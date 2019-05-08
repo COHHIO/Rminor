@@ -387,25 +387,25 @@ HHUtilizers <- Utilizers %>%
   mutate(
     EntryAdjust = case_when(
       ProjectType %in% c(1, 2, 8) ~ EntryDate,
-      ProjectType %in% c(3, 9, 13) ~ MoveInDate
+      ProjectType %in% c(3, 9) ~ MoveInDate
     ),
-    ExitAdjust = if_else(is.na(ExitDate) & ymd(EntryAdjust) <= mdy(ReportEnd), 
-                         mdy(ReportEnd), 
+    ExitAdjust = if_else(is.na(ExitDate) & ymd(EntryAdjust) <= mdy(FileEnd), 
+                         mdy(FileEnd), 
                          ymd(ExitDate)),
     ExitDate = NULL,
     StayWindow = interval(ymd(EntryAdjust), ymd(ExitAdjust))
   ) %>% 
   filter(
-    (str_detect(HouseholdID, fixed("s_")) |
-       str_detect(HouseholdID, fixed("h_")) &
+    str_detect(HouseholdID, fixed("s_")) |
+       (str_detect(HouseholdID, fixed("h_")) &
        RelationshipToHoH == 1) &
-    int_overlaps(StayWindow, ReportingPeriod) &
+    int_overlaps(StayWindow, FilePeriod) &
       (
         (
-          ProjectType %in% c(3, 9, 13) &
+          ProjectType %in% c(3, 9) &
             !is.na(EntryAdjust) &
             ymd(MoveInDate) >= ymd(EntryDate) &
-            ymd(MoveInDate) < ymd(ExitAdjust)
+            ymd(MoveInDate) <= ymd(ExitAdjust)
         ) |
           ProjectType %in% c(1, 2, 8)
       ) &
@@ -414,7 +414,7 @@ HHUtilizers <- Utilizers %>%
 
 HHUtilizers <- HHUtilizers %>%
   mutate(
-    ReportPeriod = bed_nights_per_ee(HHUtilizers, ReportingPeriod),
+    FilePeriod = bed_nights_per_ee(HHUtilizers, FilePeriod),
     Month1 = bed_nights_per_ee(HHUtilizers, FirstMonth),
     Month2 = bed_nights_per_ee(HHUtilizers, SecondMonth),
     Month3 = bed_nights_per_ee(HHUtilizers, ThirdMonth),
@@ -426,14 +426,26 @@ HHUtilizers <- HHUtilizers %>%
     Month9 = bed_nights_per_ee(HHUtilizers, NinthMonth),
     Month10 = bed_nights_per_ee(HHUtilizers, TenthMonth),
     Month11 = bed_nights_per_ee(HHUtilizers, EleventhMonth),
-    Month12 = bed_nights_per_ee(HHUtilizers, TwelfthMonth)
+    Month12 = bed_nights_per_ee(HHUtilizers, TwelfthMonth),
+    Month13 = bed_nights_per_ee(HHUtilizers, ThirteenthMonth),
+    Month14 = bed_nights_per_ee(HHUtilizers, FourteenthMonth),
+    Month15 = bed_nights_per_ee(HHUtilizers, FifteenthMonth),
+    Month16 = bed_nights_per_ee(HHUtilizers, SixteenthMonth),
+    Month17 = bed_nights_per_ee(HHUtilizers, SeventeenthMonth),
+    Month18 = bed_nights_per_ee(HHUtilizers, EighteenthMonth),
+    Month19 = bed_nights_per_ee(HHUtilizers, NineteenthMonth),
+    Month20 = bed_nights_per_ee(HHUtilizers, TwentiethMonth),
+    Month21 = bed_nights_per_ee(HHUtilizers, TwentyfirstMonth),
+    Month22 = bed_nights_per_ee(HHUtilizers, TwentysecondMonth),
+    Month23 = bed_nights_per_ee(HHUtilizers, TwentythirdMonth),
+    Month24 = bed_nights_per_ee(HHUtilizers, TwentyfourthMonth)
     )
 HHUtilizers <- as.data.frame(HHUtilizers)
 # making granularity by provider instead of by enrollment id
 HHNights <- HHUtilizers %>%
   group_by(ProjectName, ProjectID, ProjectType) %>%
   summarise(
-    HNY = sum(ReportPeriod, na.rm = TRUE),
+    HNY = sum(FilePeriod, na.rm = TRUE),
     HN1 = sum(Month1, na.rm = TRUE),
     HN2 = sum(Month2, na.rm = TRUE),
     HN3 = sum(Month3, na.rm = TRUE),
@@ -445,9 +457,23 @@ HHNights <- HHUtilizers %>%
     HN9 = sum(Month9, na.rm = TRUE),
     HN10 = sum(Month10, na.rm = TRUE),
     HN11 = sum(Month11, na.rm = TRUE),
-    HN12 = sum(Month12, na.rm = TRUE)
+    HN12 = sum(Month12, na.rm = TRUE),
+    HN13 = sum(Month13, na.rm = TRUE),
+    HN14 = sum(Month14, na.rm = TRUE),
+    HN15 = sum(Month15, na.rm = TRUE),
+    HN16 = sum(Month16, na.rm = TRUE),
+    HN17 = sum(Month17, na.rm = TRUE),
+    HN18 = sum(Month18, na.rm = TRUE),
+    HN19 = sum(Month19, na.rm = TRUE),
+    HN20 = sum(Month20, na.rm = TRUE),
+    HN21 = sum(Month21, na.rm = TRUE),
+    HN22 = sum(Month22, na.rm = TRUE),
+    HN23 = sum(Month23, na.rm = TRUE),
+    HN24 = sum(Month24, na.rm = TRUE)
   )
-rm(HHUtilizers)
+rm(HHUtilizers) # leaving this one because the client-level detail should be
+# good enough for R minor elevated
+
 # Unit Capacity -----------------------------------------------------------
 
 UnitCapacity <- Beds %>%
@@ -460,11 +486,11 @@ UnitCapacity <- Beds %>%
          InventoryStartDate,
          InventoryEndDate) %>%
   mutate(InventoryEndAdjust = if_else(is.na(InventoryEndDate),
-                                      mdy(ReportEnd),
+                                      mdy(FileEnd),
                                       ymd(InventoryEndDate)),
-         InventoryStartAdjust = if_else(ymd(InventoryStartDate) >= mdy(ReportStart),
+         InventoryStartAdjust = if_else(ymd(InventoryStartDate) >= mdy(FileStart),
                                         ymd(InventoryStartDate),
-                                        mdy(ReportStart)),
+                                        mdy(FileStart)),
          AvailableWindow = interval(ymd(InventoryStartAdjust),
                                     ymd(InventoryEndAdjust)),
          UnitCount = if_else(HouseholdType == 3,
@@ -496,7 +522,7 @@ unit_capacity <- function(interval) {
 
 UnitCapacity <- UnitCapacity %>%
   mutate(
-    ReportPeriod = unit_capacity(ReportingPeriod),
+    FilePeriod = unit_capacity(FilePeriod),
     Month1 = unit_capacity(FirstMonth),
     Month2 = unit_capacity(SecondMonth),
     Month3 = unit_capacity(ThirdMonth),
@@ -508,12 +534,24 @@ UnitCapacity <- UnitCapacity %>%
     Month9 = unit_capacity(NinthMonth),
     Month10 = unit_capacity(TenthMonth),
     Month11 = unit_capacity(EleventhMonth),
-    Month12 = unit_capacity(TwelfthMonth))
+    Month12 = unit_capacity(TwelfthMonth),
+    Month13 = unit_capacity(ThirteenthMonth),
+    Month14 = unit_capacity(FourteenthMonth),
+    Month15 = unit_capacity(FifteenthMonth),
+    Month16 = unit_capacity(SixteenthMonth),
+    Month17 = unit_capacity(SeventeenthMonth),
+    Month18 = unit_capacity(EighteenthMonth),
+    Month19 = unit_capacity(NineteenthMonth),
+    Month20 = unit_capacity(TwentiethMonth),
+    Month21 = unit_capacity(TwentyfirstMonth),
+    Month22 = unit_capacity(TwentysecondMonth),
+    Month23 = unit_capacity(TwentythirdMonth),
+    Month24 = unit_capacity(TwentyfourthMonth))
 
 UnitCapacity <- UnitCapacity %>%
   group_by(ProjectID, ProjectName, ProjectType) %>%
   summarise(
-    UCY = sum(ReportPeriod, na.rm = TRUE),
+    UCY = sum(FilePeriod, na.rm = TRUE),
     UC1 = sum(Month1, na.rm = TRUE),
     UC2 = sum(Month2, na.rm = TRUE),
     UC3 = sum(Month3, na.rm = TRUE),
@@ -525,7 +563,19 @@ UnitCapacity <- UnitCapacity %>%
     UC9 = sum(Month9, na.rm = TRUE),
     UC10 = sum(Month10, na.rm = TRUE),
     UC11 = sum(Month11, na.rm = TRUE),
-    UC12 = sum(Month12, na.rm = TRUE)
+    UC12 = sum(Month12, na.rm = TRUE),
+    UC13 = sum(Month13, na.rm = TRUE),
+    UC14 = sum(Month14, na.rm = TRUE),
+    UC15 = sum(Month15, na.rm = TRUE),
+    UC16 = sum(Month16, na.rm = TRUE),
+    UC17 = sum(Month17, na.rm = TRUE),
+    UC18 = sum(Month18, na.rm = TRUE),
+    UC19 = sum(Month19, na.rm = TRUE),
+    UC20 = sum(Month20, na.rm = TRUE),
+    UC21 = sum(Month21, na.rm = TRUE),
+    UC22 = sum(Month22, na.rm = TRUE),
+    UC23 = sum(Month23, na.rm = TRUE),
+    UC24 = sum(Month24, na.rm = TRUE)
   )
 
 # Unit Utilization --------------------------------------------------------
@@ -534,7 +584,7 @@ UnitUtilization <- left_join(UnitCapacity,
                             HHNights,
                             by = c("ProjectID", "ProjectName", "ProjectType")) %>%
   mutate(
-    ReportPeriod = HNY / UCY, accuracy = .1,
+    FilePeriod = HNY / UCY, accuracy = .1,
     Month1 = HN1 / UC1, accuracy = .1,
     Month2 = HN2 / UC2, accuracy = .1,
     Month3 = HN3 / UC3, accuracy = .1,
@@ -546,15 +596,25 @@ UnitUtilization <- left_join(UnitCapacity,
     Month9 = HN9 / UC9, accuracy = .1,
     Month10 = HN10 / UC10, accuracy = .1,
     Month11 = HN11 / UC11, accuracy = .1,
-    Month12 = HN12 / UC12, accuracy = .1
+    Month12 = HN12 / UC12, accuracy = .1,
+    Month13 = HN13 / UC13, accuracy = .1,
+    Month14 = HN14 / UC14, accuracy = .1,
+    Month15 = HN15 / UC15, accuracy = .1,
+    Month16 = HN16 / UC16, accuracy = .1,
+    Month17 = HN17 / UC17, accuracy = .1,
+    Month18 = HN18 / UC18, accuracy = .1,
+    Month19 = HN19 / UC19, accuracy = .1,
+    Month20 = HN20 / UC20, accuracy = .1,
+    Month21 = HN21 / UC21, accuracy = .1,
+    Month22 = HN22 / UC22, accuracy = .1,
+    Month23 = HN23 / UC23, accuracy = .1,
+    Month24 = HN24 / UC24, accuracy = .1
   ) %>%
-  select(ProjectID, ProjectName, ProjectType, ReportPeriod, Month1, Month2, 
-         Month3, Month4, Month5, Month6, Month7, Month8, Month9, Month10, 
-         Month11, Month12)
+  select(ProjectID, ProjectName, ProjectType, FilePeriod, starts_with("Month"))
 rm(UnitCapacity, HHNights, Beds, Utilizers)
 
 names(UnitUtilization) <- 
-  c("ProjectID", "ProjectName", "ProjectType", "ReportingPeriod",
+  c("ProjectID", "ProjectName", "ProjectType", "FilePeriod",
     format.Date(int_start(FirstMonth), "%m%d%Y"),
     format.Date(int_start(SecondMonth), "%m%d%Y"),
     format.Date(int_start(ThirdMonth), "%m%d%Y"),
@@ -566,12 +626,24 @@ names(UnitUtilization) <-
     format.Date(int_start(NinthMonth), "%m%d%Y"),
     format.Date(int_start(TenthMonth), "%m%d%Y"),
     format.Date(int_start(EleventhMonth), "%m%d%Y"),
-    format.Date(int_start(TwelfthMonth), "%m%d%Y"))
+    format.Date(int_start(TwelfthMonth), "%m%d%Y"),
+    format.Date(int_start(ThirteenthMonth), "%m%d%Y"),
+    format.Date(int_start(FourteenthMonth), "%m%d%Y"),
+    format.Date(int_start(FifteenthMonth), "%m%d%Y"),
+    format.Date(int_start(SixteenthMonth), "%m%d%Y"),
+    format.Date(int_start(SeventeenthMonth), "%m%d%Y"),
+    format.Date(int_start(EighteenthMonth), "%m%d%Y"),
+    format.Date(int_start(NineteenthMonth), "%m%d%Y"),
+    format.Date(int_start(TwentiethMonth), "%m%d%Y"),
+    format.Date(int_start(TwentyfirstMonth), "%m%d%Y"),
+    format.Date(int_start(TwentysecondMonth), "%m%d%Y"),
+    format.Date(int_start(TwentythirdMonth), "%m%d%Y"),
+    format.Date(int_start(TwentyfourthMonth), "%m%d%Y"))
 
 rm(bed_capacity, bed_nights_per_ee, unit_capacity)
 
 SmallProject <- Project %>%
-  filter(ProjectType %in% c(1, 2, 3, 8, 9, 13) &
+  filter(ProjectType %in% c(1, 2, 3, 8, 9) &
            ymd(OperatingStartDate) <= today() &
            (is.na(OperatingEndDate) | OperatingEndDate >= today()) &
            is.na(Project$GrantType)) %>%
@@ -579,6 +651,8 @@ SmallProject <- Project %>%
          ProjectName,
          ProjectType, 
          OrganizationName)
+
+# Current Bed Utilization -------------------------------------------------
 
 SmallInventory <- Inventory %>%
   filter((ymd(InventoryStartDate) <= today() &
