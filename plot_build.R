@@ -2,29 +2,23 @@ load("data/Utilization.RData")
 
 # Bed Utilization Plot ----------------------------------------------------
 
-bedPlot <- BedUtilization %>% select(-ReportingPeriod) %>%
+ReportStart <- ymd(20190501) - years(1)
+ReportEnd <- ymd(20190501)
+ReportingPeriod <- interval(ymd(ReportStart), ymd(ReportEnd))
+
+bedPlot <- BedUtilization %>% select(-FilePeriod) %>%
   gather("Month",
          "Utilization", -ProjectID, -ProjectName, -ProjectType) %>%
-  filter(
-      ProjectName == "Fayette - CAC of Fayette County - Brick House - ESap"
-  ) %>%
+  filter(ProjectName == "Warren - Warren MHA - Transitions - THap",
+         mdy(Month) %within% ReportingPeriod) %>%
   mutate(Month = mdy(Month)) %>%
   arrange(Month)
 
-ggplot(bedPlot,
-       aes(x = Month, y = Utilization, group = 1)) +
-  geom_line() +
-  ylab("Bed Utilization") + 
-  scale_y_continuous(limits = c(0,2), 
-                     labels = scales::percent_format(accuracy = 1))
-
-# Unit Utilization Plot ---------------------------------------------------
-
-unitPlot <- UnitUtilization %>% select(-ReportingPeriod) %>%
+unitPlot <- UnitUtilization %>% select(-FilePeriod) %>%
   gather("Month",
-         "Utilization",
-         -ProjectID, -ProjectName, -ProjectType) %>%
-  filter(ProjectName == "Fayette - CAC of Fayette County - Brick House - ESap") %>%
+         "Utilization", -ProjectID, -ProjectName, -ProjectType) %>%
+  filter(ProjectName == "Warren - Warren MHA - Transitions - THap",
+         mdy(Month) %within% ReportingPeriod) %>%
   mutate(Month = mdy(Month)) %>%
   arrange(Month)
 
@@ -43,4 +37,3 @@ ggplot(unitPlot,
                 y = Utilization,
                 group = 1,
                 color = "Bed Utilization"))
-
