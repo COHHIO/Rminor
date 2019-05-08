@@ -39,24 +39,26 @@ dashboardPage(
         infoBoxOutput("currentBedUtilization")
       ),
       tabItem(tabName = "cocCompetitionTab"),
-      tabItem(tabName = "utilizationTab",
-              pickerInput(
-                inputId = "providerListUtilization",
-                choices = c(sort(BedUtilization$ProjectName)),
-                options = list(`live-search` = TRUE),
-                width = "100%"),
- #             chooseSliderSkin("Round"),
-              setSliderColor("#56B4E9", 1),         
-              sliderInput(
-                "utilizationDateSlider",
-                "Choose END DATE",
-                min = ymd(20181201),
-                max = ymd(20190501) + months(1) - 1,
-                value = ymd(20190430),
-                timeFormat = "%b %Y"
-              ),
-              verbatimTextOutput("test"),
-              plotOutput("bedPlot")),
+      tabItem(
+        tabName = "utilizationTab",
+        pickerInput(
+          inputId = "providerListUtilization",
+          choices = c(sort(BedUtilization$ProjectName)),
+          options = list(`live-search` = TRUE),
+          width = "100%"
+        ),
+        #             chooseSliderSkin("Round"),
+        setSliderColor("#56B4E9", 1),
+        sliderInput(
+          "utilizationDateSlider",
+          "Choose END DATE",
+          min = floor_date(today() - years(2), unit = "month"),
+          max = ceiling_date(today(), unit = "month") - 1,
+          value = floor_date(today(), unit = "month"),
+          timeFormat = "%b %Y"
+        ),
+        plotOutput("bedPlot")
+      ), 
       tabItem(
         tabName = "spdatTab",
         pickerInput(
@@ -78,11 +80,11 @@ dashboardPage(
         box(textOutput("CountyScoresText"), 
             title = "The Lines",
             collapsible = TRUE, 
-            collapsed = TRUE),
+            collapsed = FALSE),
         box(textOutput("HHsServedScoresText"), 
             title = "The Triangles",
             collapsible = TRUE, 
-            collapsed = TRUE),
+            collapsed = FALSE),
         box(textOutput("NoteToUsers"), 
             title = "A Note about Data Quality",
             collapsible = TRUE, 
