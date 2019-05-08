@@ -45,6 +45,8 @@ dashboardPage(
                 choices = c(sort(BedUtilization$ProjectName)),
                 options = list(`live-search` = TRUE),
                 width = "100%"),
+ #             chooseSliderSkin("Round"),
+              setSliderColor("#56B4E9", 1),         
               sliderInput(
                 "utilizationDateSlider",
                 "Choose END DATE",
@@ -64,7 +66,7 @@ dashboardPage(
           width = "70%"
         ),
         chooseSliderSkin("Round"),
-        setSliderColor("#56B4E9", c(1, 2)),
+        setSliderColor("#56B4E9", 1),
         sliderTextInput(
           "spdatSlider",
           "",
