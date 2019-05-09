@@ -12,7 +12,23 @@ dashboardPage(
         menuSubItem("Bed and Unit Utilization",
                     tabName = "utilizationTab"),
         menuSubItem("Community Need (by County)",
-                    tabName = "spdatTab")
+                    tabName = "spdatTab"),
+        menuSubItem("Length of Stay",
+                    tabName = "LoSTab"),
+        menuSubItem("Exits to Permanent Housing",
+                    tabName = "PHTab"),
+        menuSubItem("Non-Cash Benefits at Exit",
+                    tabName = "NCBTab"),
+        menuSubItem("Health Insurance at Exit",
+                    tabName = "HITab"),
+        menuSubItem("Income Growth",
+                    tabName = "incomeTab"),
+        menuSubItem("Recurrence",
+                    tabName = "recurrenceTab"),
+        menuSubItem("Rapid Placement for RRH",
+                    tabName = "rapidTab"),
+        menuSubItem("RRH HP Spending",
+                    tabName = "spendingTab")
       )
     ),
     HTML(paste0(
