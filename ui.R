@@ -55,6 +55,14 @@ dashboardPage(
         infoBoxOutput("currentBedUtilization")
       ),
       tabItem(tabName = "cocCompetitionTab"),
+      tabItem(tabName = "LoSTab"),
+      tabItem(tabName = "PHTab"),
+      tabItem(tabName = "NCBTab"),
+      tabItem(tabName = "HITab"),
+      tabItem(tabName = "incomeTab"),
+      tabItem(tabName = "recurrenceTab"),
+      tabItem(tabName = "rapidTab"),
+      tabItem(tabName = "spendingTab"),
       tabItem(
         tabName = "utilizationTab",
         pickerInput(
