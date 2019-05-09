@@ -128,13 +128,10 @@ SPDATsByProject <- left_join(Entries, Scores, by = "PersonalID") %>%
 SPDATsOnNonHoHs <- left_join(Entries, Scores, by = "PersonalID") %>%
   filter(RelationshipToHoH != 1 & 
            !is.na(Score) & 
-           served_between(., ReportStart, ReportEnd)) %>%
+           served_between(., FileStart, FileEnd)) %>%
   select(ProjectName, PersonalID, EntryDate, ExitDate, Score) %>%
   arrange(ProjectName)
 
-rm(Entries, Scores, smallEnrollment, EighthMonth, EleventhMonth, FifthMonth, 
-   FirstMonth, FourthMonth, NinthMonth, ReportEnd, ReportingPeriod, ReportStart, 
-   SecondMonth, SeventhMonth, SixthMonth, TenthMonth, ThirdMonth, TwelfthMonth, 
-   Users)
+rm(Entries, Scores, smallEnrollment, FileEnd, FilePeriod, FileStart, Users)
 
 save.image("data/QPR_SPDATs.RData")
