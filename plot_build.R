@@ -11,7 +11,9 @@ bedPlot <- BedUtilization %>% select(-FilePeriod) %>%
          "Utilization", -ProjectID, -ProjectName, -ProjectType) %>%
   filter(ProjectName == "Warren - Warren MHA - Transitions - THap",
          mdy(Month) %within% ReportingPeriod) %>%
-  mutate(Month = mdy(Month)) %>%
+  mutate(Month = mdy(Month),
+         bedUtilization = Utilization,
+         Utilization = NULL) %>%
   arrange(Month)
 
 unitPlot <- UnitUtilization %>% select(-FilePeriod) %>%
@@ -19,12 +21,17 @@ unitPlot <- UnitUtilization %>% select(-FilePeriod) %>%
          "Utilization", -ProjectID, -ProjectName, -ProjectType) %>%
   filter(ProjectName == "Warren - Warren MHA - Transitions - THap",
          mdy(Month) %within% ReportingPeriod) %>%
-  mutate(Month = mdy(Month)) %>%
+  mutate(Month = mdy(Month),
+         unitUtilization = Utilization,
+         Utilization = NULL) %>%
   arrange(Month)
 
-ggplot(unitPlot,
+utilizationPlot <- unitPlot %>% full_join(bedPlot, by = c(
+  "ProjectID", "ProjectName", "ProjectType", "Month"))
+
+ggplot(utilizationPlot,
        aes(x = Month, 
-           y = Utilization, 
+           y = unitUtilization, 
            group = 1, 
            color = "Unit Utilization")) +
   theme_light() + 
