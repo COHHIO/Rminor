@@ -205,49 +205,61 @@ function(input, output, session) {
               plot.margin = margin(t = 15, r = 15, b = 15, l = 15))
     })
   
-  output$bedPlot <- 
+  output$bedPlot <-
     renderPlot({
       ReportStart <- input$utilizationDateSlider - years(1)
       ReportEnd <- input$utilizationDateSlider - days(1)
       ReportingPeriod <- interval(ymd(ReportStart), ymd(ReportEnd))
-
+      
       bedPlot <- BedUtilization %>% select(-FilePeriod) %>%
         gather("Month",
-               "Utilization", -ProjectID, -ProjectName, -ProjectType) %>%
+               "Utilization",
+               -ProjectID,
+               -ProjectName,
+               -ProjectType) %>%
         filter(ProjectName == input$providerListUtilization,
                mdy(Month) %within% ReportingPeriod) %>%
-        mutate(Month = mdy(Month)) %>%
-        arrange(Month)
+        mutate(Month = mdy(Month),
+               Bed = Utilization,
+               Utilization = NULL)
       
       unitPlot <- UnitUtilization %>% select(-FilePeriod) %>%
         gather("Month",
-               "Utilization", -ProjectID, -ProjectName, -ProjectType) %>%
+               "Utilization",
+               -ProjectID,
+               -ProjectName,
+               -ProjectType) %>%
         filter(ProjectName == input$providerListUtilization,
                mdy(Month) %within% ReportingPeriod) %>%
-        mutate(Month = mdy(Month)) %>%
+        mutate(Month = mdy(Month),
+               Unit = Utilization,
+               Utilization = NULL)
+      
+      utilizationPlot <- unitPlot %>%
+        full_join(bedPlot,
+                  by = c("ProjectID", "ProjectName", "ProjectType", "Month")) %>%
+        gather("UtilizationType",
+               "Utilization",
+               -ProjectID, -ProjectName, -ProjectType, -Month) %>%
         arrange(Month)
       
-      ggplot(unitPlot,
-             aes(x = Month, 
-                 y = Utilization, 
-                 group = 1, 
-                 color = "Unit Utilization")) +
-        theme_light() + 
-        geom_line() + 
-        scale_y_continuous(limits = c(0,2),
+      ggplot(utilizationPlot,
+             aes(x = Month,
+                 y = Utilization,
+                 color = UtilizationType)) +
+        theme_light() +
+        geom_line() +
+        scale_y_continuous(limits = c(0, 2),
                            labels = scales::percent_format(accuracy = 1)) +
         scale_x_date(date_labels = "%B %Y", date_minor_breaks = "1 month") +
-        geom_line(data = bedPlot,
-                  aes(x = Month,
-                      y = Utilization,
-                      group = 1,
-                      color = "Bed Utilization")) +
         xlab(input$providerListUtilization) +
-        ggtitle(paste("Date Range:", 
-                      format.Date(ReportStart, "%b %Y"), 
-                      "to", 
-                      format.Date(ReportEnd, "%b %Y"))) 
-        
+        ggtitle(paste(
+          "Date Range:",
+          format.Date(ReportStart, "%b %Y"),
+          "to",
+          format.Date(ReportEnd, "%b %Y")
+        ))
+      
     })
   
   output$CountyScoresText <-
