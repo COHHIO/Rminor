@@ -73,14 +73,21 @@ dashboardPage(
         ),
         #             chooseSliderSkin("Round"),
         setSliderColor("#56B4E9", 1),
-        sliderInput(
-          "utilizationDateSlider",
-          "Choose END DATE",
-          min = floor_date(today() - years(2), unit = "month"),
-          max = ceiling_date(today(), unit = "month") - 1,
-          value = floor_date(today(), unit = "month"),
-          timeFormat = "%b %Y"
+        sliderTextInput(
+          "testingtesting",
+          label = "Select END DATE",
+          choices = choices_month,
+          selected = choices_month[24]
         ),
+        verbatimTextOutput("res"),
+        # sliderInput(
+        #   "utilizationDateSlider",
+        #   "Choose END DATE",
+        #   min = floor_date(today() - years(2), unit = "month"),
+        #   max = ceiling_date(today(), unit = "month") - 1,
+        #   value = floor_date(today(), unit = "month"),
+        #   timeFormat = "%b %Y"
+        # ),
         plotOutput("bedPlot")
       ), 
       tabItem(
