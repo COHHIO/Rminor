@@ -1,6 +1,16 @@
 
 
 function(input, output, session) {
+  output$res <- renderPrint({
+    print(ymd(paste0(substr(input$testingtesting, 
+                            str_length(input$testingtesting) - 4,
+                            str_length(input$testingtesting)),
+                     substr(input$testingtesting, 1, 
+                            str_length(input$testingtesting) - 5),
+                     "01")) +
+            months(1) - 1
+          )
+  })
   observeEvent(c(input$providerList), {
     output$currentHHs <-
       if (nrow(Utilization %>%
@@ -207,8 +217,16 @@ function(input, output, session) {
   
   output$bedPlot <-
     renderPlot({
-      ReportStart <- input$utilizationDateSlider - years(1)
-      ReportEnd <- input$utilizationDateSlider - days(1)
+      ReportEnd <- ymd(paste0(substr(input$testingtesting, 
+                                     str_length(input$testingtesting) - 4,
+                                     str_length(input$testingtesting)),
+                              substr(input$testingtesting, 1, 
+                                     str_length(input$testingtesting) - 5),
+                              "01")) +
+        months(1) - 1
+      ReportStart <- floor_date(ymd(ReportEnd), unit = "month") - 
+        years(1) + 
+        months(1)
       ReportingPeriod <- interval(ymd(ReportStart), ymd(ReportEnd))
       
       bedPlot <- BedUtilization %>% select(-FilePeriod) %>%
@@ -219,7 +237,7 @@ function(input, output, session) {
                -ProjectType) %>%
         filter(ProjectName == input$providerListUtilization,
                mdy(Month) %within% ReportingPeriod) %>%
-        mutate(Month = mdy(Month),
+        mutate(Month = floor_date(mdy(Month), unit = "month"),
                Bed = Utilization,
                Utilization = NULL)
       
@@ -231,7 +249,7 @@ function(input, output, session) {
                -ProjectType) %>%
         filter(ProjectName == input$providerListUtilization,
                mdy(Month) %within% ReportingPeriod) %>%
-        mutate(Month = mdy(Month),
+        mutate(Month = floor_date(mdy(Month), unit = "month"),
                Unit = Utilization,
                Utilization = NULL)
       
@@ -251,13 +269,14 @@ function(input, output, session) {
         geom_line() +
         scale_y_continuous(limits = c(0, 2),
                            labels = scales::percent_format(accuracy = 1)) +
-        scale_x_date(date_labels = "%B %Y", date_minor_breaks = "1 month") +
+        scale_x_date(date_labels = "%B %Y", date_breaks = "3 months",
+                     minor_breaks = "1 month") +
         xlab(input$providerListUtilization) +
         ggtitle(paste(
           "Date Range:",
-          format.Date(ReportStart, "%b %Y"),
+          format.Date(ymd(ReportStart), "%b %Y"),
           "to",
-          format.Date(ReportEnd, "%b %Y")
+          format.Date(ymd(ReportEnd), "%b %Y")
         ))
       
     })
