@@ -2,11 +2,11 @@
 
 function(input, output, session) {
   output$res <- renderPrint({
-    print(ymd(paste0(substr(input$testingtesting, 
-                            str_length(input$testingtesting) - 4,
-                            str_length(input$testingtesting)),
-                     substr(input$testingtesting, 1, 
-                            str_length(input$testingtesting) - 5),
+    print(ymd(paste0(substr(input$utilizationSlider, 
+                            str_length(input$utilizationSlider) - 4,
+                            str_length(input$utilizationSlider)),
+                     substr(input$utilizationSlider, 1, 
+                            str_length(input$utilizationSlider) - 5),
                      "01")) +
             months(1) - 1
           )
@@ -187,41 +187,38 @@ function(input, output, session) {
         left_join(., Regions, by = c("CountyServed" = "County")) %>%
         filter(RegionName == input$regionList)
 # the plot      
-      ggplot(
-        Compare,
-        aes(x = CountyServed, y = AverageScore)
-      ) +
-        geom_point(
-          aes(x = CountyServed, y = AverageScore),
-          size = 14,
-          shape = 95
-        ) +
+      ggplot(Compare, aes(x = CountyServed, y = AverageScore)) +
+        geom_point(size = 14, shape = 95) +
         scale_y_continuous(limits = c(0,17)) +
-        theme(axis.text.x = element_text(size = 10)) +
         geom_point(
-          aes(x = CountyServed, y = HousedAverageScore),
+          aes(y = HousedAverageScore),
           size = 8,
           shape = 17,
           colour = "#56B4E9"
         ) +
-        xlab(input$regionList) +
+        xlab("County Where Served") +
         ylab("Average SPDAT Score") +
-        ggtitle(paste("Date Range:", ReportStart, "to", ReportEnd)) +
+        labs(title = input$regionList, subtitle = paste("Date Range:", ReportStart, "to", ReportEnd)) +
         theme_light() + 
-        theme(plot.title = element_text(lineheight = 1, size = rel(1.8)),
+        theme(plot.title = element_text(lineheight = 5, size = rel(1.8)),
               axis.text.x = element_text(size = rel(1.8)),
               axis.text.y = element_text(size = rel(1.8)),
-              axis.title = element_text(size = rel(1.8)),
-              plot.margin = margin(t = 15, r = 15, b = 15, l = 15))
+              plot.margin = margin(t = 15, r = 15, b = 15, l = 15)
+              ) +
+        labs(
+          caption = "VI-SPDAT scores and household enrollment data comes from
+          the Ohio Balance of State CoC HMIS. Detail may be found at R minor 
+          elevated."
+        )
     })
   
   output$bedPlot <-
     renderPlot({
-      ReportEnd <- ymd(paste0(substr(input$testingtesting, 
-                                     str_length(input$testingtesting) - 4,
-                                     str_length(input$testingtesting)),
-                              substr(input$testingtesting, 1, 
-                                     str_length(input$testingtesting) - 5),
+      ReportEnd <- ymd(paste0(substr(input$utilizationSlider, 
+                                     str_length(input$utilizationSlider) - 4,
+                                     str_length(input$utilizationSlider)),
+                              substr(input$utilizationSlider, 1, 
+                                     str_length(input$utilizationSlider) - 5),
                               "01")) +
         months(1) - 1
       ReportStart <- floor_date(ymd(ReportEnd), unit = "month") - 
@@ -271,13 +268,19 @@ function(input, output, session) {
                            labels = scales::percent_format(accuracy = 1)) +
         scale_x_date(date_labels = "%B %Y", date_breaks = "3 months",
                      minor_breaks = "1 month") +
-        xlab(input$providerListUtilization) +
-        ggtitle(paste(
-          "Date Range:",
-          format.Date(ymd(ReportStart), "%b %Y"),
-          "to",
-          format.Date(ymd(ReportEnd), "%b %Y")
-        ))
+        scale_colour_manual(values = c("#56B4E9", "#6be956"))+
+        labs(
+          title = input$providerListUtilization,
+          subtitle = paste(
+            "Date Range:",
+            format.Date(ymd(ReportStart), "%b %Y"),
+            "to",
+            format.Date(ymd(ReportEnd), "%b %Y")
+          ),
+          caption = "Client and household enrollment data comes from the Ohio 
+          Balance of State CoC HMIS. This visualization was created by the 
+          COHHIO HMIS team."
+        )
       
     })
   
