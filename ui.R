@@ -1,126 +1,145 @@
-dashboardPage(
-  skin = "black",
-  dashboardHeader(title = "R minor"),
-  dashboardSidebar(
-    sidebarMenu(
-      id = "sidebarmenuid",
-      menuItem("Provider Dashboard",
-               tabName = "providerDashboardTab"),
-      menuItem("CoC Competition",
-               tabName = "cocCompetitionTab"),
-      menuItem("Performance and Outcomes",
-        menuSubItem("Bed and Unit Utilization",
-                    tabName = "utilizationTab"),
-        menuSubItem("Community Need (by County)",
-                    tabName = "spdatTab"),
-        menuSubItem("Length of Stay",
-                    tabName = "LoSTab"),
-        menuSubItem("Exits to Permanent Housing",
-                    tabName = "PHTab"),
-        menuSubItem("Non-Cash Benefits at Exit",
-                    tabName = "NCBTab"),
-        menuSubItem("Health Insurance at Exit",
-                    tabName = "HITab"),
-        menuSubItem("Income Growth",
-                    tabName = "incomeTab"),
-        menuSubItem("Recurrence",
-                    tabName = "recurrenceTab"),
-        menuSubItem("Rapid Placement for RRH",
-                    tabName = "rapidTab"),
-        menuSubItem("RRH HP Spending",
-                    tabName = "spendingTab")
-      )
-    ),
-    HTML(paste0(
-      "<br>&emsp;Last update:&emsp;",
-      format(updatedate, "%m-%d-%Y %I:%M %p", tz = "US/Eastern")#,
-      #      "<br>&emsp;Happy Passover and Easter and Spring Equinox!"
-    ))
-  ),
-  dashboardBody(
-    tabItems(
-      tabItem(
-        tabName = "providerDashboardTab",
-        pickerInput(
-          inputId = "providerList",
-          choices = c(providerids$ProjectName),
-          options = list(`live-search` = TRUE),
-          width = "100%"
-        ),
-        infoBoxOutput("currentHHs"),
-        infoBoxOutput("currentUnits"),
-        infoBoxOutput("currentUnitUtilization"),
-        infoBoxOutput("currentClients"),
-        infoBoxOutput("currentBeds"),
-        infoBoxOutput("currentBedUtilization")
+tagList(
+  dashboardPage(
+    skin = "black",
+    dashboardHeader(title = "R minor"),
+    dashboardSidebar(
+      sidebarMenu(
+        id = "sidebarmenuid",
+        menuItem("Provider Dashboard",
+                 tabName = "providerDashboardTab"),
+        menuItem("CoC Competition",
+                 tabName = "cocCompetitionTab"),
+        menuItem(
+          "Performance and Outcomes",
+          menuSubItem("Bed and Unit Utilization",
+                      tabName = "utilizationTab"),
+          menuSubItem("Community Need (by County)",
+                      tabName = "spdatTab"),
+          menuSubItem("Length of Stay",
+                      tabName = "LoSTab"),
+          menuSubItem("Exits to Permanent Housing",
+                      tabName = "PHTab"),
+          menuSubItem("Non-Cash Benefits at Exit",
+                      tabName = "NCBTab"),
+          menuSubItem("Health Insurance at Exit",
+                      tabName = "HITab"),
+          menuSubItem("Income Growth",
+                      tabName = "incomeTab"),
+          menuSubItem("Recurrence",
+                      tabName = "recurrenceTab"),
+          menuSubItem("Rapid Placement for RRH",
+                      tabName = "rapidTab"),
+          menuSubItem("RRH HP Spending",
+                      tabName = "spendingTab")
+        )
       ),
-      tabItem(tabName = "cocCompetitionTab"),
-      tabItem(tabName = "LoSTab"),
-      tabItem(tabName = "PHTab"),
-      tabItem(tabName = "NCBTab"),
-      tabItem(tabName = "HITab"),
-      tabItem(tabName = "incomeTab"),
-      tabItem(tabName = "recurrenceTab"),
-      tabItem(tabName = "rapidTab"),
-      tabItem(tabName = "spendingTab"),
-      tabItem(
-        tabName = "utilizationTab",
-        pickerInput(
-          inputId = "providerListUtilization",
-          choices = c(sort(BedUtilization$ProjectName)),
-          options = list(`live-search` = TRUE),
-          width = "100%"
+      HTML(paste0(
+        "<br>&emsp;Last update:&emsp;",
+        format(updatedate, "%m-%d-%Y %I:%M %p", tz = "US/Eastern")#,
+        #      "<br>&emsp;Happy Passover and Easter and Spring Equinox!"
+      ))
+    ),
+    dashboardBody(
+      tabItems(
+        tabItem(
+          tabName = "providerDashboardTab",
+          pickerInput(
+            inputId = "providerList",
+            choices = c(providerids$ProjectName),
+            options = list(`live-search` = TRUE),
+            width = "100%"
+          ),
+          infoBoxOutput("currentHHs"),
+          infoBoxOutput("currentUnits"),
+          infoBoxOutput("currentUnitUtilization"),
+          infoBoxOutput("currentClients"),
+          infoBoxOutput("currentBeds"),
+          infoBoxOutput("currentBedUtilization")
         ),
-        #             chooseSliderSkin("Round"),
-        setSliderColor("#56B4E9", 1),
-        sliderTextInput(
-          "testingtesting",
-          label = "Select END DATE",
-          choices = choices_month,
-          selected = choices_month[24]
+        tabItem(tabName = "cocCompetitionTab"),
+        tabItem(tabName = "LoSTab"),
+        tabItem(tabName = "PHTab"),
+        tabItem(tabName = "NCBTab"),
+        tabItem(tabName = "HITab"),
+        tabItem(tabName = "incomeTab"),
+        tabItem(tabName = "recurrenceTab"),
+        tabItem(tabName = "rapidTab"),
+        tabItem(tabName = "spendingTab"),
+        tabItem(
+          tabName = "utilizationTab",
+          pickerInput(
+            inputId = "providerListUtilization",
+            choices = c(sort(BedUtilization$ProjectName)),
+            options = list(`live-search` = TRUE),
+            width = "100%"
+          ),
+          setSliderColor("#56B4E9", 1),
+          sliderTextInput(
+            "utilizationSlider",
+            label = "Select END DATE",
+            choices = choices_month,
+            selected = choices_month[24]
+          ),
+          # verbatimTextOutput("res"),
+          # sliderInput(
+          plotOutput("bedPlot")
         ),
-        verbatimTextOutput("res"),
-        # sliderInput(
-        #   "utilizationDateSlider",
-        #   "Choose END DATE",
-        #   min = floor_date(today() - years(2), unit = "month"),
-        #   max = ceiling_date(today(), unit = "month") - 1,
-        #   value = floor_date(today(), unit = "month"),
-        #   timeFormat = "%b %Y"
-        # ),
-        plotOutput("bedPlot")
-      ), 
-      tabItem(
-        tabName = "spdatTab",
-        pickerInput(
-          inputId = "regionList",
-          choices = c(unique(Regions$RegionName)),
-          options = list(`live-search` = TRUE),
-          width = "70%"
-        ),
-        chooseSliderSkin("Round"),
-        setSliderColor("#56B4E9", 1),
-        sliderTextInput(
-          "spdatSlider",
-          "",
-          c(unique(Sys.yearqtr() - 6/4 : Sys.yearqtr() + 1/4)),
-          selected = Sys.yearqtr() - 1/4
-        ),
-        plotOutput("SPDATScoresByCounty"),
-        HTML("<br>"),
-        box(textOutput("CountyScoresText"), 
+        tabItem(
+          tabName = "spdatTab",
+          pickerInput(
+            inputId = "regionList",
+            choices = c(unique(Regions$RegionName)),
+            options = list(`live-search` = TRUE),
+            width = "70%"
+          ),
+          chooseSliderSkin("Round"),
+          setSliderColor("#56B4E9", 1),
+          sliderTextInput("spdatSlider",
+                          "",
+                          c(
+                            unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
+                          ),
+                          selected = Sys.yearqtr() - 1 / 4),
+          plotOutput("SPDATScoresByCounty"),
+          HTML("<br>"),
+          box(
+            textOutput("CountyScoresText"),
             title = "The Lines",
-            collapsible = TRUE, 
-            collapsed = TRUE),
-        box(textOutput("HHsServedScoresText"), 
+            collapsible = TRUE,
+            collapsed = TRUE
+          ),
+          box(
+            textOutput("HHsServedScoresText"),
             title = "The Triangles",
-            collapsible = TRUE, 
-            collapsed = TRUE),
-        box(textOutput("NoteToUsers"), 
+            collapsible = TRUE,
+            collapsed = TRUE
+          ),
+          box(
+            textOutput("NoteToUsers"),
             title = "A Note about Data Quality",
-            collapsible = TRUE, 
-            collapsed = TRUE)
+            collapsible = TRUE,
+            collapsed = TRUE
+          )
+        )
       )
     )
+  ),
+  tags$footer(
+    HTML(
+      "<p>R minor is created and maintained by the Coalition on Homelessness and
+  Housing in Ohio (COHHIO)'s HMIS team.
+  <p>R Core Team (2019). R: A language and environment for statistical
+  computing. R Foundation for Statistical Computing, Vienna, Austria. URL
+  https://www.R-project.org/.
+  <p>Hadley Wickham (2017). tidyverse: Easily Install and Load the
+  'Tidyverse'. R package version 1.2.1.
+  https://CRAN.R-project.org/package=tidyverse
+  <p>Winston Chang, Joe Cheng, JJ Allaire, Yihui Xie and Jonathan McPherson
+  (2019). shiny: Web Application Framework for R. R package version
+  1.3.2. https://CRAN.R-project.org/package=shiny and shinydashboard: Create
+  Dashboards with 'Shiny'. R package version 0.7.1.
+  https://CRAN.R-project.org/package=shinydashboard"
+    ), 
+    style = "width:100%; color: white; padding: 10px; background-color: black"
   )
 )
