@@ -188,24 +188,24 @@ function(input, output, session) {
         filter(RegionName == input$regionList)
 # the plot      
       ggplot(Compare, aes(x = CountyServed, y = AverageScore)) +
-        geom_point(size = 14, shape = 95) +
+        geom_point(size = 12, shape = 95) +
         scale_y_continuous(limits = c(0,17)) +
         geom_point(
           aes(y = HousedAverageScore),
-          size = 8,
+          size = 6,
           shape = 17,
           colour = "#56B4E9"
         ) +
         xlab("County Where Served") +
         ylab("Average SPDAT Score") +
-        labs(title = input$regionList, subtitle = paste("Date Range:", ReportStart, "to", ReportEnd)) +
         theme_light() + 
         theme(plot.title = element_text(lineheight = 5, size = rel(1.8)),
               axis.text.x = element_text(size = rel(1.8)),
               axis.text.y = element_text(size = rel(1.8)),
               plot.margin = margin(t = 15, r = 15, b = 15, l = 15)
               ) +
-        labs(
+        labs(title = input$regionList, 
+             subtitle = paste("Date Range:", ReportStart, "to", ReportEnd),
           caption = "VI-SPDAT scores and household enrollment data comes from
           the Ohio Balance of State CoC HMIS. Detail may be found at R minor 
           elevated."
@@ -263,7 +263,8 @@ function(input, output, session) {
                  y = Utilization,
                  color = UtilizationType)) +
         theme_light() +
-        geom_line() +
+        geom_line(size = 1) +
+        geom_point(size = 2) +
         scale_y_continuous(limits = c(0, 2),
                            labels = scales::percent_format(accuracy = 1)) +
         scale_x_date(date_labels = "%B %Y", date_breaks = "3 months",
