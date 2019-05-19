@@ -292,4 +292,52 @@ function(input, output, session) {
   
   output$NoteToUsers <-
     renderText(noteToUsers)
+  
+  output$QPRLoSPlot <- 
+    renderPlot({
+      ReportStart <- format.Date(ymd(paste0(
+        substr(input$LoSSlider, 1, 4), 
+        "-01-01")), "%m-%d-%Y")
+      ReportEnd <- format.Date(mdy(paste0(
+        case_when(
+          substr(input$LoSSlider, 7, 7) == 1 ~ "03-31-",
+          substr(input$LoSSlider, 7, 7) == 2 ~ "06-30",
+          substr(input$LoSSlider, 7, 7) == 3 ~ "09-30-",
+          substr(input$LoSSlider, 7, 7) == 4 ~ "12-31-"
+        ),
+        substr(input$LoSSlider, 1, 4)
+      )), "%m-%d-%Y")
+      
+      LoSDetail <- QPR_EEs %>% 
+        filter(((!is.na(MoveInDateAdjust) & ProjectType %in% c(3, 9, 13)) |
+                  ProjectType %in% c(1, 2, 4, 8, 12)) &
+                 !is.na(ExitDate) &
+                 exited_between(., ReportStart, ReportEnd)
+                 ) 
+      
+      LoSSummary <- LoSDetail %>%
+        mutate(Short_Provider = paste(substr(ProjectName, 1, 10), "...", 
+                                      substr(ProjectName, 
+                                             str_length(ProjectName)-10, 
+                                             str_length(ProjectName))),
+               ProjectType = case_when(
+                 ProjectType == 1 ~ "Emergency Shelter",
+                 ProjectType == 2 ~ "Transitional Housing",
+                 ProjectType %in% c(3, 9) ~ "Permanent Supportive Housing",
+                 ProjectType == 4 ~ "Street Outreach",
+                 ProjectType == 8 ~ "Safe Haven",
+                 ProjectType == 12 ~ "Prevention",
+                 ProjectType == 13 ~ "Rapid Rehousing"
+               )) %>%
+        group_by(ProjectName, Short_Provider, ProjectType) %>%
+        summarise(avg = mean(DaysinProject, na.rm = TRUE),
+                  median = median(DaysinProject, na.rm = TRUE))
+      
+      ggplot(LoSSummary, 
+             aes(x = Short_Provider)) +
+        geom_col(aes(y = as.numeric(avg), fill = ProjectType)) +
+        theme(axis.text.x = element_text(angle = 45)) +
+        xlab("Project Name") + 
+        ylab("Average")
+    })
 }
