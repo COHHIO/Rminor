@@ -49,13 +49,9 @@ tagList(
             options = list(`live-search` = TRUE),
             width = "100%"
           ),
-          infoBoxOutput("currentHHs"),
-          infoBoxOutput("currentUnits"),
           infoBoxOutput("currentUnitUtilization"),
-          infoBoxOutput("currentClients"),
-          infoBoxOutput("currentBeds"),
           infoBoxOutput("currentBedUtilization"),
-          plotOutput("veteranEngagement")
+          infoBoxOutput("veteranEngagement")
         ), # tabItem providerDashboard
         tabItem(tabName = "cocCompetitionTab"),
         tabItem(tabName = "LoSTab"),

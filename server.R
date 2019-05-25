@@ -12,50 +12,6 @@ function(input, output, session) {
           )
   })
   observeEvent(c(input$providerList), {
-    output$currentHHs <-
-      if (nrow(Utilization %>%
-               filter(
-                 ProjectName == input$providerList &
-                 ProjectType %in% c(1, 2, 3, 8, 9)
-               )) > 0)
-      {
-        renderInfoBox({
-          infoBox(
-            "Current Households",
-            color = "aqua",
-            icon = icon("users"),
-            Utilization %>%
-              filter(ProjectName == input$providerList) %>%
-              select(Households)
-          )
-        })
-      }
-    else{
-      
-    }
-    
-    output$currentUnits <-
-      if (nrow(Utilization %>%
-               filter(
-                 ProjectName == input$providerList &
-                 ProjectType %in% c(1, 2, 3, 8, 9)
-               )) > 0)
-      {
-        renderInfoBox({
-          infoBox(
-            "Unit Capacity",
-            color = "aqua",
-            icon = icon("building"),
-            Utilization %>%
-              filter(ProjectName == input$providerList) %>%
-              select(UnitCount)
-          )
-        })
-      }
-    else{
-      
-    }
-    
 
     output$currentUnitUtilization <-
       if (nrow(Utilization %>%
@@ -66,56 +22,22 @@ function(input, output, session) {
       {
         renderInfoBox({
           infoBox(
-            "Current Unit Utilization",
+            title = "Current Unit Utilization",
+            subtitle = paste(
+              Utilization %>%
+                filter(ProjectName == input$providerList) %>%
+                select(Households),
+              "Current Households in",
+              Utilization %>%
+                filter(ProjectName == input$providerList) %>%
+                select(UnitCount),
+              "Units"
+            ),
             color = "aqua",
             icon = icon("building"),
             Utilization %>%
               filter(ProjectName == input$providerList) %>%
               select(UnitUtilization)
-          )
-        })
-      }
-    else{
-      
-    }
-    
-    output$currentClients <-
-      if (nrow(Utilization %>%
-               filter(
-                 ProjectName == input$providerList &
-                 ProjectType %in% c(1, 2, 3, 8, 9)
-               )) > 0)
-      {
-        renderInfoBox({
-          infoBox(
-            "Current Clients",
-            color = "purple",
-            icon = icon("user"),
-            Utilization %>%
-              filter(ProjectName == input$providerList) %>%
-              select(Clients)
-          )
-        })
-      }
-    else{
-      
-    }
-    
-    output$currentBeds <-
-      if (nrow(Utilization %>%
-               filter(
-                 ProjectName == input$providerList &
-                 ProjectType %in% c(1, 2, 3, 8, 9)
-               )) > 0)
-      {
-        renderInfoBox({
-          infoBox(
-            "Bed Capacity",
-            color = "purple",
-            icon = icon("bed"),
-            Utilization %>%
-              filter(ProjectName == input$providerList) %>%
-              select(BedCount)
           )
         })
       }
@@ -131,7 +53,17 @@ function(input, output, session) {
                )) > 0) {
         renderInfoBox({
           infoBox(
-            "Current Bed Utilization",
+            title = "Current Bed Utilization",
+            subtitle = paste(
+              Utilization %>%
+                filter(ProjectName == input$providerList) %>%
+                select(Clients),
+              "Current Clients in",
+              Utilization %>%
+                filter(ProjectName == input$providerList) %>%
+                select(BedCount),
+              "Beds"
+            ),
             color = "purple",
             icon = icon("bed"),
             Utilization %>%
@@ -150,28 +82,17 @@ function(input, output, session) {
         filter(ProjectName == input$providerList) %>%
         select(Veterans)
       ) > 0) {
-        renderPlot({
-          ggplot(
-            plotVetsData %>% filter(ProjectName == input$providerList),
-            aes(x = ProjectName, y = CurrentVeteranCount,
-                fill = EngagementStatus)
-          ) +
-            scale_discrete_manual(
-              aesthetics = c("colour", "fill"),
-              values = c(
-                "Has Current Housing Plan" = "#00B200",
-                "No Current Housing Plan" = "gray"
-              )
-            ) +
-            geom_col(width = .5) +
-            coord_flip() +
-            theme_minimal() +
-            theme(
-              axis.text.y = element_blank(),
-              axis.title.y = element_blank(),
-              axis.title.x = element_blank()
-            ) +
-            labs(title = "Veterans Currently in This Project")
+        renderInfoBox({
+          infoBox(
+            title = "Current Veterans",
+            subtitle = VetEngagementSummary %>%
+              filter(ProjectName == input$providerList) %>% pull(Summary),
+            color = "green",
+            icon = icon("ribbon"),
+            CurrentVeteranCounts %>%
+              filter(ProjectName == input$providerList) %>%
+              select(Veterans)
+          )
         })
       }
     else {
