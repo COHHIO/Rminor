@@ -150,26 +150,32 @@ function(input, output, session) {
         filter(ProjectName == input$providerList) %>%
         select(Veterans)
       ) > 0) {
-        renderText({
-          paste0(
-            "Of the ",
-            CurrentVeteranCounts %>%
-              filter(ProjectName == input$providerList) %>%
-              select(Veterans),
-            " veterans currently in this project, ",
-            CurrentVeteranCounts %>%
-              filter(ProjectName == input$providerList) %>%
-              select(HasHousingPlan),
-            " have a Housing Plan and ",
-            CurrentVeteranCounts %>%
-              filter(ProjectName == input$providerList) %>%
-              select(HasCurrentOffer),
-            " have a current Housing Offer."
-          )
+        renderPlot({
+          ggplot(
+            plotVetsData %>% filter(ProjectName == input$providerList),
+            aes(x = ProjectName, y = CurrentVeteranCount,
+                fill = EngagementStatus)
+          ) +
+            scale_discrete_manual(
+              aesthetics = c("colour", "fill"),
+              values = c(
+                "Has Current Housing Plan" = "#00B200",
+                "No Current Housing Plan" = "gray"
+              )
+            ) +
+            geom_col(width = .5) +
+            coord_flip() +
+            theme_minimal() +
+            theme(
+              axis.text.y = element_blank(),
+              axis.title.y = element_blank(),
+              axis.title.x = element_blank()
+            ) +
+            labs(title = "Veterans Currently in This Project")
         })
       }
     else {
-      renderText("There are no known Veterans in this project at this time.")
+      
     }
 
   })
