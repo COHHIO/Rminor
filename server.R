@@ -143,6 +143,35 @@ function(input, output, session) {
     else{
       
     }
+    
+    output$veteranEngagement <-
+      if (nrow(
+        CurrentVeteranCounts %>%
+        filter(ProjectName == input$providerList) %>%
+        select(Veterans)
+      ) > 0) {
+        renderText({
+          paste0(
+            "Of the ",
+            CurrentVeteranCounts %>%
+              filter(ProjectName == input$providerList) %>%
+              select(Veterans),
+            " veterans currently in this project, ",
+            CurrentVeteranCounts %>%
+              filter(ProjectName == input$providerList) %>%
+              select(HasHousingPlan),
+            " have a Housing Plan and ",
+            CurrentVeteranCounts %>%
+              filter(ProjectName == input$providerList) %>%
+              select(HasCurrentOffer),
+            " have a current Housing Offer."
+          )
+        })
+      }
+    else {
+      renderText("There are no known Veterans in this project at this time.")
+    }
+
   })
 
   output$SPDATScoresByCounty <- 
