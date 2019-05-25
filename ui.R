@@ -55,30 +55,25 @@ tagList(
           infoBoxOutput("currentClients"),
           infoBoxOutput("currentBeds"),
           infoBoxOutput("currentBedUtilization"),
-          box(
-            title = "Veteran Engagement",
-            background = "blue",
-            width = 4,
-            textOutput("veteranEngagement")
-          )
-        ),
+          plotOutput("veteranEngagement")
+        ), # tabItem providerDashboard
         tabItem(tabName = "cocCompetitionTab"),
-        tabItem(tabName = "LoSTab"#,
-                # pickerInput(
-                #   inputId = "regionListLoS",
-                #   choices = c(unique(Regions$RegionName)),
-                #   options = list(`live-search` = TRUE),
-                #   width = "70%"
-                # ),
-                # setSliderColor("#56B4E9", 1),
-                # sliderTextInput("LoSSlider",
-                #                 "",
-                #                 c(
-                #                   unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
-                #                 ),
-                #                 selected = Sys.yearqtr() - 1 / 4)#,
-                # # plotOutput("QPRLoSPlot")
-                ),
+        tabItem(tabName = "LoSTab"),
+        #,
+        # pickerInput(
+        #   inputId = "regionListLoS",
+        #   choices = c(unique(Regions$RegionName)),
+        #   options = list(`live-search` = TRUE),
+        #   width = "70%"
+        # ),
+        # setSliderColor("#56B4E9", 1),
+        # sliderTextInput("LoSSlider",
+        #                 "",
+        #                 c(
+        #                   unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
+        #                 ),
+        #                 selected = Sys.yearqtr() - 1 / 4)#,
+        # # plotOutput("QPRLoSPlot")),
         tabItem(tabName = "PHTab"),
         tabItem(tabName = "NCBTab"),
         tabItem(tabName = "HITab"),
@@ -104,7 +99,7 @@ tagList(
           # verbatimTextOutput("res"),
           # sliderInput(
           plotOutput("bedPlot")
-        ),
+        ), # tabItem utilizationTab
         tabItem(
           tabName = "spdatTab",
           pickerInput(
@@ -141,8 +136,8 @@ tagList(
             collapsible = TRUE,
             collapsed = TRUE
           )
-        )
-      )
+        ) #tabItem SPDAT tab
+      ) # tabItems
     )
   ),
   tags$footer(
@@ -160,7 +155,7 @@ tagList(
   1.3.2. https://CRAN.R-project.org/package=shiny and shinydashboard: Create
   Dashboards with 'Shiny'. R package version 0.7.1.
   https://CRAN.R-project.org/package=shinydashboard"
-    ), 
+    ),
     style = "width:100%; color: white; padding: 10px; background-color: black"
   )
 )
