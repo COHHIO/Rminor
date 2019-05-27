@@ -65,10 +65,8 @@ tagList(
         selectInput(inputId = "LoSRegionSelect", 
                     "Select Region(s)", 
                     choices = choices_regions,
-                    multiple = TRUE),
-        selectInput(inputId = "LoSProjectTypeSelect",
-                    "Select Project Type",
-                    choices = choices_project_type),
+                    multiple = TRUE,
+                    selected = "Homeless Planning Region 5"),
         plotOutput("QPRLoSPlot")
         ), # tabItem LengthOfStay LoS
         tabItem(tabName = "PHTab"),
