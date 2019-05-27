@@ -25,3 +25,15 @@ choices_month <-
     by = "month",
     length.out = 24
   ), "%b %Y")
+
+choices_regions <- unique(Regions$RegionName)
+
+choices_project_type <- c(
+  "Emergency Shelter", 
+  "Transitional Housing", 
+  "Permanent Supportive Housing",
+  "Street Outreach", 
+  "Safe Haven", 
+  "Homelessness Prevention", 
+  "Rapid Rehousing"
+)

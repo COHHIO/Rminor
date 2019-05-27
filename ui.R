@@ -54,22 +54,23 @@ tagList(
           infoBoxOutput("veteranEngagement")
         ), # tabItem providerDashboard
         tabItem(tabName = "cocCompetitionTab"),
-        tabItem(tabName = "LoSTab"),
-        #,
-        # pickerInput(
-        #   inputId = "regionListLoS",
-        #   choices = c(unique(Regions$RegionName)),
-        #   options = list(`live-search` = TRUE),
-        #   width = "70%"
-        # ),
-        # setSliderColor("#56B4E9", 1),
-        # sliderTextInput("LoSSlider",
-        #                 "",
-        #                 c(
-        #                   unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
-        #                 ),
-        #                 selected = Sys.yearqtr() - 1 / 4)#,
-        # # plotOutput("QPRLoSPlot")),
+        tabItem(tabName = "LoSTab",
+        setSliderColor("#56B4E9", 1),
+        sliderTextInput("LoSSlider",
+                        "",
+                        c(
+                          unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
+                        ),
+                        selected = Sys.yearqtr() - 1 / 4),
+        selectInput(inputId = "LoSRegionSelect", 
+                    "Select Region(s)", 
+                    choices = choices_regions,
+                    multiple = TRUE),
+        selectInput(inputId = "LoSProjectTypeSelect",
+                    "Select Project Type",
+                    choices = choices_project_type),
+        plotOutput("QPRLoSPlot")
+        ), # tabItem LengthOfStay LoS
         tabItem(tabName = "PHTab"),
         tabItem(tabName = "NCBTab"),
         tabItem(tabName = "HITab"),

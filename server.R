@@ -265,12 +265,14 @@ function(input, output, session) {
         substr(input$LoSSlider, 1, 4)
       )), "%m-%d-%Y")
       
-      LoSDetail <- QPR_EEs %>% 
-        filter(((!is.na(MoveInDateAdjust) & ProjectType %in% c(3, 9, 13)) |
-                  ProjectType %in% c(1, 2, 4, 8, 12)) &
-                 !is.na(ExitDate) &
-                 exited_between(., ReportStart, ReportEnd)
-                 ) 
+      
+      LoSDetail <- QPR_EEs %>%
+        filter((((!is.na(MoveInDateAdjust) &
+                    ProjectType %in% c(3, 9, 13)) |
+                   (ProjectType %in% c(1, 2, 4, 8, 12)) &
+                   !is.na(ExitDate)
+        )) &
+          exited_between(., ReportStart, ReportEnd))
       
       LoSSummary <- LoSDetail %>%
         mutate(Short_Provider = paste(substr(ProjectName, 1, 10), "...", 
@@ -283,13 +285,19 @@ function(input, output, session) {
                  ProjectType %in% c(3, 9) ~ "Permanent Supportive Housing",
                  ProjectType == 4 ~ "Street Outreach",
                  ProjectType == 8 ~ "Safe Haven",
-                 ProjectType == 12 ~ "Prevention",
+                 ProjectType == 12 ~ "Homelessness Prevention",
                  ProjectType == 13 ~ "Rapid Rehousing"
-               )) %>%
+               ),
+               Region = paste("Homeless Planning Region", Region)
+               ) %>%
+        filter(ProjectType == input$LoSProjectTypeSelect &
+                 Region == input$LoSRegionSelect) %>%
         group_by(ProjectName, Short_Provider, ProjectType) %>%
         summarise(avg = mean(DaysinProject, na.rm = TRUE),
                   median = median(DaysinProject, na.rm = TRUE))
-      
+      # the way it is now is kinda nice but an idea is to get rid of the 
+      # project type picker and just display the various plots using
+      # patchwork so you can see all the plots at once for a region
       ggplot(LoSSummary, 
              aes(x = Short_Provider)) +
         geom_col(aes(y = as.numeric(avg), fill = ProjectType)) +
