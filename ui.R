@@ -67,7 +67,7 @@ tagList(
                     choices = choices_regions,
                     multiple = TRUE,
                     selected = "Homeless Planning Region 5"),
-        plotOutput("QPRLoSPlot")
+        plotlyOutput("QPRLoSPlot")
         ), # tabItem LengthOfStay LoS
         tabItem(tabName = "PHTab"),
         tabItem(tabName = "NCBTab"),

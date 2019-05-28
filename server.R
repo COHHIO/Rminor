@@ -251,7 +251,7 @@ function(input, output, session) {
     renderText(noteToUsers)
   
   output$QPRLoSPlot <- 
-    renderPlot({
+    renderPlotly({
       ReportStart <- format.Date(ymd(paste0(
         substr(input$LoSSlider, 1, 4), 
         "-01-01")), "%m-%d-%Y")
@@ -338,8 +338,7 @@ function(input, output, session) {
           label = "CoC Goal") +
         theme_light() +
         theme(axis.text.x = element_text(angle = 45, hjust = 1))
-     
-      
+
       
       sh <- ggplot(LoSSummary %>% filter(ProjectType == "Safe Haven"), 
                    aes(x = brokenProjectNames)) +
@@ -380,7 +379,9 @@ function(input, output, session) {
         theme_light() +
         theme(axis.text.x = element_text(angle = 45, hjust = 1))
       
-      es+sh+th+rrh
+      ggplotly(es)
 
-    })
+      
+
+          })
 }

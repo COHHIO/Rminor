@@ -4,7 +4,7 @@ library(shinyWidgets)
 library(lubridate)
 library(shinydashboard)
 library(scales)
-library(patchwork)
+library(plotly)
 library(zoo)
 
 updatedate <- file.info("data/Utilization.RData")$mtime
