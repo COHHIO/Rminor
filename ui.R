@@ -62,12 +62,22 @@ tagList(
                           unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
                         ),
                         selected = Sys.yearqtr() - 1 / 4),
-        selectInput(inputId = "LoSRegionSelect", 
+        pickerInput(inputId = "LoSRegionSelect", 
                     "Select Region(s)", 
                     choices = choices_regions,
+                    options = list(`actions-box` = TRUE),
                     multiple = TRUE,
-                    selected = "Homeless Planning Region 5"),
-        plotlyOutput("QPRLoSPlot")
+                    selected = "Homeless Planning Region 6"),
+        prettyRadioButtons(inputId = "radioAvgMeanLoS",
+                           label = "", 
+                           thick = TRUE,
+                           animation = "pulse", status = "info",
+                           choices = c("Average Days", "Median Days"),
+                           selected = "Average Days"),
+        plotlyOutput("QPRLoSPlotEE"),
+        plotlyOutput("QPRLoSPlotTH"),
+        plotlyOutput("QPRLoSPlotRRH"),
+        plotlyOutput("QPRLoSPlotSH")
         ), # tabItem LengthOfStay LoS
         tabItem(tabName = "PHTab"),
         tabItem(tabName = "NCBTab"),
