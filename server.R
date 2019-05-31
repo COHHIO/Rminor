@@ -337,33 +337,51 @@ function(input, output, session) {
                       as.integer(median(DaysinProject, na.rm = TRUE))
                   ))
       
+      esdata <- LoSSummary %>% filter(ProjectType == "Emergency Shelter")
+      
       es <-
         ggplot(
-          LoSSummary %>% filter(ProjectType == "Emergency Shelter"),
+          esdata,
           aes(x = FriendlyProjectName)
         ) +
         ggtitle("Emergency Shelter", subtitle = "date range") +
         geom_col(aes(y = Days), fill = "#7156e9") +
         ylab("Average Length of Stay") +
         xlab("") +
-        geom_hline(yintercept = as.integer(LoSGoals %>%
-                                             filter(ProjectType == 1) %>%
-                                             select(Goal))) +
-        annotate(
-          "text",
-          x = 0.65,
-          y = as.integer(LoSGoals %>%
-                           filter(ProjectType == 1) %>%
-                           select(Goal)) + 1,
-          label = "CoC Goal"
-        ) +
+        # geom_hline(yintercept = as.integer(LoSGoals %>%
+        #                                      filter(ProjectType == 1) %>%
+        #                                      select(Goal))) +
+        # annotate(
+        #   "text",
+        #   x = 0.65,
+        #   y = as.integer(LoSGoals %>%
+        #                    filter(ProjectType == 1) %>%
+        #                    select(Goal)) + 1,
+        #   label = "CoC Goal"
+        # ) +
         theme_light() +
         theme(axis.text.x = element_text(angle = 45))
       
-      ggplotly(es)
-      
-      
-      
+      plot_ly(data = esdata,
+              x = ~FriendlyProjectName,
+              y = ~Days) %>%
+        add_trace(type = "bar") %>%
+        layout(shapes=list(type='line', 
+                           xref = "x",
+                           yref = "y",
+                           x0= -.5,
+                           # x1= 5.5,
+                           y0 = as.integer(LoSGoals %>%
+                                             filter(ProjectType == 1) %>%
+                                             select(Goal)),
+                           y1= as.integer(LoSGoals %>%
+                                            filter(ProjectType == 1) %>%
+                                            select(Goal)), 
+                           line=list(width=1)
+        ),
+        title = 'Emergency Shelters',
+        yaxis = list(title = "Average Days", showgrid = TRUE),
+        xaxis = list(title = "Project Name", showgrid = TRUE))
       
     })
   
