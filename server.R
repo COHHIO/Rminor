@@ -338,45 +338,21 @@ function(input, output, session) {
                   ))
       
       esdata <- LoSSummary %>% filter(ProjectType == "Emergency Shelter")
-      
-      es <-
-        ggplot(
-          esdata,
-          aes(x = FriendlyProjectName)
-        ) +
-        ggtitle("Emergency Shelter", subtitle = "date range") +
-        geom_col(aes(y = Days), fill = "#7156e9") +
-        ylab("Average Length of Stay") +
-        xlab("") +
-        # geom_hline(yintercept = as.integer(LoSGoals %>%
-        #                                      filter(ProjectType == 1) %>%
-        #                                      select(Goal))) +
-        # annotate(
-        #   "text",
-        #   x = 0.65,
-        #   y = as.integer(LoSGoals %>%
-        #                    filter(ProjectType == 1) %>%
-        #                    select(Goal)) + 1,
-        #   label = "CoC Goal"
-        # ) +
-        theme_light() +
-        theme(axis.text.x = element_text(angle = 45))
+      esLoSGoal <- as.integer(LoSGoals %>%
+                                filter(ProjectType == 1) %>%
+                                select(Goal))
       
       plot_ly(data = esdata,
               x = ~FriendlyProjectName,
               y = ~Days) %>%
         add_trace(type = "bar") %>%
         layout(shapes=list(type='line', 
-                           xref = "x",
+                           xref = "paper",
                            yref = "y",
-                           x0= -.5,
-                           # x1= 5.5,
-                           y0 = as.integer(LoSGoals %>%
-                                             filter(ProjectType == 1) %>%
-                                             select(Goal)),
-                           y1= as.integer(LoSGoals %>%
-                                            filter(ProjectType == 1) %>%
-                                            select(Goal)), 
+                           x0= 0,
+                           x1= 1,
+                           y0 = esLoSGoal,
+                           y1 = esLoSGoal, 
                            line=list(width=1)
         ),
         title = 'Emergency Shelters',
