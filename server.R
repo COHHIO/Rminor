@@ -343,21 +343,25 @@ function(input, output, session) {
                                 select(Goal))
       
       plot_ly(data = esdata,
-              x = ~FriendlyProjectName,
-              y = ~Days) %>%
+              x = ~ FriendlyProjectName,
+              y = ~ Days) %>%
         add_trace(type = "bar") %>%
-        layout(shapes=list(type='line', 
-                           xref = "paper",
-                           yref = "y",
-                           x0= 0,
-                           x1= 1,
-                           y0 = esLoSGoal,
-                           y1 = esLoSGoal, 
-                           line=list(width=1)
-        ),
-        title = 'Emergency Shelters',
-        yaxis = list(title = "Average Days", showgrid = TRUE),
-        xaxis = list(title = "Project Name", showgrid = TRUE))
+        layout(
+          shapes = list(
+            type = 'line',
+            xref = "paper",
+            yref = "y",
+            x0 = 0,
+            x1 = 1,
+            y0 = esLoSGoal,
+            y1 = esLoSGoal,
+            line = list(width = 1),
+            name = "CoC Goal"
+          ),
+          title = 'Emergency Shelters',
+          yaxis = list(title = "Length of Stay (Days)", showgrid = TRUE),
+          xaxis = list(title = "", showgrid = TRUE)
+        )
       
     })
   
@@ -417,30 +421,31 @@ function(input, output, session) {
                     input$radioAvgMeanLoS == "Median Days" ~
                       as.integer(median(DaysinProject, na.rm = TRUE))))
       
-      th <-
-        ggplot(
-          LoSSummary %>% filter(ProjectType == "Transitional Housing"),
-          aes(x = FriendlyProjectName)
-        ) +
-        ylab("Average Length of Stay") +
-        xlab("") +
-        ggtitle("Transitional Housing", subtitle = "date range") +
-        geom_col(aes(y = Days), fill = "#56B4E9") +
-        geom_hline(yintercept = as.integer(LoSGoals %>%
-                                             filter(ProjectType == 2) %>%
-                                             select(Goal))) +
-        annotate(
-          "text",
-          x = 0.65,
-          y = as.integer(LoSGoals %>%
-                           filter(ProjectType == 2) %>%
-                           select(Goal)) + 1,
-          label = "CoC Goal"
-        ) +
-        theme_light() +
-        theme(axis.text.x = element_text(angle = 45))
+      thdata <- LoSSummary %>% filter(ProjectType == "Transitional Housing")
+      thLoSGoal <- as.integer(LoSGoals %>%
+                                filter(ProjectType == 2) %>%
+                                select(Goal))
       
-      ggplotly(th)
+      plot_ly(data = thdata,
+              x = ~ FriendlyProjectName,
+              y = ~ Days) %>%
+        add_trace(type = "bar") %>%
+        layout(
+          shapes = list(
+            type = 'line',
+            xref = "paper",
+            yref = "y",
+            x0 = 0,
+            x1 = 1,
+            y0 = thLoSGoal,
+            y1 = thLoSGoal,
+            line = list(width = 1),
+            name = "CoC Goal"
+          ),
+          title = 'Transitional Housing',
+          yaxis = list(title = "Length of Stay (Days)", showgrid = TRUE),
+          xaxis = list(title = "", showgrid = TRUE)
+        )
       
     })
   
@@ -501,30 +506,35 @@ function(input, output, session) {
                       as.integer(median(DaysinProject, na.rm = TRUE))
                   ))
       
-      sh <-
-        ggplot(LoSSummary %>% filter(ProjectType == "Safe Haven"),
-               aes(x = FriendlyProjectName)) +
-        ylab("Average Length of Stay") +
-        xlab("") +
-        ggtitle("Safe Haven", subtitle = "date range") +
-        geom_col(aes(y = Days), fill = "#56e98c") +
-        geom_hline(yintercept = as.integer(LoSGoals %>%
-                                             filter(ProjectType == 8) %>%
-                                             select(Goal))) +
-        annotate(
-          "text",
-          x = 0.65,
-          y = as.integer(LoSGoals %>%
-                           filter(ProjectType == 8) %>%
-                           select(Goal)) + 1,
-          label = "CoC Goal"
-        ) +
-        theme_light() +
-        theme(axis.text.x = element_text(angle = 45))
+      shdata <- LoSSummary %>% filter(ProjectType == "Safe Haven")
+      shLoSGoal <- as.integer(LoSGoals %>%
+                                filter(ProjectType == 8) %>%
+                                select(Goal))
       
-      
-      ggplotly(sh)
-      
+      plot_ly(data = shdata,
+              x = ~ FriendlyProjectName,
+              y = ~ Days) %>%
+        add_trace(type = "bar") %>%
+        layout(
+          shapes = list(
+            type = 'line',
+            xref = "paper",
+            yref = "y",
+            x0 = 0,
+            x1 = 1,
+            y0 = shLoSGoal,
+            y1 = shLoSGoal,
+            line = list(width = 1),
+            name = "CoC Goal"
+          ),
+          xaxis = list(rangemode = "tozero"), 
+          yaxis = list(rangemode = "tozero"),
+          title = 'Safe Haven',
+          yaxis = list(title = "Length of Stay (Days)", showgrid = TRUE),
+          xaxis = list(title = "", showgrid = TRUE)
+        )
+
+            
     })
   
   output$QPRLoSPlotRRH <-
@@ -584,30 +594,31 @@ function(input, output, session) {
                       as.integer(median(DaysinProject, na.rm = TRUE))
                   ))
       
-      rrh <-
-        ggplot(
-          LoSSummary %>% filter(ProjectType == "Rapid Rehousing"),
-          aes(x = FriendlyProjectName)
-        ) +
-        ylab("Average Length of Stay") +
-        xlab("") +
-        ggtitle("Rapid Rehousing", subtitle = "date range") +
-        geom_col(aes(y = Days), fill = "#ba56e9") +
-        geom_hline(yintercept = as.integer(LoSGoals %>%
-                                             filter(ProjectType == 13) %>%
-                                             select(Goal))) +
-        annotate(
-          "text",
-          x = 0.65,
-          y = as.integer(LoSGoals %>%
-                           filter(ProjectType == 13) %>%
-                           select(Goal)) + 1,
-          label = "CoC Goal"
-        ) +
-        theme_light() +
-        theme(axis.text.x = element_text(angle = 45))
+      rrhdata <- LoSSummary %>% filter(ProjectType == "Rapid Rehousing")
+      rrhLoSGoal <- as.integer(LoSGoals %>%
+                                filter(ProjectType == 13) %>%
+                                select(Goal))
       
-      ggplotly(rrh)
+      plot_ly(data = rrhdata,
+              x = ~ FriendlyProjectName,
+              y = ~ Days) %>%
+        add_trace(type = "bar") %>%
+        layout(
+          shapes = list(
+            type = 'line',
+            xref = "paper",
+            yref = "y",
+            x0 = 0,
+            x1 = 1,
+            y0 = rrhLoSGoal,
+            y1 = rrhLoSGoal,
+            line = list(width = 1),
+            name = "CoC Goal"
+          ),
+          title = 'Rapid Rehousing',
+          yaxis = list(title = "Length of Stay (Days)", showgrid = TRUE),
+          xaxis = list(title = "", showgrid = TRUE)
+        )
       
       
     })
