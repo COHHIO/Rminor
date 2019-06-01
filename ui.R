@@ -74,9 +74,16 @@ tagList(
                            animation = "pulse", status = "info",
                            choices = c("Average Days", "Median Days"),
                            selected = "Average Days"),
+        #verbatimTextOutput("res"),
         plotlyOutput("QPRLoSPlotEE"),
+        br(),
+        br(),
         plotlyOutput("QPRLoSPlotTH"),
+        br(),
+        br(),
         plotlyOutput("QPRLoSPlotRRH"),
+        br(),
+        br(),
         plotlyOutput("QPRLoSPlotSH")
         ), # tabItem LengthOfStay LoS
         tabItem(tabName = "PHTab"),
