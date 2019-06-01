@@ -359,11 +359,19 @@ function(input, output, session) {
                 line = list(width = 1),
                 name = "CoC Goal"
               ),
-              xaxis = list(rangemode = "tozero"),
-              yaxis = list(rangemode = "tozero"),
               title = 'Emergency Shelters',
-              yaxis = list(title = "Length of Stay (Days)", showgrid = TRUE),
-              xaxis = list(title = "", showgrid = TRUE)
+              margin = list(
+                l = 50,
+                r = 50,
+                b = 100,
+                t = 100,
+                pad = 4
+              ),
+              yaxis = list(title = "Length of Stay (Days)", 
+                           rangemode = "tozero",
+                           showgrid = TRUE),
+              xaxis = list(title = "Providers", showgrid = TRUE,
+                           rangemode = "tozero")
             )
           
         })
@@ -459,11 +467,20 @@ function(input, output, session) {
                 line = list(width = 1),
                 name = "CoC Goal"
               ),
-              xaxis = list(rangemode = "tozero"),
-              yaxis = list(rangemode = "tozero"),
               title = 'Transitional Housing',
-              yaxis = list(title = "Length of Stay (Days)", showgrid = TRUE),
-              xaxis = list(title = "", showgrid = TRUE)
+              margin = list(
+                l = 50,
+                r = 50,
+                b = 100,
+                t = 100,
+                pad = 4
+              ),
+              yaxis = list(title = "Length of Stay (Days)", 
+                           showgrid = TRUE,
+                           rangemode = "tozero"),
+              xaxis = list(title = "Providers", 
+                           showgrid = TRUE,
+                           rangemode = "tozero")
             )
           
         })
@@ -558,11 +575,20 @@ function(input, output, session) {
                 line = list(width = 1),
                 name = "CoC Goal"
               ),
-              xaxis = list(rangemode = "tozero"),
-              yaxis = list(rangemode = "tozero"),
               title = 'Safe Haven',
-              yaxis = list(title = "Length of Stay (Days)", showgrid = TRUE),
-              xaxis = list(title = "", showgrid = TRUE)
+              margin = list(
+                l = 50,
+                r = 50,
+                b = 100,
+                t = 100,
+                pad = 4
+              ),
+              yaxis = list(title = "Length of Stay (Days)", 
+                           showgrid = TRUE,
+                           rangemode = "tozero"),
+              xaxis = list(title = "Providers", 
+                           showgrid = TRUE,
+                           rangemode = "tozero")
             )
           
           
@@ -658,11 +684,20 @@ function(input, output, session) {
                 line = list(width = 1),
                 name = "CoC Goal"
               ),
-              xaxis = list(rangemode = "tozero"),
-              yaxis = list(rangemode = "tozero"),
               title = 'Rapid Rehousing',
-              yaxis = list(title = "Length of Stay (Days)", showgrid = TRUE),
-              xaxis = list(title = "", showgrid = TRUE)
+              margin = list(
+                l = 50,
+                r = 50,
+                b = 100,
+                t = 100,
+                pad = 4
+              ),
+              yaxis = list(title = "Length of Stay (Days)", 
+                           showgrid = TRUE,
+                           rangemode = "tozero"),
+              xaxis = list(title = "Providers", 
+                           showgrid = TRUE,
+                           rangemode = "tozero")
             )
           
           
