@@ -8,12 +8,11 @@ library(plotly)
 library(zoo)
 
 
-updatedate <- file.info("data/Utilization.RData")$mtime
-
-filebeginningdate <- 
-  file.info("data/Utilization.RData")$mtime - years(2)
 
 load("data/Utilization.RData")
+
+filebeginningdate <- 
+  updatedate - years(2)
 
 load("data/QPR_SPDATs.RData")
 
