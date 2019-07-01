@@ -52,41 +52,83 @@ tagList(
           infoBoxOutput("currentUnitUtilization"),
           infoBoxOutput("currentBedUtilization"),
           infoBoxOutput("veteranEngagement")
-        ), # tabItem providerDashboard
+        ),
+        # tabItem providerDashboard
         tabItem(tabName = "cocCompetitionTab"),
-        tabItem(tabName = "LoSTab",
-        setSliderColor("#56B4E9", 1),
-        sliderTextInput("LoSSlider",
-                        "",
-                        c(
-                          unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
-                        ),
-                        selected = Sys.yearqtr() - 1 / 4),
-        pickerInput(inputId = "LoSRegionSelect", 
-                    "Select Region(s)", 
-                    choices = choices_regions,
-                    options = list(`actions-box` = TRUE),
-                    multiple = TRUE,
-                    selected = "Homeless Planning Region 6"),
-        prettyRadioButtons(inputId = "radioAvgMeanLoS",
-                           label = "", 
-                           thick = TRUE,
-                           animation = "pulse", status = "info",
-                           choices = c("Average Days", "Median Days"),
-                           selected = "Average Days"),
-        #verbatimTextOutput("res"),
-        plotlyOutput("QPRLoSPlotEE"),
-        br(),
-        br(),
-        plotlyOutput("QPRLoSPlotTH"),
-        br(),
-        br(),
-        plotlyOutput("QPRLoSPlotRRH"),
-        br(),
-        br(),
-        plotlyOutput("QPRLoSPlotSH")
-        ), # tabItem LengthOfStay LoS
-        tabItem(tabName = "PHTab"),
+        tabItem(
+          tabName = "LoSTab",
+          setSliderColor("#56B4E9", 1),
+          sliderTextInput("LoSSlider",
+                          "",
+                          c(
+                            unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
+                          ),
+                          selected = Sys.yearqtr() - 1 / 4),
+          pickerInput(
+            inputId = "LoSRegionSelect",
+            "Select Region(s)",
+            choices = choices_regions,
+            options = list(`actions-box` = TRUE),
+            multiple = TRUE,
+            selected = "Homeless Planning Region 6"
+          ),
+          prettyRadioButtons(
+            inputId = "radioAvgMeanLoS",
+            label = "",
+            thick = TRUE,
+            animation = "pulse",
+            status = "info",
+            choices = c("Average Days", "Median Days"),
+            selected = "Average Days"
+          ),
+          #verbatimTextOutput("res"),
+          plotlyOutput("QPRLoSPlotEE"),
+          br(),
+          br(),
+          plotlyOutput("QPRLoSPlotTH"),
+          br(),
+          br(),
+          plotlyOutput("QPRLoSPlotRRH"),
+          br(),
+          br(),
+          plotlyOutput("QPRLoSPlotSH")
+        ),
+        # tabItem LengthOfStay LoS
+        tabItem(tabName = "PHTab",
+                setSliderColor("#56B4E9", 1),
+                sliderTextInput("SuccessPlaceSlider",
+                                "",
+                                c(
+                                  unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
+                                ),
+                                selected = Sys.yearqtr() - 1 / 4),
+                pickerInput(
+                  inputId = "SuccessPlaceRegionSelect",
+                  "Select Region(s)",
+                  choices = choices_regions,
+                  options = list(`actions-box` = TRUE),
+                  multiple = TRUE,
+                  selected = "Homeless Planning Region 6"
+                ),
+                #verbatimTextOutput("res"),
+                plotlyOutput("QPRSuccessfulPlacementES"),
+                br(),
+                br(),
+                plotlyOutput("QPRSuccessfulPlacementTH"),
+                br(),
+                br(),
+                plotlyOutput("QPRSuccessfulPlacementRRH"),
+                # br(),
+                # br(),
+                # plotlyOutput("QPRSuccessfulPlacementSH"),
+                # br(),
+                # br(),
+                # plotlyOutput("QPRSuccessfulPlacementOUT"),
+                # br(), 
+                # br(),
+                # plotlyOutput("QPRSuccessfulPlacementRRH"),
+                br()
+        ),
         tabItem(tabName = "NCBTab"),
         tabItem(tabName = "HITab"),
         tabItem(tabName = "incomeTab"),
@@ -111,7 +153,8 @@ tagList(
           # verbatimTextOutput("res"),
           # sliderInput(
           plotOutput("bedPlot")
-        ), # tabItem utilizationTab
+        ),
+        # tabItem utilizationTab
         tabItem(
           tabName = "spdatTab",
           pickerInput(
