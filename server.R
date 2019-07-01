@@ -274,9 +274,9 @@ function(input, output, session) {
   
   observeEvent(c(input$LoSRegionSelect), {
     output$QPRLoSPlotEE <- #should this be "ES" instead of "EE"???
-      if (nrow(QPR_EEs %>% filter(Region %in% parse_number(c(
+      if (nrow(QPR_EEs %>% filter(Region %in% c(
         input$LoSRegionSelect
-      )) &
+      ) &
       ProjectType == 1)) > 0) {
         renderPlotly({
           ReportStart <- format.Date(ymd(paste0(
@@ -315,8 +315,7 @@ function(input, output, session) {
                 ProjectType == 8 ~ "Safe Haven",
                 ProjectType == 12 ~ "Homelessness Prevention",
                 ProjectType == 13 ~ "Rapid Rehousing"
-              ),
-              Region = paste("Homeless Planning Region", Region)
+              )
             ) %>%
             filter(Region %in% c(input$LoSRegionSelect)) # this filter needs
           # to be here so the selection text matches the mutated data
@@ -381,9 +380,9 @@ function(input, output, session) {
     }
     
     output$QPRLoSPlotTH <-
-      if (nrow(QPR_EEs %>% filter(Region %in% parse_number(c(
+      if (nrow(QPR_EEs %>% filter(Region %in% c(
         input$LoSRegionSelect
-      )) &
+      ) &
       ProjectType == 2)) > 0) {
         renderPlotly({
           ReportStart <- format.Date(ymd(paste0(
@@ -422,8 +421,7 @@ function(input, output, session) {
                 ProjectType == 8 ~ "Safe Haven",
                 ProjectType == 12 ~ "Homelessness Prevention",
                 ProjectType == 13 ~ "Rapid Rehousing"
-              ),
-              Region = paste("Homeless Planning Region", Region)
+              )
             ) %>%
             filter(Region %in% c(input$LoSRegionSelect)) # this filter needs
           # to be here so the selection text matches the mutated data
@@ -489,9 +487,9 @@ function(input, output, session) {
     }
 
     output$QPRLoSPlotSH <-
-      if (nrow(QPR_EEs %>% filter(Region %in% parse_number(c(
+      if (nrow(QPR_EEs %>% filter(Region %in% c(
         input$LoSRegionSelect
-      )) &
+      ) &
       ProjectType == 8)) > 0) {
         renderPlotly({
           ReportStart <- format.Date(ymd(paste0(
@@ -530,8 +528,7 @@ function(input, output, session) {
                 ProjectType == 8 ~ "Safe Haven",
                 ProjectType == 12 ~ "Homelessness Prevention",
                 ProjectType == 13 ~ "Rapid Rehousing"
-              ),
-              Region = paste("Homeless Planning Region", Region)
+              )
             ) %>%
             filter(Region %in% c(input$LoSRegionSelect)) # this filter needs
           # to be here so the selection text matches the mutated data
@@ -596,10 +593,8 @@ function(input, output, session) {
     }
 
     output$QPRLoSPlotRRH <-
-      if (nrow(QPR_EEs %>% filter(Region %in% parse_number(c(
-        input$LoSRegionSelect
-      )) &
-      ProjectType == 13)) > 0) {
+      if (nrow(QPR_EEs %>% filter(Region %in% c(input$LoSRegionSelect) &
+                                  ProjectType == 13)) > 0) {
         renderPlotly({
           ReportStart <- format.Date(ymd(paste0(
             substr(input$LoSSlider, 1, 4),
@@ -637,8 +632,7 @@ function(input, output, session) {
                 ProjectType == 8 ~ "Safe Haven",
                 ProjectType == 12 ~ "Homelessness Prevention",
                 ProjectType == 13 ~ "Rapid Rehousing"
-              ),
-              Region = paste("Homeless Planning Region", Region)
+              )
             ) %>%
             filter(Region %in% c(input$LoSRegionSelect)) # this filter needs
           # to be here so the selection text matches the mutated data
@@ -705,10 +699,8 @@ function(input, output, session) {
     }
 
     output$QPRSuccessfulPlacementES <-
-      if (nrow(QPR_EEs %>% filter(Region %in% parse_number(c(
-        input$LoSRegionSelect
-      )) &
-      ProjectType == 1)) > 0) {
+      if (nrow(QPR_EEs %>% filter(Region %in% c(input$SuccessPlaceRegionSelect) &
+                                  ProjectType == 1)) > 0) {
         renderPlotly({
           ReportStart <- format.Date(ymd(paste0(
             substr(input$SuccessPlaceSlider, 1, 4),
@@ -729,31 +721,20 @@ function(input, output, session) {
           SuccessfullyPlaced <- QPR_EEs %>%
             filter(
               ProjectType == ptc &
-                ((ProjectType %in% c(3, 9, 13) & !is.na(MoveInDateAdjust)) |
-                   ProjectType %in% c(1, 2, 4, 8, 12)) & # excluding non-mover-inners
-                ((DestinationGroup == "Permanent" &
-                    (exited_between(., ReportStart, ReportEnd) | #exited to ph or still in PSH/HP
-                    is.na(ExitDate))) &
-                   ProjectType %in% c(3, 9, 12) # PSH & HP
-                ) |
-                (DestinationGroup == "Permanent" & # exited to ph
-                   exited_between(., ReportStart, ReportEnd) &
-                   ProjectType %in% c(1, 2, 4, 8, 13)) # ES, TH, SH, RRH, OUT
+                Region %in% c(input$SuccessPlaceRegionSelect) &
+                DestinationGroup == "Permanent" & # exited to ph
+                exited_between(., ReportStart, ReportEnd)
             ) %>%
             group_by(FriendlyProjectName, ProjectType, County, Region) %>%
             summarise(SuccessfullyPlacedHHs = n())
 
           # calculating the total households to compare successful placements to
           TotalHHsSuccessfulPlacement <- QPR_EEs %>%
-            filter(ProjectType == ptc &(
-
-                served_between(., ReportStart, ReportEnd) &
-                ProjectType %in% c(3, 9, 12) # PSH & HP
-            ) |
-              (
-                exited_between(., ReportStart, ReportEnd) &
-                  ProjectType %in% c(1, 2, 4, 8, 13) # ES, TH, SH, OUT, RRH
-              )) %>%
+            filter(
+              ProjectType == ptc &
+                Region %in% c(input$SuccessPlaceRegionSelect) &
+                exited_between(., ReportStart, ReportEnd)
+            ) %>%
             group_by(FriendlyProjectName, ProjectType, County, Region) %>%
             summarise(TotalHHs = n()) # For PSH & HP, it's total hhs served;
           # otherwise, it's total hhs *exited* during the reporting period
@@ -765,12 +746,7 @@ function(input, output, session) {
 
           SuccessfulPlacement[is.na(SuccessfulPlacement)] <- 0
 
-          rm(TotalHHsSuccessfulPlacement, SuccessfullyPlaced)
-
-          esPlacementData <-
-            SuccessfulPlacement %>%
-            filter(ProjectType == ptc &
-                     Region %in% parse_number(c(input$SuccessPlaceRegionSelect)))
+          esPlacementData <-  SuccessfulPlacement 
 
           esPlacementGoal <-
             as.numeric(
@@ -825,10 +801,9 @@ function(input, output, session) {
     }
 
     output$QPRSuccessfulPlacementTH <-
-      if (nrow(QPR_EEs %>% filter(Region %in% parse_number(c(
-        input$LoSRegionSelect
-      )) &
-      ProjectType == 2)) > 0) {
+      if (nrow(QPR_EEs %>%
+               filter(Region %in% c(input$SuccessPlaceRegionSelect) &
+                      ProjectType == 2)) > 0) {
         renderPlotly({
           ReportStart <- format.Date(ymd(paste0(
             substr(input$SuccessPlaceSlider, 1, 4),
@@ -849,33 +824,45 @@ function(input, output, session) {
           SuccessfullyPlaced <- QPR_EEs %>%
             filter(
               ProjectType == ptc &
-                ((ProjectType %in% c(3, 9, 13) & !is.na(MoveInDateAdjust)) |
-                   ProjectType %in% c(1, 2, 4, 8, 12)) & # excluding non-mover-inners
-                ((DestinationGroup == "Permanent" &
-                    (exited_between(., ReportStart, ReportEnd) | #exited to ph or still in PSH/HP
-                       is.na(ExitDate))) &
-                   ProjectType %in% c(3, 9, 12) # PSH & HP
+                Region %in% c(input$SuccessPlaceRegionSelect) &
+                ((
+                  ProjectType %in% c(3, 9, 13) & !is.na(MoveInDateAdjust)
                 ) |
-                (DestinationGroup == "Permanent" & # exited to ph
-                   exited_between(., ReportStart, ReportEnd) &
-                   ProjectType %in% c(1, 2, 4, 8, 13)) # ES, TH, SH, RRH, OUT
-            ) %>%
-            group_by(FriendlyProjectName, ProjectType, County, Region) %>%
-            summarise(SuccessfullyPlacedHHs = n())
-
-          # calculating the total households to compare successful placements to
-          TotalHHsSuccessfulPlacement <- QPR_EEs %>%
-            filter(ProjectType == ptc &(
-
-              served_between(., ReportStart, ReportEnd) &
-                ProjectType %in% c(3, 9, 12) # PSH & HP
-            ) |
-              (
-                exited_between(., ReportStart, ReportEnd) &
-                  ProjectType %in% c(1, 2, 4, 8, 13) # ES, TH, SH, OUT, RRH
-              )) %>%
-            group_by(FriendlyProjectName, ProjectType, County, Region) %>%
-            summarise(TotalHHs = n()) # For PSH & HP, it's total hhs served;
+                  ProjectType %in% c(1, 2, 4, 8, 12)) &
+                # excluding non-mover-inners
+                ((
+                  DestinationGroup == "Permanent" &
+                    (exited_between(., ReportStart, ReportEnd) |
+                       #exited to ph or still in PSH/HP
+                       is.na(ExitDate))
+                ) &
+                  ProjectType %in% c(3, 9, 12) # PSH & HP
+                ) |
+                (
+                  DestinationGroup == "Permanent" & # exited to ph
+                    exited_between(., ReportStart, ReportEnd) &
+                    ProjectType %in% c(1, 2, 4, 8, 13)
+                ) # ES, TH, SH, RRH, OUT
+                ) %>%
+                group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+                summarise(SuccessfullyPlacedHHs = n())
+              
+              # calculating the total households to compare successful placements to
+              TotalHHsSuccessfulPlacement <- QPR_EEs %>%
+                filter(
+                  ProjectType == ptc &
+                    Region %in% c(input$SuccessPlaceRegionSelect) &
+                    (
+                      served_between(., ReportStart, ReportEnd) &
+                        ProjectType %in% c(3, 9, 12) # PSH & HP
+                    ) |
+                    (
+                      exited_between(., ReportStart, ReportEnd) &
+                        ProjectType %in% c(1, 2, 4, 8, 13) # ES, TH, SH, OUT, RRH
+                    )
+                ) %>%
+                group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+                summarise(TotalHHs = n()) # For PSH & HP, it's total hhs served;
           # otherwise, it's total hhs *exited* during the reporting period
 
           SuccessfulPlacement <- TotalHHsSuccessfulPlacement %>%
@@ -890,7 +877,7 @@ function(input, output, session) {
           thPlacementData <-
             SuccessfulPlacement %>%
             filter(ProjectType == ptc &
-                     Region %in% parse_number(c(input$SuccessPlaceRegionSelect)))
+                     Region %in% c(input$SuccessPlaceRegionSelect))
 
           thPlacementGoal <-
             as.numeric(
@@ -943,489 +930,472 @@ function(input, output, session) {
     else{
 
     }
-    # 
-    # output$QPRSuccessfulPlacementPSH <-
-    #   if (nrow(QPR_EEs %>% filter(Region %in% parse_number(c(
-    #     input$LoSRegionSelect
-    #   )) &
-    #   ProjectType %in% c(3, 9))) > 0) {
-    #     renderPlotly({
-    #       ReportStart <- format.Date(ymd(paste0(
-    #         substr(input$SuccessPlaceSlider, 1, 4),
-    #         "-01-01"
-    #       )), "%m-%d-%Y")
-    #       ReportEnd <- format.Date(mdy(paste0(
-    #         case_when(
-    #           substr(input$SuccessPlaceSlider, 7, 7) == 1 ~ "03-31-",
-    #           substr(input$SuccessPlaceSlider, 7, 7) == 2 ~ "06-30",
-    #           substr(input$SuccessPlaceSlider, 7, 7) == 3 ~ "09-30-",
-    #           substr(input$SuccessPlaceSlider, 7, 7) == 4 ~ "12-31-"
-    #         ),
-    #         substr(input$SuccessPlaceSlider, 1, 4)
-    #       )), "%m-%d-%Y")
-    #       
-    #       ptc <- 3
-    #       
-    #       SuccessfullyPlaced <- QPR_EEs %>%
-    #         filter(
-    #           ProjectType == ptc &
-    #             ((ProjectType %in% c(3, 9, 13) & !is.na(MoveInDateAdjust)) |
-    #                ProjectType %in% c(1, 2, 4, 8, 12)) & # excluding non-mover-inners
-    #             ((DestinationGroup == "Permanent" &
-    #                 (exited_between(., ReportStart, ReportEnd) | #exited to ph or still in PSH/HP
-    #                    is.na(ExitDate))) &
-    #                ProjectType %in% c(3, 9, 12) # PSH & HP
-    #             ) | 
-    #             (DestinationGroup == "Permanent" & # exited to ph
-    #                exited_between(., ReportStart, ReportEnd) &
-    #                ProjectType %in% c(1, 2, 4, 8, 13)) # ES, TH, SH, RRH, OUT
-    #         ) %>%
-    #         group_by(FriendlyProjectName, ProjectType, County, Region) %>%
-    #         summarise(SuccessfullyPlacedHHs = n())
-    #       
-    #       # calculating the total households to compare successful placements to
-    #       TotalHHsSuccessfulPlacement <- QPR_EEs %>%
-    #         filter(ProjectType == ptc &(
-    #           
-    #           served_between(., ReportStart, ReportEnd) &
-    #             ProjectType %in% c(3, 9, 12) # PSH & HP
-    #         ) |
-    #           (
-    #             exited_between(., ReportStart, ReportEnd) &
-    #               ProjectType %in% c(1, 2, 4, 8, 13) # ES, TH, SH, OUT, RRH
-    #           )) %>%
-    #         group_by(FriendlyProjectName, ProjectType, County, Region) %>%
-    #         summarise(TotalHHs = n()) # For PSH & HP, it's total hhs served; 
-    #       # otherwise, it's total hhs *exited* during the reporting period
-    #       
-    #       SuccessfulPlacement <- TotalHHsSuccessfulPlacement %>%
-    #         left_join(SuccessfullyPlaced,
-    #                   by = c("FriendlyProjectName", "ProjectType", "County", "Region")) %>%
-    #         mutate(Percent = SuccessfullyPlacedHHs / TotalHHs)
-    #       
-    #       SuccessfulPlacement[is.na(SuccessfulPlacement)] <- 0
-    #       
-    #       rm(TotalHHsSuccessfulPlacement, SuccessfullyPlaced)
-    #       
-    #       pshPlacementData <- 
-    #         SuccessfulPlacement %>% 
-    #         filter(ProjectType == ptc & 
-    #                  Region %in% parse_number(c(input$SuccessPlaceRegionSelect)))
-    #       
-    #       pshPlacementGoal <-
-    #         as.numeric(
-    #           goals %>%
-    #             filter(
-    #               ProjectType == ptc &
-    #                 SummaryMeasure == "Obtaining and Maintaining Permanent Housing" &
-    #                 !is.na(Goal)
-    #             ) %>%
-    #             select(Goal)
-    #         )
-    #       
-    #       plot_ly(
-    #         data = pshPlacementData,
-    #         x = ~ FriendlyProjectName,
-    #         y = ~ Percent
-    #       ) %>%
-    #         add_trace(type = "bar") %>%
-    #         layout(
-    #           shapes = list(
-    #             type = 'line',
-    #             xref = "paper",
-    #             yref = "y",
-    #             x0 = 0,
-    #             x1 = 1,
-    #             y0 = pshPlacementGoal,
-    #             y1 = pshPlacementGoal,
-    #             line = list(width = 1),
-    #             name = "CoC Goal"
-    #           ),
-    #           title = 'Permanent Supportive Housing',
-    #           margin = list(
-    #             l = 50,
-    #             r = 50,
-    #             b = 100,
-    #             t = 100,
-    #             pad = 4
-    #           ),
-    #           yaxis = list(title = "Exits to Permanent Housing", 
-    #                        showgrid = TRUE,
-    #                        rangemode = "tozero"),
-    #           xaxis = list(title = "", 
-    #                        showgrid = TRUE,
-    #                        rangemode = "tozero")
-    #         )%>% 
-    #         layout(yaxis = list(tickformat = "%"))
-    #       
-    #     })
-    #   }
-    # else{
-    #   
-    # }
-    # 
-    # output$QPRSuccessfulPlacementOUT <-
-    #   if (nrow(QPR_EEs %>% filter(Region %in% parse_number(c(
-    #     input$LoSRegionSelect
-    #   )) &
-    #   ProjectType == 4)) > 0) {
-    #     renderPlotly({
-    #       ReportStart <- format.Date(ymd(paste0(
-    #         substr(input$SuccessPlaceSlider, 1, 4),
-    #         "-01-01"
-    #       )), "%m-%d-%Y")
-    #       ReportEnd <- format.Date(mdy(paste0(
-    #         case_when(
-    #           substr(input$SuccessPlaceSlider, 7, 7) == 1 ~ "03-31-",
-    #           substr(input$SuccessPlaceSlider, 7, 7) == 2 ~ "06-30",
-    #           substr(input$SuccessPlaceSlider, 7, 7) == 3 ~ "09-30-",
-    #           substr(input$SuccessPlaceSlider, 7, 7) == 4 ~ "12-31-"
-    #         ),
-    #         substr(input$SuccessPlaceSlider, 1, 4)
-    #       )), "%m-%d-%Y")
-    #       
-    #       ptc <- 4 # Street Outreach
-    #       
-    #       SuccessfullyPlaced <- QPR_EEs %>%
-    #         filter(
-    #           ProjectType == ptc &
-    #             ((ProjectType %in% c(3, 9, 13) & !is.na(MoveInDateAdjust)) |
-    #                ProjectType %in% c(1, 2, 4, 8, 12)) & # excluding non-mover-inners
-    #             ((DestinationGroup == "Permanent" &
-    #                 (exited_between(., ReportStart, ReportEnd) | #exited to ph or still in PSH/HP
-    #                    is.na(ExitDate))) &
-    #                ProjectType %in% c(3, 9, 12) # PSH & HP
-    #             ) | 
-    #             (DestinationGroup == "Permanent" & # exited to ph
-    #                exited_between(., ReportStart, ReportEnd) &
-    #                ProjectType %in% c(1, 2, 4, 8, 13)) # ES, TH, SH, RRH, OUT
-    #         ) %>%
-    #         group_by(FriendlyProjectName, ProjectType, County, Region) %>%
-    #         summarise(SuccessfullyPlacedHHs = n())
-    #       
-    #       # calculating the total households to compare successful placements to
-    #       TotalHHsSuccessfulPlacement <- QPR_EEs %>%
-    #         filter(ProjectType == ptc &(
-    #           
-    #           served_between(., ReportStart, ReportEnd) &
-    #             ProjectType %in% c(3, 9, 12) # PSH & HP
-    #         ) |
-    #           (
-    #             exited_between(., ReportStart, ReportEnd) &
-    #               ProjectType %in% c(1, 2, 4, 8, 13) # ES, TH, SH, OUT, RRH
-    #           )) %>%
-    #         group_by(FriendlyProjectName, ProjectType, County, Region) %>%
-    #         summarise(TotalHHs = n()) # For PSH & HP, it's total hhs served; 
-    #       # otherwise, it's total hhs *exited* during the reporting period
-    #       
-    #       SuccessfulPlacement <- TotalHHsSuccessfulPlacement %>%
-    #         left_join(SuccessfullyPlaced,
-    #                   by = c("FriendlyProjectName", "ProjectType", "County", "Region")) %>%
-    #         mutate(Percent = SuccessfullyPlacedHHs / TotalHHs)
-    #       
-    #       SuccessfulPlacement[is.na(SuccessfulPlacement)] <- 0
-    #       
-    #       rm(TotalHHsSuccessfulPlacement, SuccessfullyPlaced)
-    #       
-    #       outPlacementData <- 
-    #         SuccessfulPlacement %>% 
-    #         filter(ProjectType == ptc & 
-    #                  Region %in% parse_number(c(input$SuccessPlaceRegionSelect)))
-    #       
-    #       outPlacementGoal <-
-    #         as.numeric(
-    #           goals %>%
-    #             filter(
-    #               ProjectType == ptc &
-    #                 SummaryMeasure == "Obtaining and Maintaining Permanent Housing" &
-    #                 !is.na(Goal)
-    #             ) %>%
-    #             select(Goal)
-    #         )
-    #       
-    #       plot_ly(
-    #         data = outPlacementData,
-    #         x = ~ FriendlyProjectName,
-    #         y = ~ Percent
-    #       ) %>%
-    #         add_trace(type = "bar") %>%
-    #         layout(
-    #           shapes = list(
-    #             type = 'line',
-    #             xref = "paper",
-    #             yref = "y",
-    #             x0 = 0,
-    #             x1 = 1,
-    #             y0 = outPlacementGoal,
-    #             y1 = outPlacementGoal,
-    #             line = list(width = 1),
-    #             name = "CoC Goal"
-    #           ),
-    #           title = 'Street Outreach',
-    #           margin = list(
-    #             l = 50,
-    #             r = 50,
-    #             b = 100,
-    #             t = 100,
-    #             pad = 4
-    #           ),
-    #           yaxis = list(title = "Exits to Permanent Housing", 
-    #                        showgrid = TRUE,
-    #                        rangemode = "tozero"),
-    #           xaxis = list(title = "", 
-    #                        showgrid = TRUE,
-    #                        rangemode = "tozero")
-    #         )%>% 
-    #         layout(yaxis = list(tickformat = "%"))
-    #       
-    #     })
-    #   }
-    # else{
-    #   
-    # }
-    # 
-    # output$QPRSuccessfulPlacementSH <-
-    #   if (nrow(QPR_EEs %>% filter(Region %in% parse_number(c(
-    #     input$LoSRegionSelect
-    #   )) &
-    #   ProjectType == 8)) > 0) {
-    #     renderPlotly({
-    #       ReportStart <- format.Date(ymd(paste0(
-    #         substr(input$SuccessPlaceSlider, 1, 4),
-    #         "-01-01"
-    #       )), "%m-%d-%Y")
-    #       ReportEnd <- format.Date(mdy(paste0(
-    #         case_when(
-    #           substr(input$SuccessPlaceSlider, 7, 7) == 1 ~ "03-31-",
-    #           substr(input$SuccessPlaceSlider, 7, 7) == 2 ~ "06-30",
-    #           substr(input$SuccessPlaceSlider, 7, 7) == 3 ~ "09-30-",
-    #           substr(input$SuccessPlaceSlider, 7, 7) == 4 ~ "12-31-"
-    #         ),
-    #         substr(input$SuccessPlaceSlider, 1, 4)
-    #       )), "%m-%d-%Y")
-    #       
-    #       ptc <- 8 # Safe Haven
-    #       
-    #       SuccessfullyPlaced <- QPR_EEs %>%
-    #         filter(
-    #           ProjectType == ptc &
-    #             ((ProjectType %in% c(3, 9, 13) & !is.na(MoveInDateAdjust)) |
-    #                ProjectType %in% c(1, 2, 4, 8, 12)) & # excluding non-mover-inners
-    #             ((DestinationGroup == "Permanent" &
-    #                 (exited_between(., ReportStart, ReportEnd) | #exited to ph or still in PSH/HP
-    #                    is.na(ExitDate))) &
-    #                ProjectType %in% c(3, 9, 12) # PSH & HP
-    #             ) | 
-    #             (DestinationGroup == "Permanent" & # exited to ph
-    #                exited_between(., ReportStart, ReportEnd) &
-    #                ProjectType %in% c(1, 2, 4, 8, 13)) # ES, TH, SH, RRH, OUT
-    #         ) %>%
-    #         group_by(FriendlyProjectName, ProjectType, County, Region) %>%
-    #         summarise(SuccessfullyPlacedHHs = n())
-    #       
-    #       # calculating the total households to compare successful placements to
-    #       TotalHHsSuccessfulPlacement <- QPR_EEs %>%
-    #         filter(ProjectType == ptc &(
-    #           
-    #           served_between(., ReportStart, ReportEnd) &
-    #             ProjectType %in% c(3, 9, 12) # PSH & HP
-    #         ) |
-    #           (
-    #             exited_between(., ReportStart, ReportEnd) &
-    #               ProjectType %in% c(1, 2, 4, 8, 13) # ES, TH, SH, OUT, RRH
-    #           )) %>%
-    #         group_by(FriendlyProjectName, ProjectType, County, Region) %>%
-    #         summarise(TotalHHs = n()) # For PSH & HP, it's total hhs served; 
-    #       # otherwise, it's total hhs *exited* during the reporting period
-    #       
-    #       SuccessfulPlacement <- TotalHHsSuccessfulPlacement %>%
-    #         left_join(SuccessfullyPlaced,
-    #                   by = c("FriendlyProjectName", "ProjectType", "County", "Region")) %>%
-    #         mutate(Percent = SuccessfullyPlacedHHs / TotalHHs)
-    #       
-    #       SuccessfulPlacement[is.na(SuccessfulPlacement)] <- 0
-    #       
-    #       rm(TotalHHsSuccessfulPlacement, SuccessfullyPlaced)
-    #       
-    #       shPlacementData <- 
-    #         SuccessfulPlacement %>% 
-    #         filter(ProjectType == ptc & 
-    #                  Region %in% parse_number(c(input$SuccessPlaceRegionSelect)))
-    #       
-    #       shPlacementGoal <-
-    #         as.numeric(
-    #           goals %>%
-    #             filter(
-    #               ProjectType == ptc &
-    #                 SummaryMeasure == "Obtaining and Maintaining Permanent Housing" &
-    #                 !is.na(Goal)
-    #             ) %>%
-    #             select(Goal)
-    #         )
-    #       
-    #       plot_ly(
-    #         data = shPlacementData,
-    #         x = ~ FriendlyProjectName,
-    #         y = ~ Percent
-    #       ) %>%
-    #         add_trace(type = "bar") %>%
-    #         layout(
-    #           shapes = list(
-    #             type = 'line',
-    #             xref = "paper",
-    #             yref = "y",
-    #             x0 = 0,
-    #             x1 = 1,
-    #             y0 = shPlacementGoal,
-    #             y1 = shPlacementGoal,
-    #             line = list(width = 1),
-    #             name = "CoC Goal"
-    #           ),
-    #           title = 'Safe Haven',
-    #           margin = list(
-    #             l = 50,
-    #             r = 50,
-    #             b = 100,
-    #             t = 100,
-    #             pad = 4
-    #           ),
-    #           yaxis = list(title = "Exits to Permanent Housing", 
-    #                        showgrid = TRUE,
-    #                        rangemode = "tozero"),
-    #           xaxis = list(title = "", 
-    #                        showgrid = TRUE,
-    #                        rangemode = "tozero")
-    #         )%>% 
-    #         layout(yaxis = list(tickformat = "%"))
-    #       
-    #     })
-    #   }
-    # else{
-    #   
-    # }
-    # output$QPRSuccessfulPlacementHP <-
-    #   if (nrow(QPR_EEs %>% filter(Region %in% parse_number(c(
-    #     input$LoSRegionSelect
-    #   )) &
-    #   ProjectType == 12)) > 0) {
-    #     renderPlotly({
-    #       ReportStart <- format.Date(ymd(paste0(
-    #         substr(input$SuccessPlaceSlider, 1, 4),
-    #         "-01-01"
-    #       )), "%m-%d-%Y")
-    #       ReportEnd <- format.Date(mdy(paste0(
-    #         case_when(
-    #           substr(input$SuccessPlaceSlider, 7, 7) == 1 ~ "03-31-",
-    #           substr(input$SuccessPlaceSlider, 7, 7) == 2 ~ "06-30",
-    #           substr(input$SuccessPlaceSlider, 7, 7) == 3 ~ "09-30-",
-    #           substr(input$SuccessPlaceSlider, 7, 7) == 4 ~ "12-31-"
-    #         ),
-    #         substr(input$SuccessPlaceSlider, 1, 4)
-    #       )), "%m-%d-%Y")
-    #       
-    #       ptc <- 12 # Homelessness Prevention
-    #       
-    #       SuccessfullyPlaced <- QPR_EEs %>%
-    #         filter(
-    #           ProjectType == ptc &
-    #             ((ProjectType %in% c(3, 9, 13) & !is.na(MoveInDateAdjust)) |
-    #                ProjectType %in% c(1, 2, 4, 8, 12)) & # excluding non-mover-inners
-    #             ((DestinationGroup == "Permanent" &
-    #                 (exited_between(., ReportStart, ReportEnd) | #exited to ph or still in PSH/HP
-    #                    is.na(ExitDate))) &
-    #                ProjectType %in% c(3, 9, 12) # PSH & HP
-    #             ) | 
-    #             (DestinationGroup == "Permanent" & # exited to ph
-    #                exited_between(., ReportStart, ReportEnd) &
-    #                ProjectType %in% c(1, 2, 4, 8, 13)) # ES, TH, SH, RRH, OUT
-    #         ) %>%
-    #         group_by(FriendlyProjectName, ProjectType, County, Region) %>%
-    #         summarise(SuccessfullyPlacedHHs = n())
-    #       
-    #       # calculating the total households to compare successful placements to
-    #       TotalHHsSuccessfulPlacement <- QPR_EEs %>%
-    #         filter(ProjectType == ptc &(
-    #           
-    #           served_between(., ReportStart, ReportEnd) &
-    #             ProjectType %in% c(3, 9, 12) # PSH & HP
-    #         ) |
-    #           (
-    #             exited_between(., ReportStart, ReportEnd) &
-    #               ProjectType %in% c(1, 2, 4, 8, 13) # ES, TH, SH, OUT, RRH
-    #           )) %>%
-    #         group_by(FriendlyProjectName, ProjectType, County, Region) %>%
-    #         summarise(TotalHHs = n()) # For PSH & HP, it's total hhs served; 
-    #       # otherwise, it's total hhs *exited* during the reporting period
-    #       
-    #       SuccessfulPlacement <- TotalHHsSuccessfulPlacement %>%
-    #         left_join(SuccessfullyPlaced,
-    #                   by = c("FriendlyProjectName", "ProjectType", "County", "Region")) %>%
-    #         mutate(Percent = SuccessfullyPlacedHHs / TotalHHs)
-    #       
-    #       SuccessfulPlacement[is.na(SuccessfulPlacement)] <- 0
-    #       
-    #       rm(TotalHHsSuccessfulPlacement, SuccessfullyPlaced)
-    #       
-    #       hpPlacementData <- 
-    #         SuccessfulPlacement %>% 
-    #         filter(ProjectType == ptc & 
-    #                  Region %in% parse_number(c(input$SuccessPlaceRegionSelect)))
-    #       
-    #       hpPlacementGoal <-
-    #         as.numeric(
-    #           goals %>%
-    #             filter(
-    #               ProjectType == ptc &
-    #                 SummaryMeasure == "Obtaining and Maintaining Permanent Housing" &
-    #                 !is.na(Goal)
-    #             ) %>%
-    #             select(Goal)
-    #         )
-    #       
-    #       plot_ly(
-    #         data = hpPlacementData,
-    #         x = ~ FriendlyProjectName,
-    #         y = ~ Percent
-    #       ) %>%
-    #         add_trace(type = "bar") %>%
-    #         layout(
-    #           shapes = list(
-    #             type = 'line',
-    #             xref = "paper",
-    #             yref = "y",
-    #             x0 = 0,
-    #             x1 = 1,
-    #             y0 = hpPlacementGoal,
-    #             y1 = hpPlacementGoal,
-    #             line = list(width = 1),
-    #             name = "CoC Goal"
-    #           ),
-    #           title = 'Homelessness Prevention',
-    #           margin = list(
-    #             l = 50,
-    #             r = 50,
-    #             b = 100,
-    #             t = 100,
-    #             pad = 4
-    #           ),
-    #           yaxis = list(title = "Exits to Permanent Housing", 
-    #                        showgrid = TRUE,
-    #                        rangemode = "tozero"),
-    #           xaxis = list(title = "", 
-    #                        showgrid = TRUE,
-    #                        rangemode = "tozero")
-    #         )%>% 
-    #         layout(yaxis = list(tickformat = "%"))
-    #       
-    #     })
-    #   }
-    # else{
-    #   
-    # }
+
+    output$QPRSuccessfulPlacementPSH <-
+      if (nrow(QPR_EEs %>%
+               filter(Region %in% c(input$SuccessPlaceRegionSelect) &
+                      ProjectType == 3)) > 0) {
+        renderPlotly({
+          ReportStart <- format.Date(ymd(paste0(
+            substr(input$SuccessPlaceSlider, 1, 4),
+            "-01-01"
+          )), "%m-%d-%Y")
+          ReportEnd <- format.Date(mdy(paste0(
+            case_when(
+              substr(input$SuccessPlaceSlider, 7, 7) == 1 ~ "03-31-",
+              substr(input$SuccessPlaceSlider, 7, 7) == 2 ~ "06-30",
+              substr(input$SuccessPlaceSlider, 7, 7) == 3 ~ "09-30-",
+              substr(input$SuccessPlaceSlider, 7, 7) == 4 ~ "12-31-"
+            ),
+            substr(input$SuccessPlaceSlider, 1, 4)
+          )), "%m-%d-%Y")
+
+          ptc <- 3
+
+          SuccessfullyPlaced <- QPR_EEs %>%
+            filter(
+              ProjectType == ptc &
+                Region %in% c(input$SuccessPlaceRegionSelect) &
+                ((
+                  ProjectType %in% c(3, 9, 13) & !is.na(MoveInDateAdjust)
+                ) |
+                  ProjectType %in% c(1, 2, 4, 8, 12)) &
+                # excluding non-mover-inners
+                ((
+                  DestinationGroup == "Permanent" &
+                    (exited_between(., ReportStart, ReportEnd) |
+                       #exited to ph or still in PSH/HP
+                       is.na(ExitDate))
+                ) &
+                  ProjectType %in% c(3, 9, 12) # PSH & HP
+                ) |
+                (
+                  DestinationGroup == "Permanent" & # exited to ph
+                    exited_between(., ReportStart, ReportEnd) &
+                    ProjectType %in% c(1, 2, 4, 8, 13)
+                ) # ES, TH, SH, RRH, OUT
+                ) %>%
+                group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+                summarise(SuccessfullyPlacedHHs = n())
+              
+              # calculating the total households to compare successful placements to
+              TotalHHsSuccessfulPlacement <- QPR_EEs %>%
+                filter(
+                  ProjectType == ptc &
+                    Region %in% c(input$SuccessPlaceRegionSelect) &
+                    (
+                      served_between(., ReportStart, ReportEnd) &
+                        ProjectType %in% c(3, 9, 12) # PSH & HP
+                    ) |
+                    (
+                      exited_between(., ReportStart, ReportEnd) &
+                        ProjectType %in% c(1, 2, 4, 8, 13) # ES, TH, SH, OUT, RRH
+                    )
+                ) %>%
+                group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+                summarise(TotalHHs = n()) # For PSH & HP, it's total hhs served;
+          # otherwise, it's total hhs *exited* during the reporting period
+
+          SuccessfulPlacement <- TotalHHsSuccessfulPlacement %>%
+            left_join(SuccessfullyPlaced,
+                      by = c("FriendlyProjectName", "ProjectType", "County", "Region")) %>%
+            mutate(Percent = SuccessfullyPlacedHHs / TotalHHs)
+
+          SuccessfulPlacement[is.na(SuccessfulPlacement)] <- 0
+
+          rm(TotalHHsSuccessfulPlacement, SuccessfullyPlaced)
+
+          pshPlacementData <-
+            SuccessfulPlacement %>%
+            filter(ProjectType == ptc &
+                     Region %in% c(input$SuccessPlaceRegionSelect))
+
+          pshPlacementGoal <-
+            as.numeric(
+              goals %>%
+                filter(
+                  ProjectType == ptc &
+                    SummaryMeasure == "Obtaining and Maintaining Permanent Housing" &
+                    !is.na(Goal)
+                ) %>%
+                select(Goal)
+            )
+
+          plot_ly(
+            data = pshPlacementData,
+            x = ~ FriendlyProjectName,
+            y = ~ Percent
+          ) %>%
+            add_trace(type = "bar") %>%
+            layout(
+              shapes = list(
+                type = 'line',
+                xref = "paper",
+                yref = "y",
+                x0 = 0,
+                x1 = 1,
+                y0 = pshPlacementGoal,
+                y1 = pshPlacementGoal,
+                line = list(width = 1),
+                name = "CoC Goal"
+              ),
+              title = 'Permanent Supportive Housing',
+              margin = list(
+                l = 50,
+                r = 50,
+                b = 100,
+                t = 100,
+                pad = 4
+              ),
+              yaxis = list(title = "Exits to Permanent Housing",
+                           showgrid = TRUE,
+                           rangemode = "tozero"),
+              xaxis = list(title = "",
+                           showgrid = TRUE,
+                           rangemode = "tozero")
+            )%>%
+            layout(yaxis = list(tickformat = "%"))
+
+        })
+      }
+    else{
+
+    }
+
+    output$QPRSuccessfulPlacementOUT <-
+      if (nrow(QPR_EEs %>% 
+               filter(Region %in% c(input$SuccessPlaceRegionSelect) &
+      ProjectType == 4)) > 0) {
+        renderPlotly({
+          ReportStart <- format.Date(ymd(paste0(
+            substr(input$SuccessPlaceSlider, 1, 4),
+            "-01-01"
+          )), "%m-%d-%Y")
+          ReportEnd <- format.Date(mdy(paste0(
+            case_when(
+              substr(input$SuccessPlaceSlider, 7, 7) == 1 ~ "03-31-",
+              substr(input$SuccessPlaceSlider, 7, 7) == 2 ~ "06-30",
+              substr(input$SuccessPlaceSlider, 7, 7) == 3 ~ "09-30-",
+              substr(input$SuccessPlaceSlider, 7, 7) == 4 ~ "12-31-"
+            ),
+            substr(input$SuccessPlaceSlider, 1, 4)
+          )), "%m-%d-%Y")
+
+          ptc <- 4 # Street Outreach
+
+          SuccessfullyPlaced <- QPR_EEs %>%
+            filter(
+              ProjectType == ptc &
+                Region %in% c(input$SuccessPlaceRegionSelect) &
+                DestinationGroup == "Permanent" & # exited to ph
+                exited_between(., ReportStart, ReportEnd)
+            ) %>%
+            group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+            summarise(SuccessfullyPlacedHHs = n())
+
+          # calculating the total households to compare successful placements to
+          TotalHHsSuccessfulPlacement <- QPR_EEs %>%
+            filter(ProjectType == ptc &
+                     Region %in% c(input$SuccessPlaceRegionSelect) &
+                     exited_between(., ReportStart, ReportEnd)
+              ) %>%
+            group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+            summarise(TotalHHs = n()) # For PSH & HP, it's total hhs served;
+          # otherwise, it's total hhs *exited* during the reporting period
+
+          SuccessfulPlacement <- TotalHHsSuccessfulPlacement %>%
+            left_join(SuccessfullyPlaced,
+                      by = c("FriendlyProjectName", "ProjectType", "County", "Region")) %>%
+            mutate(Percent = SuccessfullyPlacedHHs / TotalHHs)
+
+          SuccessfulPlacement[is.na(SuccessfulPlacement)] <- 0
+
+          rm(TotalHHsSuccessfulPlacement, SuccessfullyPlaced)
+
+          outPlacementData <-
+            SuccessfulPlacement %>%
+            filter(ProjectType == ptc &
+                     Region %in% c(input$SuccessPlaceRegionSelect))
+
+          outPlacementGoal <-
+            as.numeric(
+              goals %>%
+                filter(
+                  ProjectType == ptc &
+                    Measure == "Exits to Permanent Housing" &
+                    !is.na(Goal)
+                ) %>%
+                select(Goal)
+            )
+
+          plot_ly(
+            data = outPlacementData,
+            x = ~ FriendlyProjectName,
+            y = ~ Percent
+          ) %>%
+            add_trace(type = "bar") %>%
+            layout(
+              shapes = list(
+                type = 'line',
+                xref = "paper",
+                yref = "y",
+                x0 = 0,
+                x1 = 1,
+                y0 = outPlacementGoal,
+                y1 = outPlacementGoal,
+                line = list(width = 1),
+                name = "CoC Goal"
+              ),
+              title = 'Street Outreach',
+              margin = list(
+                l = 50,
+                r = 50,
+                b = 100,
+                t = 100,
+                pad = 4
+              ),
+              yaxis = list(title = "Exits to Permanent Housing",
+                           showgrid = TRUE,
+                           rangemode = "tozero"),
+              xaxis = list(title = "",
+                           showgrid = TRUE,
+                           rangemode = "tozero")
+            )%>%
+            layout(yaxis = list(tickformat = "%"))
+
+        })
+      }
+    else{
+
+    }
+
+    output$QPRSuccessfulPlacementSH <-
+      if (nrow(QPR_EEs %>%
+               filter(Region %in% c(input$SuccessPlaceRegionSelect) &
+               ProjectType == 8)) > 0) {
+        renderPlotly({
+          ReportStart <- format.Date(ymd(paste0(
+            substr(input$SuccessPlaceSlider, 1, 4),
+            "-01-01"
+          )), "%m-%d-%Y")
+          ReportEnd <- format.Date(mdy(paste0(
+            case_when(
+              substr(input$SuccessPlaceSlider, 7, 7) == 1 ~ "03-31-",
+              substr(input$SuccessPlaceSlider, 7, 7) == 2 ~ "06-30",
+              substr(input$SuccessPlaceSlider, 7, 7) == 3 ~ "09-30-",
+              substr(input$SuccessPlaceSlider, 7, 7) == 4 ~ "12-31-"
+            ),
+            substr(input$SuccessPlaceSlider, 1, 4)
+          )), "%m-%d-%Y")
+
+          ptc <- 8 # Safe Haven
+
+          SuccessfullyPlaced <- QPR_EEs %>%
+            filter(
+              ProjectType == ptc &
+                Region %in% c(input$SuccessPlaceRegionSelect) &
+                DestinationGroup == "Permanent" & # exited to ph
+                   exited_between(., ReportStart, ReportEnd)
+            ) %>%
+            group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+            summarise(SuccessfullyPlacedHHs = n())
+
+          # calculating the total households to compare successful placements to
+          TotalHHsSuccessfulPlacement <- QPR_EEs %>%
+            filter(
+              ProjectType == ptc &
+                Region %in% c(input$SuccessPlaceRegionSelect) &
+                exited_between(., ReportStart, ReportEnd)
+            ) %>%
+            group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+            summarise(TotalHHs = n()) # For PSH & HP, it's total hhs served;
+          # otherwise, it's total hhs *exited* during the reporting period
+
+          SuccessfulPlacement <- TotalHHsSuccessfulPlacement %>%
+            left_join(SuccessfullyPlaced,
+                      by = c("FriendlyProjectName", "ProjectType", "County", "Region")) %>%
+            mutate(Percent = SuccessfullyPlacedHHs / TotalHHs)
+
+          SuccessfulPlacement[is.na(SuccessfulPlacement)] <- 0
+
+          rm(TotalHHsSuccessfulPlacement, SuccessfullyPlaced)
+
+          shPlacementData <-  SuccessfulPlacement
+          
+          shPlacementGoal <-
+            as.numeric(
+              goals %>%
+                filter(
+                  ProjectType == ptc &
+                    SummaryMeasure == "Obtaining and Maintaining Permanent Housing" &
+                    !is.na(Goal)
+                ) %>%
+                select(Goal)
+            )
+
+          plot_ly(
+            data = shPlacementData,
+            x = ~ FriendlyProjectName,
+            y = ~ Percent
+          ) %>%
+            add_trace(type = "bar") %>%
+            layout(
+              shapes = list(
+                type = 'line',
+                xref = "paper",
+                yref = "y",
+                x0 = 0,
+                x1 = 1,
+                y0 = shPlacementGoal,
+                y1 = shPlacementGoal,
+                line = list(width = 1),
+                name = "CoC Goal"
+              ),
+              title = 'Safe Haven',
+              margin = list(
+                l = 50,
+                r = 50,
+                b = 100,
+                t = 100,
+                pad = 4
+              ),
+              yaxis = list(title = "Exits to Permanent Housing",
+                           showgrid = TRUE,
+                           rangemode = "tozero"),
+              xaxis = list(title = "",
+                           showgrid = TRUE,
+                           rangemode = "tozero")
+            )%>%
+            layout(yaxis = list(tickformat = "%"))
+
+        })
+      }
+    else{
+
+    }
+    
+    output$QPRSuccessfulPlacementHP <-
+      if (nrow(QPR_EEs %>% 
+               filter(Region %in% c(input$SuccessPlaceRegionSelect) &
+      ProjectType == 12)) > 0) {
+        renderPlotly({
+          ReportStart <- format.Date(ymd(paste0(
+            substr(input$SuccessPlaceSlider, 1, 4),
+            "-01-01"
+          )), "%m-%d-%Y")
+          ReportEnd <- format.Date(mdy(paste0(
+            case_when(
+              substr(input$SuccessPlaceSlider, 7, 7) == 1 ~ "03-31-",
+              substr(input$SuccessPlaceSlider, 7, 7) == 2 ~ "06-30",
+              substr(input$SuccessPlaceSlider, 7, 7) == 3 ~ "09-30-",
+              substr(input$SuccessPlaceSlider, 7, 7) == 4 ~ "12-31-"
+            ),
+            substr(input$SuccessPlaceSlider, 1, 4)
+          )), "%m-%d-%Y")
+
+          ptc <- 12 # Homelessness Prevention
+
+          SuccessfullyPlaced <- QPR_EEs %>%
+            filter(
+              ProjectType == ptc &
+                Region %in% c(input$SuccessPlaceRegionSelect) &
+                ((ProjectType %in% c(3, 9, 13) & !is.na(MoveInDateAdjust)) |
+                   ProjectType %in% c(1, 2, 4, 8, 12)) & # excluding non-mover-inners
+                ((DestinationGroup == "Permanent" &
+                    (exited_between(., ReportStart, ReportEnd) | #exited to ph or still in PSH/HP
+                       is.na(ExitDate))) &
+                   ProjectType %in% c(3, 9, 12) # PSH & HP
+                ) |
+                (DestinationGroup == "Permanent" & # exited to ph
+                   exited_between(., ReportStart, ReportEnd) &
+                   ProjectType %in% c(1, 2, 4, 8, 13)) # ES, TH, SH, RRH, OUT
+            ) %>%
+            group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+            summarise(SuccessfullyPlacedHHs = n())
+
+          # calculating the total households to compare successful placements to
+          TotalHHsSuccessfulPlacement <- QPR_EEs %>%
+            filter(
+              ProjectType == ptc &
+                Region %in% c(input$SuccessPlaceRegionSelect) &
+                
+                (
+                  served_between(., ReportStart, ReportEnd) &
+                    ProjectType %in% c(3, 9, 12) # PSH & HP
+                ) |
+                (
+                  exited_between(., ReportStart, ReportEnd) &
+                    ProjectType %in% c(1, 2, 4, 8, 13) # ES, TH, SH, OUT, RRH
+                )
+            ) %>%
+            group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+            summarise(TotalHHs = n()) # For PSH & HP, it's total hhs served;
+          # otherwise, it's total hhs *exited* during the reporting period
+
+          SuccessfulPlacement <- TotalHHsSuccessfulPlacement %>%
+            left_join(SuccessfullyPlaced,
+                      by = c("FriendlyProjectName", "ProjectType", "County", "Region")) %>%
+            mutate(Percent = SuccessfullyPlacedHHs / TotalHHs)
+
+          SuccessfulPlacement[is.na(SuccessfulPlacement)] <- 0
+
+          rm(TotalHHsSuccessfulPlacement, SuccessfullyPlaced)
+
+          hpPlacementData <- SuccessfulPlacement
+          
+          hpPlacementGoal <-
+            as.numeric(
+              goals %>%
+                filter(
+                  ProjectType == ptc &
+                    SummaryMeasure == "Obtaining and Maintaining Permanent Housing" &
+                    !is.na(Goal)
+                ) %>%
+                select(Goal)
+            )
+
+          plot_ly(
+            data = hpPlacementData,
+            x = ~ FriendlyProjectName,
+            y = ~ Percent
+          ) %>%
+            add_trace(type = "bar") %>%
+            layout(
+              shapes = list(
+                type = 'line',
+                xref = "paper",
+                yref = "y",
+                x0 = 0,
+                x1 = 1,
+                y0 = hpPlacementGoal,
+                y1 = hpPlacementGoal,
+                line = list(width = 1),
+                name = "CoC Goal"
+              ),
+              title = 'Homelessness Prevention',
+              margin = list(
+                l = 50,
+                r = 50,
+                b = 100,
+                t = 100,
+                pad = 4
+              ),
+              yaxis = list(title = "Exits to Permanent Housing",
+                           showgrid = TRUE,
+                           rangemode = "tozero"),
+              xaxis = list(title = "",
+                           showgrid = TRUE,
+                           rangemode = "tozero")
+            )%>%
+            layout(yaxis = list(tickformat = "%"))
+
+        })
+      }
+    else{
+
+    }
     output$QPRSuccessfulPlacementRRH <-
-      if (nrow(QPR_EEs %>% filter(Region %in% parse_number(c(
-        input$LoSRegionSelect
-      )) &
+      if (nrow(QPR_EEs %>% filter(Region %in% c(input$SuccessPlaceRegionSelect) &
       ProjectType == 13)) > 0) {
         renderPlotly({
           ReportStart <- format.Date(ymd(paste0(
@@ -1447,31 +1417,21 @@ function(input, output, session) {
           SuccessfullyPlaced <- QPR_EEs %>%
             filter(
               ProjectType == ptc &
-                ((ProjectType %in% c(3, 9, 13) & !is.na(MoveInDateAdjust)) |
-                   ProjectType %in% c(1, 2, 4, 8, 12)) & # excluding non-mover-inners
-                ((DestinationGroup == "Permanent" &
-                    (exited_between(., ReportStart, ReportEnd) | #exited to ph or still in PSH/HP
-                       is.na(ExitDate))) &
-                   ProjectType %in% c(3, 9, 12) # PSH & HP
-                ) |
-                (DestinationGroup == "Permanent" & # exited to ph
-                   exited_between(., ReportStart, ReportEnd) &
-                   ProjectType %in% c(1, 2, 4, 8, 13)) # ES, TH, SH, RRH, OUT
+                Region %in% c(input$SuccessPlaceRegionSelect) &
+                !is.na(MoveInDateAdjust) & # excluding non-mover-inners
+                DestinationGroup == "Permanent" & # exited to ph
+                exited_between(., ReportStart, ReportEnd)
             ) %>%
             group_by(FriendlyProjectName, ProjectType, County, Region) %>%
             summarise(SuccessfullyPlacedHHs = n())
 
           # calculating the total households to compare successful placements to
           TotalHHsSuccessfulPlacement <- QPR_EEs %>%
-            filter(ProjectType == ptc &(
-
-              served_between(., ReportStart, ReportEnd) &
-                ProjectType %in% c(3, 9, 12) # PSH & HP
-            ) |
-              (
-                exited_between(., ReportStart, ReportEnd) &
-                  ProjectType %in% c(1, 2, 4, 8, 13) # ES, TH, SH, OUT, RRH
-              )) %>%
+            filter(
+              ProjectType == ptc &
+                Region %in% c(input$SuccessPlaceRegionSelect) &
+                exited_between(., ReportStart, ReportEnd)
+            ) %>%
             group_by(FriendlyProjectName, ProjectType, County, Region) %>%
             summarise(TotalHHs = n()) # For PSH & HP, it's total hhs served;
           # otherwise, it's total hhs *exited* during the reporting period
@@ -1483,13 +1443,8 @@ function(input, output, session) {
 
           SuccessfulPlacement[is.na(SuccessfulPlacement)] <- 0
 
-          rm(TotalHHsSuccessfulPlacement, SuccessfullyPlaced)
-
-          rrhPlacementData <-
-            SuccessfulPlacement %>%
-            filter(ProjectType == ptc &
-                     Region %in% parse_number(c(input$SuccessPlaceRegionSelect)))
-
+          rrhPlacementData <- SuccessfulPlacement
+          
           rrhPlacementGoal <-
             as.numeric(
               goals %>%
