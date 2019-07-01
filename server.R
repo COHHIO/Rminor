@@ -321,8 +321,7 @@ function(input, output, session) {
           # to be here so the selection text matches the mutated data
           
           LoSSummary <- LoSDetail %>%
-            group_by(brokenProjectNames,
-                     FriendlyProjectName,
+            group_by(FriendlyProjectName,
                      Region,
                      County,
                      ProjectType) %>%
@@ -429,8 +428,7 @@ function(input, output, session) {
           # to be here so the selection text matches the mutated data
           
           LoSSummary <- LoSDetail %>%
-            group_by(brokenProjectNames,
-                     FriendlyProjectName,
+            group_by(FriendlyProjectName,
                      Region,
                      County,
                      ProjectType) %>%
@@ -538,8 +536,7 @@ function(input, output, session) {
           # to be here so the selection text matches the mutated data
           
           LoSSummary <- LoSDetail %>%
-            group_by(brokenProjectNames,
-                     FriendlyProjectName,
+            group_by(FriendlyProjectName,
                      Region,
                      County,
                      ProjectType) %>%
@@ -646,8 +643,7 @@ function(input, output, session) {
           # to be here so the selection text matches the mutated data
           
           LoSSummary <- LoSDetail %>%
-            group_by(brokenProjectNames,
-                     FriendlyProjectName,
+            group_by(FriendlyProjectName,
                      Region,
                      County,
                      ProjectType) %>%
