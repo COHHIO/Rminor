@@ -697,8 +697,11 @@ function(input, output, session) {
     else{
 
     }
-
-    output$QPRSuccessfulPlacementES <-
+  
+  })
+    
+    observeEvent(c(input$SuccessPlaceRegionSelect), {
+      output$QPRSuccessfulPlacementES <-
       if (nrow(QPR_EEs %>% filter(Region %in% c(input$SuccessPlaceRegionSelect) &
                                   ProjectType == 1)) > 0) {
         renderPlotly({
