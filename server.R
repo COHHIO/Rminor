@@ -369,7 +369,7 @@ function(input, output, session) {
               yaxis = list(title = "Length of Stay (Days)", 
                            rangemode = "tozero",
                            showgrid = TRUE),
-              xaxis = list(title = "Providers", showgrid = TRUE,
+              xaxis = list(title = "", showgrid = TRUE,
                            rangemode = "tozero")
             )
           
@@ -475,7 +475,7 @@ function(input, output, session) {
               yaxis = list(title = "Length of Stay (Days)",
                            showgrid = TRUE,
                            rangemode = "tozero"),
-              xaxis = list(title = "Providers",
+              xaxis = list(title = "",
                            showgrid = TRUE,
                            rangemode = "tozero")
             )
@@ -581,7 +581,7 @@ function(input, output, session) {
               yaxis = list(title = "Length of Stay (Days)",
                            showgrid = TRUE,
                            rangemode = "tozero"),
-              xaxis = list(title = "Providers",
+              xaxis = list(title = "",
                            showgrid = TRUE,
                            rangemode = "tozero")
             )
@@ -686,7 +686,7 @@ function(input, output, session) {
               yaxis = list(title = "Length of Stay (Days)",
                            showgrid = TRUE,
                            rangemode = "tozero"),
-              xaxis = list(title = "Providers",
+              xaxis = list(title = "",
                            showgrid = TRUE,
                            rangemode = "tozero")
             )
