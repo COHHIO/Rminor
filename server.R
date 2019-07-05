@@ -300,11 +300,11 @@ function(input, output, session) {
             unique()
           
           LoSDetail <- QPR_EEs %>%
-            filter((((!is.na(MoveInDateAdjust) &
+            filter(((!is.na(MoveInDateAdjust) &
                         ProjectType %in% c(13)) |
-                       (ProjectType %in% c(1, 2, 8)) &
-                       !is.na(ExitDate)
-            )) &
+                       (ProjectType %in% c(1, 2, 8) &
+                       !is.na(ExitDate))
+            ) &
               exited_between(., ReportStart, ReportEnd)) %>%
             mutate(
               ProjectType = case_when(
