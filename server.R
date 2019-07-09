@@ -300,11 +300,11 @@ function(input, output, session) {
             unique()
           
           LoSDetail <- QPR_EEs %>%
-            filter((((!is.na(MoveInDateAdjust) &
+            filter(((!is.na(MoveInDateAdjust) &
                         ProjectType %in% c(13)) |
-                       (ProjectType %in% c(1, 2, 8)) &
-                       !is.na(ExitDate)
-            )) &
+                       (ProjectType %in% c(1, 2, 8) &
+                       !is.na(ExitDate))
+            ) &
               exited_between(., ReportStart, ReportEnd)) %>%
             mutate(
               ProjectType = case_when(
@@ -369,7 +369,7 @@ function(input, output, session) {
               yaxis = list(title = "Length of Stay (Days)", 
                            rangemode = "tozero",
                            showgrid = TRUE),
-              xaxis = list(title = "Providers", showgrid = TRUE,
+              xaxis = list(title = "", showgrid = TRUE,
                            rangemode = "tozero")
             )
           
@@ -475,7 +475,7 @@ function(input, output, session) {
               yaxis = list(title = "Length of Stay (Days)",
                            showgrid = TRUE,
                            rangemode = "tozero"),
-              xaxis = list(title = "Providers",
+              xaxis = list(title = "",
                            showgrid = TRUE,
                            rangemode = "tozero")
             )
@@ -581,7 +581,7 @@ function(input, output, session) {
               yaxis = list(title = "Length of Stay (Days)",
                            showgrid = TRUE,
                            rangemode = "tozero"),
-              xaxis = list(title = "Providers",
+              xaxis = list(title = "",
                            showgrid = TRUE,
                            rangemode = "tozero")
             )
@@ -686,7 +686,7 @@ function(input, output, session) {
               yaxis = list(title = "Length of Stay (Days)",
                            showgrid = TRUE,
                            rangemode = "tozero"),
-              xaxis = list(title = "Providers",
+              xaxis = list(title = "",
                            showgrid = TRUE,
                            rangemode = "tozero")
             )
