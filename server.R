@@ -2,6 +2,7 @@
 
 
 
+
 function(input, output, session) {
   output$res <- renderPrint({
     input$LoSRegionSelect
@@ -193,10 +194,7 @@ function(input, output, session) {
       
       bedPlot <- BedUtilization %>% select(-FilePeriod) %>%
         gather("Month",
-               "Utilization",
-               -ProjectID,
-               -ProjectName,
-               -ProjectType) %>%
+               "Utilization",-ProjectID,-ProjectName,-ProjectType) %>%
         filter(
           ProjectName == input$providerListUtilization,
           mdy(Month) %within% ReportingPeriod
@@ -209,10 +207,7 @@ function(input, output, session) {
       
       unitPlot <- UnitUtilization %>% select(-FilePeriod) %>%
         gather("Month",
-               "Utilization",
-               -ProjectID,
-               -ProjectName,
-               -ProjectType) %>%
+               "Utilization",-ProjectID,-ProjectName,-ProjectType) %>%
         filter(
           ProjectName == input$providerListUtilization,
           mdy(Month) %within% ReportingPeriod
@@ -228,8 +223,10 @@ function(input, output, session) {
                   by = c("ProjectID", "ProjectName", "ProjectType", "Month")) %>%
         gather(
           "UtilizationType",
-          "Utilization",
-          -ProjectID,-ProjectName,-ProjectType,-Month
+          "Utilization",-ProjectID,
+          -ProjectName,
+          -ProjectType,
+          -Month
         ) %>%
         arrange(Month)
       
@@ -272,12 +269,10 @@ function(input, output, session) {
   output$NoteToUsers <-
     renderText(noteToUsers)
   
-  observeEvent(c(input$LoSRegionSelect), {
+  observeEvent(c(input$LoSRegionSelect, input$LoSSlider), {
     output$QPRLoSPlotEE <- #should this be "ES" instead of "EE"???
-      if (nrow(QPR_EEs %>% filter(Region %in% c(
-        input$LoSRegionSelect
-      ) &
-      ProjectType == 1)) > 0) {
+      if (nrow(QPR_EEs %>% filter(Region %in% c(input$LoSRegionSelect) &
+                                  ProjectType == 1)) > 0) {
         renderPlotly({
           ReportStart <- format.Date(ymd(paste0(
             substr(input$LoSSlider, 1, 4),
@@ -380,10 +375,8 @@ function(input, output, session) {
     }
     
     output$QPRLoSPlotTH <-
-      if (nrow(QPR_EEs %>% filter(Region %in% c(
-        input$LoSRegionSelect
-      ) &
-      ProjectType == 2)) > 0) {
+      if (nrow(QPR_EEs %>% filter(Region %in% c(input$LoSRegionSelect) &
+                                  ProjectType == 2)) > 0) {
         renderPlotly({
           ReportStart <- format.Date(ymd(paste0(
             substr(input$LoSSlider, 1, 4),
@@ -398,13 +391,13 @@ function(input, output, session) {
             ),
             substr(input$LoSSlider, 1, 4)
           )), "%m-%d-%Y")
-
+          
           LoSGoals <- goals %>%
             select(-Measure) %>%
             filter(SummaryMeasure == "Length of Stay" &
                      !is.na(Goal)) %>%
             unique()
-
+          
           LoSDetail <- QPR_EEs %>%
             filter((((!is.na(MoveInDateAdjust) &
                         ProjectType %in% c(13)) |
@@ -425,7 +418,7 @@ function(input, output, session) {
             ) %>%
             filter(Region %in% c(input$LoSRegionSelect)) # this filter needs
           # to be here so the selection text matches the mutated data
-
+          
           LoSSummary <- LoSDetail %>%
             group_by(FriendlyProjectName,
                      Region,
@@ -439,13 +432,13 @@ function(input, output, session) {
                   as.integer(median(DaysinProject, na.rm = TRUE))
               )
             )
-
+          
           thdata <-
             LoSSummary %>% filter(ProjectType == "Transitional Housing")
           thLoSGoal <- as.integer(LoSGoals %>%
                                     filter(ProjectType == 2) %>%
                                     select(Goal))
-
+          
           plot_ly(
             data = thdata,
             x = ~ FriendlyProjectName,
@@ -479,18 +472,16 @@ function(input, output, session) {
                            showgrid = TRUE,
                            rangemode = "tozero")
             )
-
+          
         })
       }
     else{
-
+      
     }
-
+    
     output$QPRLoSPlotSH <-
-      if (nrow(QPR_EEs %>% filter(Region %in% c(
-        input$LoSRegionSelect
-      ) &
-      ProjectType == 8)) > 0) {
+      if (nrow(QPR_EEs %>% filter(Region %in% c(input$LoSRegionSelect) &
+                                  ProjectType == 8)) > 0) {
         renderPlotly({
           ReportStart <- format.Date(ymd(paste0(
             substr(input$LoSSlider, 1, 4),
@@ -505,13 +496,13 @@ function(input, output, session) {
             ),
             substr(input$LoSSlider, 1, 4)
           )), "%m-%d-%Y")
-
+          
           LoSGoals <- goals %>%
             select(-Measure) %>%
             filter(SummaryMeasure == "Length of Stay" &
                      !is.na(Goal)) %>%
             unique()
-
+          
           LoSDetail <- QPR_EEs %>%
             filter((((!is.na(MoveInDateAdjust) &
                         ProjectType %in% c(13)) |
@@ -532,7 +523,7 @@ function(input, output, session) {
             ) %>%
             filter(Region %in% c(input$LoSRegionSelect)) # this filter needs
           # to be here so the selection text matches the mutated data
-
+          
           LoSSummary <- LoSDetail %>%
             group_by(FriendlyProjectName,
                      Region,
@@ -546,12 +537,13 @@ function(input, output, session) {
                   as.integer(median(DaysinProject, na.rm = TRUE))
               )
             )
-
-          shdata <- LoSSummary %>% filter(ProjectType == "Safe Haven")
+          
+          shdata <-
+            LoSSummary %>% filter(ProjectType == "Safe Haven")
           shLoSGoal <- as.integer(LoSGoals %>%
                                     filter(ProjectType == 8) %>%
                                     select(Goal))
-
+          
           plot_ly(
             data = shdata,
             x = ~ FriendlyProjectName,
@@ -585,13 +577,14 @@ function(input, output, session) {
                            showgrid = TRUE,
                            rangemode = "tozero")
             )
-
-
+          
+          
         })
       }
     else{
+      
     }
-
+    
     output$QPRLoSPlotRRH <-
       if (nrow(QPR_EEs %>% filter(Region %in% c(input$LoSRegionSelect) &
                                   ProjectType == 13)) > 0) {
@@ -609,13 +602,13 @@ function(input, output, session) {
             ),
             substr(input$LoSSlider, 1, 4)
           )), "%m-%d-%Y")
-
+          
           LoSGoals <- goals %>%
             select(-Measure) %>%
             filter(SummaryMeasure == "Length of Stay" &
                      !is.na(Goal)) %>%
             unique()
-
+          
           LoSDetail <- QPR_EEs %>%
             filter((((!is.na(MoveInDateAdjust) &
                         ProjectType %in% c(13)) |
@@ -636,7 +629,7 @@ function(input, output, session) {
             ) %>%
             filter(Region %in% c(input$LoSRegionSelect)) # this filter needs
           # to be here so the selection text matches the mutated data
-
+          
           LoSSummary <- LoSDetail %>%
             group_by(FriendlyProjectName,
                      Region,
@@ -650,13 +643,13 @@ function(input, output, session) {
                   as.integer(median(DaysinProject, na.rm = TRUE))
               )
             )
-
+          
           rrhdata <-
             LoSSummary %>% filter(ProjectType == "Rapid Rehousing")
           rrhLoSGoal <- as.integer(LoSGoals %>%
                                      filter(ProjectType == 13) %>%
                                      select(Goal))
-
+          
           plot_ly(
             data = rrhdata,
             x = ~ FriendlyProjectName,
@@ -683,21 +676,143 @@ function(input, output, session) {
                 t = 100,
                 pad = 4
               ),
-              yaxis = list(title = "Length of Stay (Days)",
-                           showgrid = TRUE,
-                           rangemode = "tozero"),
-              xaxis = list(title = "",
-                           showgrid = TRUE,
-                           rangemode = "tozero")
+              yaxis = list(
+                title = "Length of Stay (Days)",
+                showgrid = TRUE,
+                rangemode = "tozero"
+              ),
+              xaxis = list(
+                title = "",
+                showgrid = TRUE,
+                rangemode = "tozero"
+              )
             )
-
-
+          
+          
         })
       }
     else{
-
+      
     }
-  
-  })
     
+  })
+  
+  observeEvent(
+    c(input$ExitsToPHRegionSelect, input$ExitsToPHSlider),
+    {
+      output$ExitsToPH <- renderPlotly({
+        ReportStart <- format.Date(ymd(paste0(
+          substr(input$ExitsToPHSlider, 1, 4),
+          "-01-01"
+        )), "%m-%d-%Y")
+        ReportEnd <- format.Date(mdy(paste0(
+          case_when(
+            substr(input$ExitsToPHSlider, 7, 7) == 1 ~ "03-31-",
+            substr(input$ExitsToPHSlider, 7, 7) == 2 ~ "06-30",
+            substr(input$ExitsToPHSlider, 7, 7) == 3 ~ "09-30-",
+            substr(input$ExitsToPHSlider, 7, 7) == 4 ~ "12-31-"
+          ),
+          substr(input$ExitsToPHSlider, 1, 4)
+        )), "%m-%d-%Y")
+        
+        SuccessfullyPlaced <- QPR_EEs %>%
+          filter(
+            exited_between(., ReportStart, ReportEnd) &
+              ((ProjectType %in% c(3, 9, 13) &
+                  !is.na(MoveInDateAdjust)) |
+                 ProjectType %in% c(1, 2, 4, 8, 12)
+              ) & # excluding non-mover-inners
+              ((DestinationGroup == "Permanent" |
+                  #exited to ph or still in PSH/HP
+                  is.na(ExitDate)) &
+                 ProjectType %in% c(3, 9, 12) # PSH & HP
+              ) |
+              (
+                DestinationGroup == "Permanent" & # exited to ph
+                  ProjectType %in% c(1, 2, 4, 8, 13)
+              ) # ES, TH, SH, RRH, OUT
+          ) %>%
+          group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+          summarise(SuccessfullyPlacedHHs = n())
+        
+        # calculating the total households to compare successful placements to
+        TotalHHsSuccessfulPlacement <- QPR_EEs %>%
+          filter((
+            served_between(., ReportStart, ReportEnd) &
+              ProjectType %in% c(3, 9, 12) # PSH & HP
+          ) |
+            (
+              exited_between(., ReportStart, ReportEnd) &
+                ProjectType %in% c(1, 2, 4, 8, 13) # ES, TH, SH, OUT, RRH
+            )) %>%
+          group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+          summarise(TotalHHs = n()) # For PSH & HP, it's total hhs served;
+        # otherwise, it's total hhs *exited* during the reporting period
+        
+        SuccessfulPlacement <- TotalHHsSuccessfulPlacement %>%
+          left_join(
+            SuccessfullyPlaced,
+            by = c("FriendlyProjectName", "ProjectType", "County", "Region")
+          ) %>%
+          mutate(Percent = SuccessfullyPlacedHHs / TotalHHs)
+        
+        SuccessfulPlacement[is.na(SuccessfulPlacement)] <- 0
+        
+        PlacementGoal <-
+          goals %>%
+          filter(
+            SummaryMeasure == "Obtaining and Maintaining Permanent Housing" &
+              Measure != "Exits to Temporary or Permanent Housing"
+          )
+        
+        region <- input$ExitsToPHRegionSelect
+        ptc <- 13
+        
+        stagingExitsToPH <- SuccessfulPlacement %>%
+          left_join(PlacementGoal, by = "ProjectType") %>%
+          filter(ProjectType == ptc, Region == region) %>%
+          mutate(
+            hover = paste0(
+              FriendlyProjectName,
+              "\nExited to PH: ",
+              SuccessfullyPlacedHHs,
+              "\nTotal Leavers: ",
+              TotalHHs,
+              "\n",
+              as.integer(Percent * 100),
+              "%",
+              sep = "\n"
+            )
+          )
+        
+        plot_ly(
+          stagingExitsToPH,
+          x = ~ FriendlyProjectName,
+          y = ~ Percent,
+          text = ~ hover,
+          hoverinfo = 'text',
+          type = "bar"
+        ) %>%
+          layout(
+            xaxis = list(title = ~ FriendlyProjectName),
+            yaxis = list(title = "Percent Exited to Permanent Housing",
+                         tickformat = "%"),
+            shapes = list(
+              type = "rect",
+              name = "CoC Goal",
+              fillcolor = "#41ae76",
+              line = list(color = "white"),
+              layer = "below",
+              xref = "paper",
+              yref = "y",
+              x0 = 0,
+              x1 = 1,
+              y0 = ~ Goal[1],
+              y1 = 1,
+              opacity = .2
+            ),
+            title = "Obtaining and Maintaining Permanent Housing"
+          )
+      })
+  })
 }
