@@ -64,6 +64,16 @@ tagList(
                             unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
                           ),
                           selected = Sys.yearqtr() - 1 / 4),
+          prettyRadioButtons(
+            inputId = "radioLoSPTC",
+            label = "Program Type",
+            thick = TRUE,
+            animation = "pulse",
+            status = "info",
+            choices = c("Emergency Shelters", "Transitional Housing",
+                        "Safe Haven", "Rapid Rehousing"),
+            selected = "Emergency Shelters"
+          ),
           pickerInput(
             inputId = "LoSRegionSelect",
             "Select Region(s)",
@@ -81,17 +91,8 @@ tagList(
             choices = c("Average Days", "Median Days"),
             selected = "Average Days"
           ),
-          #verbatimTextOutput("res"),
-          plotlyOutput("QPRLoSPlotEE"),
-          br(),
-          br(),
-          plotlyOutput("QPRLoSPlotTH"),
-          br(),
-          br(),
-          plotlyOutput("QPRLoSPlotRRH"),
-          br(),
-          br(),
-          plotlyOutput("QPRLoSPlotSH")
+          # verbatimTextOutput("res"),
+          plotlyOutput("QPRLoSPlot")
         ),
         # tabItem LengthOfStay LoS
         tabItem(tabName = "PHTab",
