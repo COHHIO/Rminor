@@ -106,7 +106,7 @@ function(input, output, session) {
       ReportEnd <- format.Date(mdy(paste0(
         case_when(
           substr(input$spdatSlider, 7, 7) == 1 ~ "03-31-",
-          substr(input$spdatSlider, 7, 7) == 2 ~ "06-30",
+          substr(input$spdatSlider, 7, 7) == 2 ~ "06-30-",
           substr(input$spdatSlider, 7, 7) == 3 ~ "09-30-",
           substr(input$spdatSlider, 7, 7) == 4 ~ "12-31-"
         ),
@@ -281,7 +281,7 @@ function(input, output, session) {
           ReportEnd <- format.Date(mdy(paste0(
             case_when(
               substr(input$LoSSlider, 7, 7) == 1 ~ "03-31-",
-              substr(input$LoSSlider, 7, 7) == 2 ~ "06-30",
+              substr(input$LoSSlider, 7, 7) == 2 ~ "06-30-",
               substr(input$LoSSlider, 7, 7) == 3 ~ "09-30-",
               substr(input$LoSSlider, 7, 7) == 4 ~ "12-31-"
             ),
@@ -385,7 +385,7 @@ function(input, output, session) {
           ReportEnd <- format.Date(mdy(paste0(
             case_when(
               substr(input$LoSSlider, 7, 7) == 1 ~ "03-31-",
-              substr(input$LoSSlider, 7, 7) == 2 ~ "06-30",
+              substr(input$LoSSlider, 7, 7) == 2 ~ "06-30-",
               substr(input$LoSSlider, 7, 7) == 3 ~ "09-30-",
               substr(input$LoSSlider, 7, 7) == 4 ~ "12-31-"
             ),
@@ -490,7 +490,7 @@ function(input, output, session) {
           ReportEnd <- format.Date(mdy(paste0(
             case_when(
               substr(input$LoSSlider, 7, 7) == 1 ~ "03-31-",
-              substr(input$LoSSlider, 7, 7) == 2 ~ "06-30",
+              substr(input$LoSSlider, 7, 7) == 2 ~ "06-30-",
               substr(input$LoSSlider, 7, 7) == 3 ~ "09-30-",
               substr(input$LoSSlider, 7, 7) == 4 ~ "12-31-"
             ),
@@ -596,7 +596,7 @@ function(input, output, session) {
           ReportEnd <- format.Date(mdy(paste0(
             case_when(
               substr(input$LoSSlider, 7, 7) == 1 ~ "03-31-",
-              substr(input$LoSSlider, 7, 7) == 2 ~ "06-30",
+              substr(input$LoSSlider, 7, 7) == 2 ~ "06-30-",
               substr(input$LoSSlider, 7, 7) == 3 ~ "09-30-",
               substr(input$LoSSlider, 7, 7) == 4 ~ "12-31-"
             ),
@@ -708,7 +708,7 @@ function(input, output, session) {
         ReportEnd <- format.Date(mdy(paste0(
           case_when(
             substr(input$ExitsToPHSlider, 7, 7) == 1 ~ "03-31-",
-            substr(input$ExitsToPHSlider, 7, 7) == 2 ~ "06-30",
+            substr(input$ExitsToPHSlider, 7, 7) == 2 ~ "06-30-",
             substr(input$ExitsToPHSlider, 7, 7) == 3 ~ "09-30-",
             substr(input$ExitsToPHSlider, 7, 7) == 4 ~ "12-31-"
           ),
@@ -716,22 +716,24 @@ function(input, output, session) {
         )), "%m-%d-%Y")
         
         SuccessfullyPlaced <- QPR_EEs %>%
-          filter(
-            exited_between(., ReportStart, ReportEnd) &
-              ((ProjectType %in% c(3, 9, 13) &
-                  !is.na(MoveInDateAdjust)) |
-                 ProjectType %in% c(1, 2, 4, 8, 12)
-              ) & # excluding non-mover-inners
-              ((DestinationGroup == "Permanent" |
-                  #exited to ph or still in PSH/HP
-                  is.na(ExitDate)) &
-                 ProjectType %in% c(3, 9, 12) # PSH & HP
-              ) |
+          filter(((
+            ProjectType %in% c(3, 9, 13) &
+              !is.na(MoveInDateAdjust)
+          ) |
+            ProjectType %in% c(1, 2, 4, 8, 12)) &
+            # excluding non-mover-inners
+            (((DestinationGroup == "Permanent" |
+                 #exited to ph or still in PSH/HP
+                 is.na(ExitDate)) &
+                ProjectType %in% c(3, 9, 12) &
+                served_between(., ReportStart, ReportEnd)# PSH & HP
+            ) |
               (
                 DestinationGroup == "Permanent" & # exited to ph
-                  ProjectType %in% c(1, 2, 4, 8, 13)
-              ) # ES, TH, SH, RRH, OUT
-          ) %>%
+                  ProjectType %in% c(1, 2, 4, 8, 13) &
+                  exited_between(., ReportStart, ReportEnd)
+              )
+            )) %>% # ES, TH, SH, RRH, OUT) %>%
           group_by(FriendlyProjectName, ProjectType, County, Region) %>%
           summarise(SuccessfullyPlacedHHs = n())
         
@@ -766,21 +768,25 @@ function(input, output, session) {
           )
         
         region <- input$ExitsToPHRegionSelect
-        ptc <- 13
+        # translating the project type from radiobutton to numeric
+        # since PSH is both 3 and 9, we have to account for that
+        x <- c(1, 2, 3, 4, 8, 9, 12, 13)
+        y <- c("Emergency Shelters", "Transitional Housing", 
+               "Permanent Supportive Housing", "Street Outreach", "Safe Haven",
+               "Permanent Supportive Housing", "Prevention",  "Rapid Rehousing")
+        PTC <- as.data.frame(cbind(x, y))
+        ptc <- PTC %>% filter(y == input$radioExitsToPHPTC) %>% select(x)
+        ptc <- as_vector(ptc)
         
         stagingExitsToPH <- SuccessfulPlacement %>%
           left_join(PlacementGoal, by = "ProjectType") %>%
-          filter(ProjectType == ptc, Region == region) %>%
+          filter(ProjectType %in% ptc, Region %in% region) %>%
           mutate(
             hover = paste0(
-              FriendlyProjectName,
-              "\nExited to PH: ",
-              SuccessfullyPlacedHHs,
-              "\nTotal Leavers: ",
-              TotalHHs,
-              "\n",
-              as.integer(Percent * 100),
-              "%",
+              FriendlyProjectName, 
+              "\nExited to PH: ", SuccessfullyPlacedHHs, 
+              "\nTotal Leavers: ", TotalHHs, 
+              "\n", as.integer(Percent * 100), "%",
               sep = "\n"
             )
           )
@@ -795,12 +801,12 @@ function(input, output, session) {
         ) %>%
           layout(
             xaxis = list(title = ~ FriendlyProjectName),
-            yaxis = list(title = "Percent Exited to Permanent Housing",
+            yaxis = list(title = "Exited to Permanent Housing",
                          tickformat = "%"),
             shapes = list(
               type = "rect",
               name = "CoC Goal",
-              fillcolor = "#41ae76",
+              fillcolor = "#00FF00",
               line = list(color = "white"),
               layer = "below",
               xref = "paper",
