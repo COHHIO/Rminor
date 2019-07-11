@@ -110,6 +110,17 @@ tagList(
                   multiple = TRUE,
                   selected = "Homeless Planning Region 6"
                 ),
+                prettyRadioButtons(
+                  inputId = "radioExitsToPHPTC",
+                  label = "Program Type",
+                  thick = TRUE,
+                  animation = "pulse",
+                  status = "info",
+                  choices = c("Emergency Shelters", "Transitional Housing",
+                              "Safe Haven", "Rapid Rehousing", 
+                              "Permanent Supportive Housing"),
+                  selected = "Emergency Shelters"
+                ),
                 plotlyOutput("ExitsToPH")
         ),
         tabItem(tabName = "NCBTab"),
