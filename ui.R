@@ -117,7 +117,7 @@ tagList(
                   animation = "pulse",
                   status = "info",
                   choices = c("Emergency Shelters", "Transitional Housing",
-                              "Safe Haven", "Rapid Rehousing", 
+                              "Safe Haven", "Prevention", "Rapid Rehousing", 
                               "Permanent Supportive Housing"),
                   selected = "Emergency Shelters"
                 ),
