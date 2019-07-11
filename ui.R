@@ -119,10 +119,13 @@ tagList(
                   status = "info",
                   choices = c("Emergency Shelters", "Transitional Housing",
                               "Safe Haven", "Prevention", "Rapid Rehousing", 
-                              "Permanent Supportive Housing"),
+                              "Permanent Supportive Housing", "Street Outreach"),
                   selected = "Emergency Shelters"
                 ),
-                plotlyOutput("ExitsToPH")
+                plotlyOutput("ExitsToPH"),
+                br(),
+                br(),
+                plotlyOutput("ExitsToPHOutreach")
         ),
         tabItem(tabName = "NCBTab"),
         tabItem(tabName = "HITab"),
