@@ -266,7 +266,7 @@ function(input, output, session) {
   
   output$NoteToUsers <-
     renderText(noteToUsers)
-  
+  # QPR Length of Stay
   observeEvent(c(input$LoSRegionSelect, input$LoSSlider, input$radioLoSPTC),
                {
                  output$QPRLoSPlot <-
@@ -404,7 +404,7 @@ function(input, output, session) {
                      }
                    })
                })
-  
+ # QPR Exits to PH 
   observeEvent(
     c(input$ExitsToPHRegionSelect, input$ExitsToPHSlider),
     {
@@ -497,7 +497,7 @@ function(input, output, session) {
             hover = paste0(
               FriendlyProjectName, 
               "\nExited to PH: ", SuccessfullyPlacedHHs, 
-              "\nTotal Leavers: ", TotalHHs, 
+              "\nTotal Households: ", TotalHHs, 
               "\n", as.integer(Percent * 100), "%",
               sep = "\n"
             )
@@ -547,5 +547,115 @@ function(input, output, session) {
           
         }
       })
+      output$ExitsToPHOutreach <- renderPlotly({
+          if(input$radioExitsToPHPTC == "Street Outreach") {
+            
+            ReportStart <- format.Date(ymd(paste0(
+              substr(input$ExitsToPHSlider, 1, 4),
+              "-01-01"
+            )), "%m-%d-%Y")
+            ReportEnd <- format.Date(mdy(paste0(
+              case_when(
+                substr(input$ExitsToPHSlider, 7, 7) == 1 ~ "03-31-",
+                substr(input$ExitsToPHSlider, 7, 7) == 2 ~ "06-30-",
+                substr(input$ExitsToPHSlider, 7, 7) == 3 ~ "09-30-",
+                substr(input$ExitsToPHSlider, 7, 7) == 4 ~ "12-31-"
+              ),
+              substr(input$ExitsToPHSlider, 1, 4)
+            )), "%m-%d-%Y")
+            
+            totalServed <- QPR_EEs %>%
+              filter(exited_between(., ReportStart, ReportEnd) &
+                    ProjectType == 4) %>%
+              group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+              summarise(TotalHHs = n())
+            
+            notUnsheltered <- QPR_EEs %>%
+              filter(
+                ProjectType == 4 &
+                  Destination != 16 &
+                  DestinationGroup %in% c("Temporary", "Permanent") &
+                  exited_between(., ReportStart, ReportEnd)
+              ) %>% 
+              group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+              summarise(NotUnsheltered = n())
+            
+            goalOutreach <- goals %>%
+              filter(Measure == "Exits to Temporary or Permanent Housing") %>%
+              select(Goal, ProjectType)
+            
+            notUnsheltered <- notUnsheltered %>%
+              left_join(goalOutreach, by = "ProjectType") %>%
+              left_join(totalServed,
+                        by = c("FriendlyProjectName",
+                               "ProjectType",
+                               "County",
+                               "Region")) %>%
+              mutate(
+                Percent = NotUnsheltered / TotalHHs,
+                hover = paste0(
+                  FriendlyProjectName,
+                  "\nExited to Temp or PH: ",
+                  NotUnsheltered,
+                  "\nTotal Households: ",
+                  TotalHHs,
+                  "\n",
+                  as.integer(Percent * 100),
+                  "%",
+                  sep = "\n"
+                )
+              ) %>%
+              filter(Region %in% c(input$ExitsToPHRegionSelect))
+            
+            title <- paste0("Exits to Temporary or Permanent Housing\n", 
+                            "Street Outreach\n",
+                            ReportStart, " to ", ReportEnd)
+            
+            plot_ly(
+              notUnsheltered,
+              x = ~ FriendlyProjectName,
+              y = ~ Percent,
+              text = ~ hover,
+              hoverinfo = 'text',
+              type = "bar"
+            ) %>%
+              layout(
+                xaxis = list(title = ~ FriendlyProjectName),
+                yaxis = list(title = "Exited to Temporary or Permanent Housing",
+                             tickformat = "%"),
+                title = list(
+                  text = title,
+                  font = list(
+                    size = 15
+                  )),
+                margin = list(
+                  l = 50,
+                  r = 50,
+                  b = 100,
+                  t = 100,
+                  pad = 4
+                ),
+                shapes = list(
+                  type = "rect",
+                  name = "CoC Goal",
+                  fillcolor = "#008000",
+                  line = list(color = "white", width = .01),
+                  layer = "below",
+                  xref = "paper",
+                  yref = "y",
+                  x0 = 0,
+                  x1 = 1,
+                  y0 = ~ Goal[1],
+                  y1 = 1,
+                  opacity = .2
+                ),
+                title = "Obtaining and Maintaining Permanent Housing"
+              )
+          }
+          else{
+            NULL
+          }
+        })
+        
   })
 }
