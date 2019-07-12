@@ -109,7 +109,7 @@ tagList(
                   choices = choices_regions,
                   options = list(`actions-box` = TRUE),
                   multiple = TRUE,
-                  selected = "Homeless Planning Region 6"
+                  selected = "Homeless Planning Region 4"
                 ),
                 prettyRadioButtons(
                   inputId = "radioExitsToPHPTC",
@@ -131,7 +131,23 @@ tagList(
         tabItem(tabName = "HITab"),
         tabItem(tabName = "incomeTab"),
         tabItem(tabName = "recurrenceTab"),
-        tabItem(tabName = "rapidTab"),
+        tabItem(tabName = "rapidTab",
+                setSliderColor("#56B4E9", 1),
+                sliderTextInput("RapidRRHDateSlider",
+                                "",
+                                c(
+                                  unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
+                                ),
+                                selected = Sys.yearqtr() - 1 / 4),
+                pickerInput(
+                  inputId = "RapidRRHRegion",
+                  "Select Region(s)",
+                  choices = choices_regions,
+                  options = list(`actions-box` = TRUE),
+                  multiple = TRUE,
+                  selected = "Homeless Planning Region 4"
+                ),
+                plotlyOutput("DaysToHouse")),
         tabItem(tabName = "spendingTab"),
         tabItem(
           tabName = "utilizationTab",

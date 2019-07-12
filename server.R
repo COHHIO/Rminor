@@ -658,4 +658,93 @@ function(input, output, session) {
         })
         
   })
+  
+  output$DaysToHouse <- 
+    renderPlotly({
+      
+      ReportStart <- format.Date(ymd(paste0(
+        substr(input$RapidRRHDateSlider, 1, 4),
+        "-01-01"
+      )), "%m-%d-%Y")
+      
+      ReportEnd <- format.Date(mdy(paste0(
+        case_when(
+          substr(input$RapidRRHDateSlider, 7, 7) == 1 ~ "03-31-",
+          substr(input$RapidRRHDateSlider, 7, 7) == 2 ~ "06-30-",
+          substr(input$RapidRRHDateSlider, 7, 7) == 3 ~ "09-30-",
+          substr(input$RapidRRHDateSlider, 7, 7) == 4 ~ "12-31-"
+        ),
+        substr(input$RapidRRHDateSlider, 1, 4)
+      )), "%m-%d-%Y")
+      
+      daysToHouse <- QPR_EEs %>%
+        filter(
+          ProjectType == 13 &
+            !is.na(MoveInDateAdjust) &
+            Region %in% c(input$RapidRRHRegion) &
+            entered_between(., ReportStart, ReportEnd)
+        ) %>%
+        mutate(DaysToHouse = difftime(MoveInDateAdjust, EntryDate, units = "days"))
+      
+      RRHgoal <- goals %>%
+        filter(SummaryMeasure == "Rapid Placement") %>%
+        select(ProjectType, Goal)
+      
+      summaryDays <- daysToHouse %>%
+        group_by(FriendlyProjectName, County, Region, ProjectType) %>%
+        summarise(AvgDays = as.integer(mean(DaysToHouse, na.rm = TRUE)),
+                  TotalHHs = n()) %>%
+        left_join(RRHgoal, by = "ProjectType") %>%
+        mutate(hover = paste0(
+          FriendlyProjectName,
+          "\nAverage Days to House: ",
+          AvgDays,
+          "\nTotal Households: ",
+          TotalHHs,
+          sep = "\n"
+        ))
+      
+      title <- paste0("Average Days to House\nRapid Rehousing\n",
+                      ReportStart, " to ", ReportEnd)
+      
+      plot_ly(
+        summaryDays,
+        x = ~ FriendlyProjectName,
+        y = ~ AvgDays,
+        text = ~ hover,
+        hoverinfo = 'text',
+        type = "bar"
+      ) %>%
+        layout(
+          xaxis = list(title = ~ FriendlyProjectName),
+          yaxis = list(title = "Average Days to House"),
+          title = list(
+            text = title,
+            font = list(
+              size = 15
+            )),
+          margin = list(
+            l = 50,
+            r = 50,
+            b = 100,
+            t = 100,
+            pad = 4
+          ),
+          shapes = list(
+            type = "rect",
+            name = "CoC Goal",
+            fillcolor = "#008000",
+            line = list(color = "white", width = .01),
+            layer = "below",
+            xref = "paper",
+            yref = "y",
+            x0 = 0,
+            x1 = 1,
+            y0 = ~ Goal[1],
+            y1 = 0,
+            opacity = .2
+          ),
+          title = "Days to House"
+        )
+    })
 }
