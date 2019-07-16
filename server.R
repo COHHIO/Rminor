@@ -518,7 +518,7 @@ function(input, output, session) {
           type = "bar"
         ) %>%
           layout(
-            xaxis = list(title = ~ FriendlyProjectName),
+            xaxis = list(title = ""),
             yaxis = list(title = yAxisTitle,
                          tickformat = "%"),
             title = list(
