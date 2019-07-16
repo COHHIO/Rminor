@@ -352,6 +352,7 @@ function(input, output, session) {
                          "\nDays: ", Days,
                          sep = "\n"))
                      
+                     
                      if (nrow(LoSDetail) > 0) {
                        plot_ly(data = LoSSummary,
                                x = ~ FriendlyProjectName,
@@ -422,6 +423,10 @@ function(input, output, session) {
           ),
           substr(input$ExitsToPHSlider, 1, 4)
         )), "%m-%d-%Y")
+        
+        yAxisTitle <- if_else(input$radioExitsToPHPTC != "Permanent Supportive Housing",
+                              "Exited to Permanent Housing",
+                              "Remained in or Exited to PH")
         
         SuccessfullyPlaced <- QPR_EEs %>%
           filter(((
@@ -502,6 +507,7 @@ function(input, output, session) {
               sep = "\n"
             )
           )
+        
         if(nrow(stagingExitsToPH) > 0) {
         plot_ly(
           stagingExitsToPH,
@@ -513,7 +519,7 @@ function(input, output, session) {
         ) %>%
           layout(
             xaxis = list(title = ~ FriendlyProjectName),
-            yaxis = list(title = "Exited to Permanent Housing",
+            yaxis = list(title = yAxisTitle,
                          tickformat = "%"),
             title = list(
               text = title,
@@ -620,7 +626,7 @@ function(input, output, session) {
               type = "bar"
             ) %>%
               layout(
-                xaxis = list(title = ~ FriendlyProjectName),
+                xaxis = list(title = ""),
                 yaxis = list(title = "Exited to Temporary or Permanent Housing",
                              tickformat = "%"),
                 title = list(
@@ -658,7 +664,7 @@ function(input, output, session) {
         })
         
   })
-  
+  # QPR Rapid Placement into RRH
   output$DaysToHouse <- 
     renderPlotly({
       
