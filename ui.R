@@ -54,7 +54,8 @@ tagList(
           infoBoxOutput("veteranEngagement")
         ),
         # tabItem providerDashboard
-        tabItem(tabName = "cocCompetitionTab"),
+        tabItem(tabName = "cocCompetitionTab",
+                HTML("<h1>Under Construction</h1>")),
         tabItem(
           tabName = "LoSTab",
           setSliderColor("#56B4E9", 1),
@@ -127,10 +128,14 @@ tagList(
                 br(),
                 plotlyOutput("ExitsToPHOutreach")
         ),
-        tabItem(tabName = "NCBTab"),
-        tabItem(tabName = "HITab"),
-        tabItem(tabName = "incomeTab"),
-        tabItem(tabName = "recurrenceTab"),
+        tabItem(tabName = "NCBTab",
+                HTML("<h1>Under Construction</h1>")),
+        tabItem(tabName = "HITab",
+                HTML("<h1>Under Construction</h1>")),
+        tabItem(tabName = "incomeTab",
+                HTML("<h1>Under Construction</h1>")),
+        tabItem(tabName = "recurrenceTab",
+                HTML("<h1>Under Construction</h1>")),
         tabItem(tabName = "rapidTab",
                 setSliderColor("#56B4E9", 1),
                 sliderTextInput("RapidRRHDateSlider",
@@ -148,7 +153,8 @@ tagList(
                   selected = "Homeless Planning Region 4"
                 ),
                 plotlyOutput("DaysToHouse")),
-        tabItem(tabName = "spendingTab"),
+        tabItem(tabName = "spendingTab",
+                HTML("<h1>Under Construction</h1>")),
         tabItem(
           tabName = "utilizationTab",
           pickerInput(
