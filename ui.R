@@ -54,7 +54,8 @@ tagList(
           infoBoxOutput("veteranEngagement")
         ),
         # tabItem providerDashboard
-        tabItem(tabName = "cocCompetitionTab"),
+        tabItem(tabName = "cocCompetitionTab",
+                HTML("<h1>Under Construction</h1>")),
         tabItem(
           tabName = "LoSTab",
           setSliderColor("#56B4E9", 1),
@@ -64,6 +65,16 @@ tagList(
                             unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
                           ),
                           selected = Sys.yearqtr() - 1 / 4),
+          prettyRadioButtons(
+            inputId = "radioLoSPTC",
+            label = "Program Type",
+            thick = TRUE,
+            animation = "pulse",
+            status = "info",
+            choices = c("Emergency Shelters", "Transitional Housing",
+                        "Safe Haven", "Rapid Rehousing"),
+            selected = "Emergency Shelters"
+          ),
           pickerInput(
             inputId = "LoSRegionSelect",
             "Select Region(s)",
@@ -81,60 +92,69 @@ tagList(
             choices = c("Average Days", "Median Days"),
             selected = "Average Days"
           ),
-          #verbatimTextOutput("res"),
-          plotlyOutput("QPRLoSPlotEE"),
-          br(),
-          br(),
-          plotlyOutput("QPRLoSPlotTH"),
-          br(),
-          br(),
-          plotlyOutput("QPRLoSPlotRRH"),
-          br(),
-          br(),
-          plotlyOutput("QPRLoSPlotSH")
+          # verbatimTextOutput("res"),
+          plotlyOutput("QPRLoSPlot")
         ),
         # tabItem LengthOfStay LoS
-        tabItem(tabName = "PHTab"#,
-                # setSliderColor("#56B4E9", 1),
-                # sliderTextInput("SuccessPlaceSlider",
-                #                 "",
-                #                 c(
-                #                   unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
-                #                 ),
-                #                 selected = Sys.yearqtr() - 1 / 4),
-                # pickerInput(
-                #   inputId = "SuccessPlaceRegionSelect",
-                #   "Select Region(s)",
-                #   choices = choices_regions,
-                #   options = list(`actions-box` = TRUE),
-                #   multiple = TRUE,
-                #   selected = "Homeless Planning Region 6"
-                # ),
-                # #verbatimTextOutput("res"),
-                # plotlyOutput("QPRSuccessfulPlacementES"),
-                # br(),
-                # br(),
-                # plotlyOutput("QPRSuccessfulPlacementTH"),
-                # br(),
-                # br(),
-                # plotlyOutput("QPRSuccessfulPlacementRRH"),
-                # br(),
-                # br(),
-                # plotlyOutput("QPRSuccessfulPlacementSH"),
-                # br(),
-                # br(),
-                # plotlyOutput("QPRSuccessfulPlacementOUT"),
-                # br(),
-                # br(),
-                # plotlyOutput("QPRSuccessfulPlacementHP"),
-                # br()
+        tabItem(tabName = "PHTab",
+                setSliderColor("#56B4E9", 1),
+                sliderTextInput("ExitsToPHSlider",
+                                "",
+                                c(
+                                  unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
+                                ),
+                                selected = Sys.yearqtr() - 1 / 4),
+                pickerInput(
+                  inputId = "ExitsToPHRegionSelect",
+                  "Select Region(s)",
+                  choices = choices_regions,
+                  options = list(`actions-box` = TRUE),
+                  multiple = TRUE,
+                  selected = "Homeless Planning Region 4"
+                ),
+                prettyRadioButtons(
+                  inputId = "radioExitsToPHPTC",
+                  label = "Program Type",
+                  thick = TRUE,
+                  animation = "pulse",
+                  status = "info",
+                  choices = c("Emergency Shelters", "Transitional Housing",
+                              "Safe Haven", "Prevention", "Rapid Rehousing", 
+                              "Permanent Supportive Housing", "Street Outreach"),
+                  selected = "Emergency Shelters"
+                ),
+                plotlyOutput("ExitsToPH"),
+                br(),
+                br(),
+                plotlyOutput("ExitsToPHOutreach")
         ),
-        tabItem(tabName = "NCBTab"),
-        tabItem(tabName = "HITab"),
-        tabItem(tabName = "incomeTab"),
-        tabItem(tabName = "recurrenceTab"),
-        tabItem(tabName = "rapidTab"),
-        tabItem(tabName = "spendingTab"),
+        tabItem(tabName = "NCBTab",
+                HTML("<h1>Under Construction</h1>")),
+        tabItem(tabName = "HITab",
+                HTML("<h1>Under Construction</h1>")),
+        tabItem(tabName = "incomeTab",
+                HTML("<h1>Under Construction</h1>")),
+        tabItem(tabName = "recurrenceTab",
+                HTML("<h1>Under Construction</h1>")),
+        tabItem(tabName = "rapidTab",
+                setSliderColor("#56B4E9", 1),
+                sliderTextInput("RapidRRHDateSlider",
+                                "",
+                                c(
+                                  unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
+                                ),
+                                selected = Sys.yearqtr() - 1 / 4),
+                pickerInput(
+                  inputId = "RapidRRHRegion",
+                  "Select Region(s)",
+                  choices = choices_regions,
+                  options = list(`actions-box` = TRUE),
+                  multiple = TRUE,
+                  selected = "Homeless Planning Region 4"
+                ),
+                plotlyOutput("DaysToHouse")),
+        tabItem(tabName = "spendingTab",
+                HTML("<h1>Under Construction</h1>")),
         tabItem(
           tabName = "utilizationTab",
           pickerInput(
