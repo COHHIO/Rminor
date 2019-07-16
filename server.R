@@ -28,7 +28,7 @@ function(input, output, session) {
             ),
             color = "aqua",
             icon = icon("building"),
-            Utilization %>%
+            value = Utilization %>%
               filter(ProjectName == input$providerList) %>%
               select(UnitUtilization)
           )
