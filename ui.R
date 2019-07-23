@@ -21,8 +21,8 @@ tagList(
         id = "sidebarmenuid",
         menuItem("Provider Dashboard",
                  tabName = "providerDashboardTab"),
-        menuItem("CoC Competition",
-                 tabName = "cocCompetitionTab"),
+        # menuItem("CoC Competition",
+        #          tabName = "cocCompetitionTab"),
         menuItem(
           "Performance and Outcomes",
           menuSubItem("Bed and Unit Utilization",
@@ -61,15 +61,16 @@ tagList(
             inputId = "providerList",
             choices = c(providerids$ProjectName),
             options = list(`live-search` = TRUE),
-            width = "100%"
+            width = "100%",
+            selected = sample(providerids$ProjectName, 1)
           ),
           infoBoxOutput("currentUnitUtilization"),
           infoBoxOutput("currentBedUtilization"),
           infoBoxOutput("veteranEngagement")
         ),
         # tabItem providerDashboard
-        tabItem(tabName = "cocCompetitionTab",
-                HTML("<h1>Under Construction</h1>")),
+        # tabItem(tabName = "cocCompetitionTab",
+        #         HTML("<h1>Under Construction</h1>")),
         tabItem(
           tabName = "LoSTab",
           setSliderColor("#56B4E9", 1),
@@ -95,7 +96,7 @@ tagList(
             choices = choices_regions,
             options = list(`actions-box` = TRUE),
             multiple = TRUE,
-            selected = "Homeless Planning Region 6"
+            selected = sample(choices_regions, 1)
           ),
           prettyRadioButtons(
             inputId = "radioAvgMeanLoS",
@@ -124,7 +125,7 @@ tagList(
                   choices = choices_regions,
                   options = list(`actions-box` = TRUE),
                   multiple = TRUE,
-                  selected = "Homeless Planning Region 4"
+                  selected = sample(choices_regions, 1)
                 ),
                 prettyRadioButtons(
                   inputId = "radioExitsToPHPTC",
@@ -164,7 +165,7 @@ tagList(
                   choices = choices_regions,
                   options = list(`actions-box` = TRUE),
                   multiple = TRUE,
-                  selected = "Homeless Planning Region 4"
+                  selected = sample(choices_regions, 1)
                 ),
                 plotlyOutput("DaysToHouse")),
         tabItem(tabName = "spendingTab",
