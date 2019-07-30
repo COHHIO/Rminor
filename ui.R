@@ -23,10 +23,10 @@ tagList(
                  tabName = "providerDashboardTab"),
         # menuItem("CoC Competition",
         #          tabName = "cocCompetitionTab"),
+        menuItem("Bed and Unit Utilization",
+                      tabName = "utilizationTab"),
         menuItem(
           "Performance and Outcomes",
-          menuSubItem("Bed and Unit Utilization",
-                      tabName = "utilizationTab"),
           menuSubItem("Community Need (by County)",
                       tabName = "spdatTab"),
           menuSubItem("Length of Stay",
