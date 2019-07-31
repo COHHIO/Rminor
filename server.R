@@ -351,9 +351,9 @@ function(input, output, session) {
                        summarise(
                          Days = case_when(
                            input$radioAvgMeanLoS == "Average Days" ~
-                             as.integer(mean(DaysinProject, na.rm = TRUE)),
+                             as.numeric(mean(DaysinProject)),
                            input$radioAvgMeanLoS == "Median Days" ~
-                             as.integer(median(DaysinProject, na.rm = TRUE))
+                             as.numeric(median(DaysinProject))
                          )
                        ) %>%
                        left_join(LoSGoals, by = "ProjectType") %>%
