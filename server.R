@@ -351,9 +351,9 @@ function(input, output, session) {
                        summarise(
                          Days = case_when(
                            input$radioAvgMeanLoS == "Average Days" ~
-                             as.integer(mean(DaysinProject, na.rm = TRUE)),
+                             as.numeric(mean(DaysinProject)),
                            input$radioAvgMeanLoS == "Median Days" ~
-                             as.integer(median(DaysinProject, na.rm = TRUE))
+                             as.numeric(median(DaysinProject))
                          )
                        ) %>%
                        left_join(LoSGoals, by = "ProjectType") %>%
@@ -695,14 +695,12 @@ function(input, output, session) {
         substr(input$RapidRRHDateSlider, 1, 4)
       )), "%m-%d-%Y")
       
-      daysToHouse <- QPR_EEs %>%
+      daysToHouse <- RRHEnterers %>%
         filter(
-          ProjectType == 13 &
             !is.na(MoveInDateAdjust) &
             Region %in% c(input$RapidRRHRegion) &
             entered_between(., ReportStart, ReportEnd)
-        ) %>%
-        mutate(DaysToHouse = difftime(MoveInDateAdjust, EntryDate, units = "days"))
+        )
       
       RRHgoal <- goals %>%
         filter(SummaryMeasure == "Rapid Placement") %>%
@@ -710,7 +708,7 @@ function(input, output, session) {
       
       summaryDays <- daysToHouse %>%
         group_by(FriendlyProjectName, County, Region, ProjectType) %>%
-        summarise(AvgDays = as.integer(mean(DaysToHouse, na.rm = TRUE)),
+        summarise(AvgDays = as.integer(mean(DaysToHouse)),
                   TotalHHs = n()) %>%
         left_join(RRHgoal, by = "ProjectType") %>%
         mutate(hover = paste0(
