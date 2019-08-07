@@ -64,10 +64,12 @@ tagList(
             width = "100%",
             selected = sample(providerids$ProjectName, 1)
           ),
-          infoBoxOutput("currentUnitUtilization"),
-          infoBoxOutput("currentBedUtilization"),
-          infoBoxOutput("veteranEngagement"),
-          infoBoxOutput("ShelterExitsToRRH")
+          fluidRow(
+            infoBoxOutput("currentUnitUtilization"),
+            infoBoxOutput("currentBedUtilization"),
+            infoBoxOutput("veteranEngagement"),
+            infoBoxOutput("ShelterExitsToRRH")
+          )
         ),
         # tabItem providerDashboard
         # tabItem(tabName = "cocCompetitionTab",
