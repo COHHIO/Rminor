@@ -104,6 +104,33 @@ function(input, output, session) {
       
     }
     
+    output$ShelterExitsToRRH <-
+      if(nrow(validation %>%
+              filter(ProjectType == 1 &
+                     ProjectName == input$providerList)) > 0) {
+        ReportStart <- format.Date(floor_date(today(), unit = "year"), "%m-%d-%Y")
+
+        renderInfoBox({
+          infoBox(
+            title = paste("Client Exits to Rapid Rehousing in", year(mdy(FileEnd))),
+            subtitle = "Destination: Rental by client, with RRH...",
+            color = "light-blue",
+            icon = icon("door-open"),
+            nrow(
+              validation %>%
+                filter(
+                  ProjectName == input$providerList &
+                    exited_between(., ReportStart, FileEnd) &
+                    Destination == 31
+                )
+            )
+          )
+        })
+      }
+    else{
+
+    }
+    
   })
   
   output$SPDATScoresByCounty <-
