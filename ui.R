@@ -66,7 +66,8 @@ tagList(
           ),
           infoBoxOutput("currentUnitUtilization"),
           infoBoxOutput("currentBedUtilization"),
-          infoBoxOutput("veteranEngagement")
+          infoBoxOutput("veteranEngagement"),
+          infoBoxOutput("ShelterExitsToRRH")
         ),
         # tabItem providerDashboard
         # tabItem(tabName = "cocCompetitionTab",
