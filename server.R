@@ -109,18 +109,34 @@ function(input, output, session) {
                filter(ProjectType %in% c(3, 9, 13) &
                       ProjectName == input$providerList)) > 0) {
         renderInfoBox({
+          
+          hhs <- nrow(
+            validation %>%
+              filter(
+                ProjectName == input$providerList &
+                  is.na(MoveInDateAdjust) &
+                  is.na(ExitDate)
+              ) %>%
+              select(HouseholdID) %>%
+              unique()
+          )
+          
+          daysWaiting <- validation %>%
+            filter(
+              ProjectName == input$providerList &
+                is.na(MoveInDateAdjust) &
+                is.na(ExitDate)
+            ) %>% 
+            mutate(Waiting = as.numeric(mdy(FileEnd) - ymd(EntryDate))) %>%
+            group_by(ProjectID) %>%
+            summarise(avgWait = as.integer(mean(Waiting)))
+          
           infoBox(
             title = "Households Currently Awaiting Housing",
+            subtitle = paste("Average Days Waiting:", daysWaiting$avgWait),
             color = "black",
             icon = icon("pause-circle"),
-            nrow(
-              validation %>%
-                filter(ProjectName == input$providerList &
-                         is.na(MoveInDateAdjust) &
-                         is.na(ExitDate)) %>%
-                select(HouseholdID) %>%
-                unique()
-            )
+            hhs
           )
         })
       }
@@ -130,20 +146,36 @@ function(input, output, session) {
     
     output$CurrentClientCount <-
       if (nrow(validation %>%
-               filter(ProjectType %in% c(12, 4) &
+               filter(ProjectType %in% c(12, 13, 4) &
                       ProjectName == input$providerList)) > 0) {
+        current <- validation %>%
+          filter(ProjectName == input$providerList &
+                   is.na(ExitDate)) %>%
+          select(PersonalID) %>%
+          unique()
+        
+        movedin <- validation %>%
+          filter(ProjectName == input$providerList &
+                   is.na(ExitDate) &
+                   !is.na(MoveInDateAdjust) &
+                   ProjectType == 13) %>%
+          select(PersonalID) %>%
+          unique()
+        
+        PTC <- validation %>%
+          filter(ProjectName == input$providerList) %>%
+          select(ProjectType) %>% unique()
+        
         renderInfoBox({
           infoBox(
             title = "Current Clients",
+            subtitle = if_else(PTC == 13,
+                               paste(nrow(movedin),
+                                     "client(s) housed in the project"),
+                               ""), 
             color = "fuchsia",
             icon = icon("home"),
-            nrow(
-              validation %>%
-                filter(ProjectName == input$providerList &
-                         is.na(ExitDate)) %>%
-                select(PersonalID) %>%
-                unique()
-            )
+            nrow(current)
           )
         })
       }
@@ -153,20 +185,36 @@ function(input, output, session) {
     
   output$CurrentHHCount <-
     if (nrow(validation %>%
-             filter(ProjectType %in% c(12, 4) &
+             filter(ProjectType %in% c(12, 13, 4) &
                     ProjectName == input$providerList)) > 0) {
+      current <- validation %>%
+        filter(ProjectName == input$providerList &
+                 is.na(ExitDate)) %>%
+        select(HouseholdID) %>%
+        unique()
+      
+      movedin <- validation %>%
+        filter(ProjectName == input$providerList &
+                 is.na(ExitDate) &
+                 !is.na(MoveInDateAdjust) &
+                 ProjectType == 13) %>%
+        select(HouseholdID) %>%
+        unique()
+      
+      PTC <- validation %>%
+        filter(ProjectName == input$providerList) %>%
+        select(ProjectType) %>% unique()
+      
       renderInfoBox({
         infoBox(
           title = "Current Households",
+          subtitle = if_else(PTC == 13,
+                             paste(nrow(movedin), 
+                                   "household(s) housed in the project"),
+                             ""),
           color = "teal",
           icon = icon("users"),
-          nrow(
-            validation %>%
-              filter(ProjectName == input$providerList &
-                       is.na(ExitDate)) %>%
-              select(HouseholdID) %>%
-              unique()
-          )
+          nrow(current)
         )
       })
     }
