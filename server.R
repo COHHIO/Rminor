@@ -104,13 +104,34 @@ function(input, output, session) {
       
     }
 
+    output$CurrentlyAwaitingPH <-
+      if (nrow(validation %>%
+               filter(ProjectType %in% c(3, 9, 13) &
+                      ProjectName == input$providerList)) > 0) {
+        renderInfoBox({
+          infoBox(
+            title = "Households Currently Awaiting Housing",
+            color = "black",
+            icon = icon("pause-circle"),
+            nrow(
+              validation %>%
+                filter(ProjectName == input$providerList &
+                         is.na(MoveInDateAdjust) &
+                         is.na(ExitDate)) %>%
+                select(HouseholdID) %>%
+                unique()
+            )
+          )
+        })
+      }
+    else{
+      
+    }
+    
     output$CurrentClientCount <-
       if (nrow(validation %>%
                filter(ProjectType %in% c(12, 4) &
                       ProjectName == input$providerList)) > 0) {
-        ReportStart <-
-          format.Date(floor_date(today(), unit = "year"), "%m-%d-%Y")
-        
         renderInfoBox({
           infoBox(
             title = "Current Clients",
@@ -134,9 +155,6 @@ function(input, output, session) {
     if (nrow(validation %>%
              filter(ProjectType %in% c(12, 4) &
                     ProjectName == input$providerList)) > 0) {
-      ReportStart <-
-        format.Date(floor_date(today(), unit = "year"), "%m-%d-%Y")
-      
       renderInfoBox({
         infoBox(
           title = "Current Households",

@@ -70,7 +70,8 @@ tagList(
             infoBoxOutput("veteranEngagement"),
             infoBoxOutput("ShelterExitsToRRH"),
             infoBoxOutput("CurrentClientCount"),
-            infoBoxOutput("CurrentHHCount")
+            infoBoxOutput("CurrentHHCount"),
+            infoBoxOutput("CurrentlyAwaitingPH")
           )
         ),
         # tabItem providerDashboard
