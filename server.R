@@ -103,7 +103,59 @@ function(input, output, session) {
     else {
       
     }
+
+    output$CurrentClientCount <-
+      if (nrow(validation %>%
+               filter(ProjectType %in% c(12, 4) &
+                      ProjectName == input$providerList)) > 0) {
+        ReportStart <-
+          format.Date(floor_date(today(), unit = "year"), "%m-%d-%Y")
+        
+        renderInfoBox({
+          infoBox(
+            title = "Current Clients",
+            color = "fuchsia",
+            icon = icon("home"),
+            nrow(
+              validation %>%
+                filter(ProjectName == input$providerList &
+                         is.na(ExitDate)) %>%
+                select(PersonalID) %>%
+                unique()
+            )
+          )
+        })
+      }
+    else{
+      
+    }
     
+  output$CurrentHHCount <-
+    if (nrow(validation %>%
+             filter(ProjectType %in% c(12, 4) &
+                    ProjectName == input$providerList)) > 0) {
+      ReportStart <-
+        format.Date(floor_date(today(), unit = "year"), "%m-%d-%Y")
+      
+      renderInfoBox({
+        infoBox(
+          title = "Current Households",
+          color = "teal",
+          icon = icon("users"),
+          nrow(
+            validation %>%
+              filter(ProjectName == input$providerList &
+                       is.na(ExitDate)) %>%
+              select(HouseholdID) %>%
+              unique()
+          )
+        )
+      })
+    }
+  else{
+    
+  }
+
     output$ShelterExitsToRRH <-
       if(nrow(validation %>%
               filter(ProjectType == 1 &

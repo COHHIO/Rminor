@@ -59,16 +59,18 @@ tagList(
           tabName = "providerDashboardTab",
           pickerInput(
             inputId = "providerList",
-            choices = c(providerids$ProjectName),
+            choices = providers,
             options = list(`live-search` = TRUE),
             width = "100%",
-            selected = sample(providerids$ProjectName, 1)
+            selected = sample(providers, 1)
           ),
           fluidRow(
             infoBoxOutput("currentUnitUtilization"),
             infoBoxOutput("currentBedUtilization"),
             infoBoxOutput("veteranEngagement"),
-            infoBoxOutput("ShelterExitsToRRH")
+            infoBoxOutput("ShelterExitsToRRH"),
+            infoBoxOutput("CurrentClientCount"),
+            infoBoxOutput("CurrentHHCount")
           )
         ),
         # tabItem providerDashboard
