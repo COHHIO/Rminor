@@ -64,13 +64,13 @@ tagList(
             width = "100%",
             selected = sample(providers, 1)
           ),
-          infoBoxOutput("currentUnitUtilization"),
-          infoBoxOutput("currentBedUtilization"),
-          infoBoxOutput("veteranEngagement"),
-          infoBoxOutput("ShelterExitsToRRH"),
-          infoBoxOutput("CurrentClientCount"),
-          infoBoxOutput("CurrentHHCount"),
-          infoBoxOutput("CurrentlyAwaitingPH")
+          uiOutput("CurrentClientCount"),
+          uiOutput("CurrentHHCount"),          
+          uiOutput("currentUnitUtilization"),
+          uiOutput("currentBedUtilization"),
+          uiOutput("veteranEngagement"),
+          uiOutput("ShelterExitsToRRH"),
+          uiOutput("CurrentlyAwaitingPH")
         ), 
         # tabItem providerDashboard
         # tabItem(tabName = "cocCompetitionTab",
