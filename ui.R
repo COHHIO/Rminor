@@ -64,16 +64,14 @@ tagList(
             width = "100%",
             selected = sample(providers, 1)
           ),
-          fluidRow(
-            infoBoxOutput("currentUnitUtilization"),
-            infoBoxOutput("currentBedUtilization"),
-            infoBoxOutput("veteranEngagement"),
-            infoBoxOutput("ShelterExitsToRRH"),
-            infoBoxOutput("CurrentClientCount"),
-            infoBoxOutput("CurrentHHCount"),
-            infoBoxOutput("CurrentlyAwaitingPH")
-          )
-        ),
+          infoBoxOutput("currentUnitUtilization"),
+          infoBoxOutput("currentBedUtilization"),
+          infoBoxOutput("veteranEngagement"),
+          infoBoxOutput("ShelterExitsToRRH"),
+          infoBoxOutput("CurrentClientCount"),
+          infoBoxOutput("CurrentHHCount"),
+          infoBoxOutput("CurrentlyAwaitingPH")
+        ), 
         # tabItem providerDashboard
         # tabItem(tabName = "cocCompetitionTab",
         #         HTML("<h1>Under Construction</h1>")),

@@ -54,7 +54,7 @@ function(input, output, session) {
       if (nrow(Utilization %>%
                filter(
                  ProjectName == input$providerList &
-                 ProjectType %in% c(1, 2, 3, 8, 9)
+                 ProjectType %in% c(1:3, 8, 9)
                )) > 0) {
         renderInfoBox({
           infoBox(
@@ -132,7 +132,7 @@ function(input, output, session) {
             summarise(avgWait = as.integer(mean(Waiting)))
           
           infoBox(
-            title = "Households Currently Awaiting Housing",
+            title = "Active Households Not Yet Housed",
             subtitle = paste("Average Days Waiting:", daysWaiting$avgWait),
             color = "black",
             icon = icon("pause-circle"),
