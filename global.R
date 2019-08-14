@@ -42,6 +42,8 @@ choices_month <-
 
 choices_regions <- unique(Regions$RegionName)
 
+providers <- sort(validation$ProjectName) %>% unique() 
+
 choices_project_type <- c(
   "Emergency Shelter", 
   "Transitional Housing", 

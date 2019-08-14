@@ -54,7 +54,7 @@ function(input, output, session) {
       if (nrow(Utilization %>%
                filter(
                  ProjectName == input$providerList &
-                 ProjectType %in% c(1, 2, 3, 8, 9)
+                 ProjectType %in% c(1:3, 8, 9)
                )) > 0) {
         renderInfoBox({
           infoBox(
@@ -103,7 +103,125 @@ function(input, output, session) {
     else {
       
     }
+
+    output$CurrentlyAwaitingPH <-
+      if (nrow(validation %>%
+               filter(ProjectType %in% c(3, 9, 13) &
+                      ProjectName == input$providerList)) > 0) {
+        renderInfoBox({
+          
+          hhs <- nrow(
+            validation %>%
+              filter(
+                ProjectName == input$providerList &
+                  is.na(MoveInDateAdjust) &
+                  is.na(ExitDate)
+              ) %>%
+              select(HouseholdID) %>%
+              unique()
+          )
+          
+          daysWaiting <- validation %>%
+            filter(
+              ProjectName == input$providerList &
+                is.na(MoveInDateAdjust) &
+                is.na(ExitDate)
+            ) %>% 
+            mutate(Waiting = as.numeric(mdy(FileEnd) - ymd(EntryDate))) %>%
+            group_by(ProjectID) %>%
+            summarise(avgWait = as.integer(mean(Waiting)))
+          
+          infoBox(
+            title = "Active Households Not Yet Housed",
+            subtitle = paste("Average Days Waiting:", daysWaiting$avgWait),
+            color = "black",
+            icon = icon("pause-circle"),
+            hhs
+          )
+        })
+      }
+    else{
+      
+    }
     
+    output$CurrentClientCount <-
+      if (nrow(validation %>%
+               filter(ProjectType %in% c(12, 13, 4) &
+                      ProjectName == input$providerList)) > 0) {
+        current <- validation %>%
+          filter(ProjectName == input$providerList &
+                   is.na(ExitDate)) %>%
+          select(PersonalID) %>%
+          unique()
+        
+        movedin <- validation %>%
+          filter(ProjectName == input$providerList &
+                   is.na(ExitDate) &
+                   !is.na(MoveInDateAdjust) &
+                   ProjectType == 13) %>%
+          select(PersonalID) %>%
+          unique()
+        
+        PTC <- validation %>%
+          filter(ProjectName == input$providerList) %>%
+          select(ProjectType) %>% unique()
+        
+        renderInfoBox({
+          infoBox(
+            title = "Current Clients",
+            subtitle = if_else(PTC == 13,
+                               paste(nrow(movedin),
+                                     "client(s) housed in the project"),
+                               ""), 
+            color = "fuchsia",
+            icon = icon("home"),
+            nrow(current)
+          )
+        })
+      }
+    else{
+      
+    }
+    
+  output$CurrentHHCount <-
+    if (nrow(validation %>%
+             filter(ProjectType %in% c(12, 13, 4) &
+                    ProjectName == input$providerList)) > 0) {
+      current <- validation %>%
+        filter(ProjectName == input$providerList &
+                 is.na(ExitDate)) %>%
+        select(HouseholdID) %>%
+        unique()
+      
+      movedin <- validation %>%
+        filter(ProjectName == input$providerList &
+                 is.na(ExitDate) &
+                 !is.na(MoveInDateAdjust) &
+                 ProjectType == 13) %>%
+        select(HouseholdID) %>%
+        unique()
+      
+      PTC <- validation %>%
+        filter(ProjectName == input$providerList) %>%
+        select(ProjectType) %>% unique()
+      
+      renderInfoBox({
+        infoBox(
+          title = "Current Households",
+          subtitle = if_else(PTC == 13,
+                             paste(nrow(movedin), 
+                                   "household(s) housed in the project"),
+                             ""),
+          color = "teal",
+          icon = icon("users"),
+          nrow(current)
+        )
+      })
+    }
+  else{
+    
+  }
+
     output$ShelterExitsToRRH <-
       if(nrow(validation %>%
               filter(ProjectType == 1 &
