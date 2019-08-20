@@ -629,11 +629,15 @@ function(input, output, session) {
       substr(input$ExitsToPHSlider, 1, 4)
     )), "%m-%d-%Y")
     
-    x <- renderText(input$ExitsToPHRegionSelect)
+    x <- str_split(renderText(input$ExitsToPHRegionSelect), 
+                  "Homeless Planning Region")
+    y <- ifelse(lengths(x) == 2,
+                 input$ExitsToPHRegionSelect,
+                 "Multiple Regions")
     
     list(h2("Quarterly Performance Report"),
          h3("Exits to Permanent Housing"),
-         h4(x),
+         h4(y),
          h4(ReportStart, "-", ReportEnd))
   })  
   
