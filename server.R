@@ -17,6 +17,35 @@ function(input, output, session) {
   #  # input$LoSRegionSelect
   # cat("Length of Stay", input$LoSRegionSelect)
   # })
+  output$headerUtilization <- renderUI({
+    ReportEnd <- ymd(paste0(
+      substr(
+        input$utilizationSlider,
+        str_length(input$utilizationSlider) - 4,
+        str_length(input$utilizationSlider)
+      ),
+      substr(
+        input$utilizationSlider,
+        1,
+        str_length(input$utilizationSlider) - 5
+      ),
+      "01"
+    )) +
+      months(1) - 1
+    ReportStart <- floor_date(ymd(ReportEnd), unit = "month") -
+      years(1) +
+      months(1)
+    
+    ReportStart <- format.Date(ymd(ReportStart), "%B %d, %Y")
+    ReportEnd <- format.Date(ymd(ReportEnd), "%B %d, %Y")
+    
+    list(
+      h2("Bed and Unit Utilization"),
+      h4(input$providerListUtilization),
+      h4(ReportStart, "-", ReportEnd)
+    )
+  })
+  
   observeEvent(c(input$providerList), {
     output$currentUnitUtilization <-
       if (nrow(Utilization %>%
@@ -103,13 +132,12 @@ function(input, output, session) {
     else {
       
     }
-
+    
     output$CurrentlyAwaitingPH <-
       if (nrow(validation %>%
                filter(ProjectType %in% c(3, 9, 13) &
                       ProjectName == input$providerList)) > 0) {
         renderInfoBox({
-          
           hhs <- nrow(
             validation %>%
               filter(
@@ -122,11 +150,9 @@ function(input, output, session) {
           )
           
           daysWaiting <- validation %>%
-            filter(
-              ProjectName == input$providerList &
-                is.na(MoveInDateAdjust) &
-                is.na(ExitDate)
-            ) %>% 
+            filter(ProjectName == input$providerList &
+                     is.na(MoveInDateAdjust) &
+                     is.na(ExitDate)) %>%
             mutate(Waiting = as.numeric(mdy(FileEnd) - ymd(EntryDate))) %>%
             group_by(ProjectID) %>%
             summarise(avgWait = as.integer(mean(Waiting)))
@@ -146,8 +172,10 @@ function(input, output, session) {
     
     output$CurrentClientCount <-
       if (nrow(validation %>%
-               filter(ProjectType %in% c(12, 13, 4) &
-                      ProjectName == input$providerList)) > 0) {
+               filter(
+                 ProjectType %in% c(12, 13, 4) &
+                 ProjectName == input$providerList
+               )) > 0) {
         current <- validation %>%
           filter(ProjectName == input$providerList &
                    is.na(ExitDate)) %>%
@@ -155,10 +183,12 @@ function(input, output, session) {
           unique()
         
         movedin <- validation %>%
-          filter(ProjectName == input$providerList &
-                   is.na(ExitDate) &
-                   !is.na(MoveInDateAdjust) &
-                   ProjectType == 13) %>%
+          filter(
+            ProjectName == input$providerList &
+              is.na(ExitDate) &
+              !is.na(MoveInDateAdjust) &
+              ProjectType == 13
+          ) %>%
           select(PersonalID) %>%
           unique()
         
@@ -169,10 +199,12 @@ function(input, output, session) {
         renderInfoBox({
           infoBox(
             title = "Current Clients",
-            subtitle = if_else(PTC == 13,
-                               paste(nrow(movedin),
-                                     "client(s) housed in the project"),
-                               ""), 
+            subtitle = if_else(
+              PTC == 13,
+              paste(nrow(movedin),
+                    "client(s) housed in the project"),
+              ""
+            ),
             color = "fuchsia",
             icon = icon("home"),
             nrow(current)
@@ -183,51 +215,58 @@ function(input, output, session) {
       
     }
     
-  output$CurrentHHCount <-
-    if (nrow(validation %>%
-             filter(ProjectType %in% c(12, 13, 4) &
-                    ProjectName == input$providerList)) > 0) {
-      current <- validation %>%
-        filter(ProjectName == input$providerList &
-                 is.na(ExitDate)) %>%
-        select(HouseholdID) %>%
-        unique()
+    output$CurrentHHCount <-
+      if (nrow(validation %>%
+               filter(
+                 ProjectType %in% c(12, 13, 4) &
+                 ProjectName == input$providerList
+               )) > 0) {
+        current <- validation %>%
+          filter(ProjectName == input$providerList &
+                   is.na(ExitDate)) %>%
+          select(HouseholdID) %>%
+          unique()
+        
+        movedin <- validation %>%
+          filter(
+            ProjectName == input$providerList &
+              is.na(ExitDate) &
+              !is.na(MoveInDateAdjust) &
+              ProjectType == 13
+          ) %>%
+          select(HouseholdID) %>%
+          unique()
+        
+        PTC <- validation %>%
+          filter(ProjectName == input$providerList) %>%
+          select(ProjectType) %>% unique()
+        
+        renderInfoBox({
+          infoBox(
+            title = "Current Households",
+            subtitle = if_else(
+              PTC == 13,
+              paste(nrow(movedin),
+                    "household(s) housed in the project"),
+              ""
+            ),
+            color = "teal",
+            icon = icon("users"),
+            nrow(current)
+          )
+        })
+      }
+    else{
       
-      movedin <- validation %>%
-        filter(ProjectName == input$providerList &
-                 is.na(ExitDate) &
-                 !is.na(MoveInDateAdjust) &
-                 ProjectType == 13) %>%
-        select(HouseholdID) %>%
-        unique()
-      
-      PTC <- validation %>%
-        filter(ProjectName == input$providerList) %>%
-        select(ProjectType) %>% unique()
-      
-      renderInfoBox({
-        infoBox(
-          title = "Current Households",
-          subtitle = if_else(PTC == 13,
-                             paste(nrow(movedin), 
-                                   "household(s) housed in the project"),
-                             ""),
-          color = "teal",
-          icon = icon("users"),
-          nrow(current)
-        )
-      })
     }
-  else{
     
-  }
-
     output$ShelterExitsToRRH <-
-      if(nrow(validation %>%
-              filter(ProjectType == 1 &
-                     ProjectName == input$providerList)) > 0) {
-        ReportStart <- format.Date(floor_date(today(), unit = "year"), "%m-%d-%Y")
-
+      if (nrow(validation %>%
+               filter(ProjectType == 1 &
+                      ProjectName == input$providerList)) > 0) {
+        ReportStart <-
+          format.Date(floor_date(today(), unit = "year"), "%m-%d-%Y")
+        
         renderInfoBox({
           infoBox(
             title = paste("Client Exits to Rapid Rehousing in", year(mdy(FileEnd))),
@@ -246,10 +285,118 @@ function(input, output, session) {
         })
       }
     else{
-
+      
     }
     
   })
+  
+  output$bedPlot <-
+    renderPlot({
+      ReportEnd <- ymd(paste0(
+        substr(
+          input$utilizationSlider,
+          str_length(input$utilizationSlider) - 4,
+          str_length(input$utilizationSlider)
+        ),
+        substr(
+          input$utilizationSlider,
+          1,
+          str_length(input$utilizationSlider) - 5
+        ),
+        "01"
+      )) +
+        months(1) - 1
+      ReportStart <- floor_date(ymd(ReportEnd), unit = "month") -
+        years(1) +
+        months(1)
+      ReportingPeriod <- interval(ymd(ReportStart), ymd(ReportEnd))
+      
+      bedPlot <- BedUtilization %>% select(-FilePeriod) %>%
+        gather("Month",
+               "Utilization",
+               -ProjectID,
+               -ProjectName,
+               -ProjectType) %>%
+        filter(ProjectName == input$providerListUtilization,
+               mdy(Month) %within% ReportingPeriod) %>%
+        mutate(
+          Month = floor_date(mdy(Month), unit = "month"),
+          Bed = Utilization,
+          Utilization = NULL
+        )
+      
+      unitPlot <- UnitUtilization %>% select(-FilePeriod) %>%
+        gather("Month",
+               "Utilization",
+               -ProjectID,
+               -ProjectName,
+               -ProjectType) %>%
+        filter(ProjectName == input$providerListUtilization,
+               mdy(Month) %within% ReportingPeriod) %>%
+        mutate(
+          Month = floor_date(mdy(Month), unit = "month"),
+          Unit = Utilization,
+          Utilization = NULL
+        )
+      
+      utilizationPlot <- unitPlot %>%
+        full_join(bedPlot,
+                  by = c("ProjectID", "ProjectName", "ProjectType", "Month")) %>%
+        gather("UtilizationType",
+               "Utilization",
+               -ProjectID,-ProjectName,-ProjectType,-Month) %>%
+        arrange(Month)
+      
+      ggplot(utilizationPlot,
+             aes(x = Month,
+                 y = Utilization,
+                 color = UtilizationType)) +
+        theme_light() +
+        geom_line(size = 1) +
+        geom_point(size = 2) +
+        scale_y_continuous(limits = c(0, 2),
+                           labels = scales::percent_format(accuracy = 1)) +
+        scale_x_date(
+          date_labels = "%B %Y",
+          date_breaks = "3 months",
+          minor_breaks = "1 month"
+        ) +
+        scale_colour_manual(values = c("#56B4E9", "#6be956")) +
+        labs(
+          title = input$providerListUtilization,
+          subtitle = paste(
+            "Date Range:",
+            format.Date(ymd(ReportStart), "%b %Y"),
+            "to",
+            format.Date(ymd(ReportEnd), "%b %Y")
+          ),
+          caption = "Client and household enrollment data comes from the Ohio
+          Balance of State CoC HMIS. This visualization was created by the
+          COHHIO HMIS team."
+        )
+      
+    })  
+  
+  output$headerQPRCommunityNeed <- renderUI({
+    ReportStart <- format.Date(ymd(paste0(
+      substr(input$spdatSlider, 1, 4),
+      "-01-01"
+    )), "%m-%d-%Y")
+    ReportEnd <- format.Date(mdy(paste0(
+      case_when(
+        substr(input$spdatSlider, 7, 7) == 1 ~ "03-31-",
+        substr(input$spdatSlider, 7, 7) == 2 ~ "06-30-",
+        substr(input$spdatSlider, 7, 7) == 3 ~ "09-30-",
+        substr(input$spdatSlider, 7, 7) == 4 ~ "12-31-"
+      ),
+      substr(input$spdatSlider, 1, 4)
+    )), "%m-%d-%Y")
+    
+    list(h2("Quarterly Performance Report"),
+         h3("Community Need"),
+         h4(input$regionList),
+         h4(ReportStart, "-", ReportEnd))
+  })  
   
   output$SPDATScoresByCounty <-
     renderPlot({
@@ -324,95 +471,6 @@ function(input, output, session) {
           the Ohio Balance of State CoC HMIS. Detail may be found at R minor
           elevated."
         )
-    })
-  
-  output$bedPlot <-
-    renderPlot({
-      ReportEnd <- ymd(paste0(
-        substr(
-          input$utilizationSlider,
-          str_length(input$utilizationSlider) - 4,
-          str_length(input$utilizationSlider)
-        ),
-        substr(
-          input$utilizationSlider,
-          1,
-          str_length(input$utilizationSlider) - 5
-        ),
-        "01"
-      )) +
-        months(1) - 1
-      ReportStart <- floor_date(ymd(ReportEnd), unit = "month") -
-        years(1) +
-        months(1)
-      ReportingPeriod <- interval(ymd(ReportStart), ymd(ReportEnd))
-      
-      bedPlot <- BedUtilization %>% select(-FilePeriod) %>%
-        gather("Month",
-               "Utilization",-ProjectID,-ProjectName,-ProjectType) %>%
-        filter(
-          ProjectName == input$providerListUtilization,
-          mdy(Month) %within% ReportingPeriod
-        ) %>%
-        mutate(
-          Month = floor_date(mdy(Month), unit = "month"),
-          Bed = Utilization,
-          Utilization = NULL
-        )
-      
-      unitPlot <- UnitUtilization %>% select(-FilePeriod) %>%
-        gather("Month",
-               "Utilization",-ProjectID,-ProjectName,-ProjectType) %>%
-        filter(
-          ProjectName == input$providerListUtilization,
-          mdy(Month) %within% ReportingPeriod
-        ) %>%
-        mutate(
-          Month = floor_date(mdy(Month), unit = "month"),
-          Unit = Utilization,
-          Utilization = NULL
-        )
-      
-      utilizationPlot <- unitPlot %>%
-        full_join(bedPlot,
-                  by = c("ProjectID", "ProjectName", "ProjectType", "Month")) %>%
-        gather(
-          "UtilizationType",
-          "Utilization",-ProjectID,
-          -ProjectName,
-          -ProjectType,
-          -Month
-        ) %>%
-        arrange(Month)
-      
-      ggplot(utilizationPlot,
-             aes(x = Month,
-                 y = Utilization,
-                 color = UtilizationType)) +
-        theme_light() +
-        geom_line(size = 1) +
-        geom_point(size = 2) +
-        scale_y_continuous(limits = c(0, 2),
-                           labels = scales::percent_format(accuracy = 1)) +
-        scale_x_date(
-          date_labels = "%B %Y",
-          date_breaks = "3 months",
-          minor_breaks = "1 month"
-        ) +
-        scale_colour_manual(values = c("#56B4E9", "#6be956")) +
-        labs(
-          title = input$providerListUtilization,
-          subtitle = paste(
-            "Date Range:",
-            format.Date(ymd(ReportStart), "%b %Y"),
-            "to",
-            format.Date(ymd(ReportEnd), "%b %Y")
-          ),
-          caption = "Client and household enrollment data comes from the Ohio
-          Balance of State CoC HMIS. This visualization was created by the
-          COHHIO HMIS team."
-        )
-      
     })
   
   output$CountyScoresText <-
@@ -562,7 +620,37 @@ function(input, output, session) {
                      }
                    })
                })
- # QPR Exits to PH 
+ 
+  # QPR Exits to PH 
+  
+  output$headerQPRExitsToPH <- renderUI({
+    ReportStart <- format.Date(ymd(paste0(
+      substr(input$ExitsToPHSlider, 1, 4),
+      "-01-01"
+    )), "%m-%d-%Y")
+    ReportEnd <- format.Date(mdy(paste0(
+      case_when(
+        substr(input$ExitsToPHSlider, 7, 7) == 1 ~ "03-31-",
+        substr(input$ExitsToPHSlider, 7, 7) == 2 ~ "06-30-",
+        substr(input$ExitsToPHSlider, 7, 7) == 3 ~ "09-30-",
+        substr(input$ExitsToPHSlider, 7, 7) == 4 ~ "12-31-"
+      ),
+      substr(input$ExitsToPHSlider, 1, 4)
+    )), "%m-%d-%Y")
+    
+    x <- renderText(input$ExitsToPHRegionSelect)
+    # y <- if_else(sum(sapply(x, length)) == 2,
+    #              renderText(input$ExitsToPHRegionSelect),
+    #              "Multiple Regions")
+    
+    list(
+      h2("Quarterly Performance Report"),
+      h3("Exits to Permanent Housing"),
+      h4(x),
+      h4(ReportStart, "-", ReportEnd)
+    )
+  })  
+  
   observeEvent(
     c(input$ExitsToPHRegionSelect, input$ExitsToPHSlider),
     {

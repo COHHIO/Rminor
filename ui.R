@@ -116,6 +116,7 @@ tagList(
         ),
         # tabItem LengthOfStay LoS
         tabItem(tabName = "PHTab",
+                fluidRow(box(htmlOutput("headerQPRExitsToPH"), width = 12)),
                 setSliderColor("#56B4E9", 1),
                 sliderTextInput("ExitsToPHSlider",
                                 "",
@@ -176,6 +177,7 @@ tagList(
                 HTML("<h1>Under Construction</h1>")),
         tabItem(
           tabName = "utilizationTab",
+          fluidRow(box(htmlOutput("headerUtilization"), width = 12)),
           pickerInput(
             inputId = "providerListUtilization",
             choices = c(sort(BedUtilization$ProjectName)),
@@ -196,6 +198,7 @@ tagList(
         # tabItem utilizationTab
         tabItem(
           tabName = "spdatTab",
+          fluidRow(box(htmlOutput("headerQPRCommunityNeed"), width = 12)),
           pickerInput(
             inputId = "regionList",
             choices = c(unique(Regions$RegionName)),
