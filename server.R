@@ -899,6 +899,152 @@ function(input, output, session) {
         })
         
   })
+  
+  # QPR NonCash Benefits
+  
+  output$headerQPRNCBs <- renderUI({
+    ReportStart <- format.Date(ymd(paste0(
+      substr(input$QPRNCBDateSlider, 1, 4),
+      "-01-01"
+    )), "%m-%d-%Y")
+    ReportEnd <- format.Date(mdy(paste0(
+      case_when(
+        substr(input$QPRNCBDateSlider, 7, 7) == 1 ~ "03-31-",
+        substr(input$QPRNCBDateSlider, 7, 7) == 2 ~ "06-30-",
+        substr(input$QPRNCBDateSlider, 7, 7) == 3 ~ "09-30-",
+        substr(input$QPRNCBDateSlider, 7, 7) == 4 ~ "12-31-"
+      ),
+      substr(input$QPRNCBDateSlider, 1, 4)
+    )), "%m-%d-%Y")
+    
+    list(h2("Quarterly Performance Report"),
+         h3("Access to Mainstream Benefits: Non-cash Benefits"),
+         h4(ReportStart, "-", ReportEnd))
+  })  
+  
+  output$QPRNCBs <- renderPlotly({
+    ReportStart <- format.Date(ymd(paste0(
+      substr(input$QPRNCBDateSlider, 1, 4),
+      "-01-01"
+    )), "%m-%d-%Y")
+    ReportEnd <- format.Date(mdy(paste0(
+      case_when(
+        substr(input$QPRNCBDateSlider, 7, 7) == 1 ~ "03-31-",
+        substr(input$QPRNCBDateSlider, 7, 7) == 2 ~ "06-30-",
+        substr(input$QPRNCBDateSlider, 7, 7) == 3 ~ "09-30-",
+        substr(input$QPRNCBDateSlider, 7, 7) == 4 ~ "12-31-"
+      ),
+      substr(input$QPRNCBDateSlider, 1, 4)
+    )), "%m-%d-%Y")
+    
+    meeting_objective <- QPR_MainstreamBenefits %>%
+      filter(
+        Region %in% parse_number(input$QPRNCBRegionSelect) &
+          ProjectType == input$radioQPR_NCB_PTC &
+          exited_between(., ReportStart, ReportEnd) &
+          BenefitsFromAnySource == 1
+      ) %>% 
+      group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+      summarise(BenefitsAtExit = n())
+    
+    # calculating the total households for comparison
+    all_hhs <- QPR_MainstreamBenefits %>%
+      filter(Region %in% parse_number(input$QPRNCBRegionSelect) &
+               ProjectType == input$radioQPR_NCB_PTC &
+               exited_between(., ReportStart, ReportEnd)) %>%
+      group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+      summarise(TotalHHs = n()) 
+    
+    NCBsAtExit <- all_hhs %>%
+      left_join(
+        meeting_objective,
+        by = c("FriendlyProjectName", "ProjectType", "County", "Region")
+      )
+    
+    NCBsAtExit[is.na(NCBsAtExit)] <- 0
+    
+    NCBsAtExit <- NCBsAtExit %>%
+      mutate(Percent = BenefitsAtExit / TotalHHs)
+    
+    NCBGoal <-
+      goals %>%
+      filter(Measure == "Non-cash Benefits") %>%
+      mutate(ProjectType = case_when(
+        ProjectType == 1 ~ "Emergency Shelters", 
+        ProjectType == 2 ~ "Transitional Housing", 
+        ProjectType == 3 ~ "Permanent Supportive Housing", 
+        ProjectType == 4 ~ "Street Outreach", 
+        ProjectType == 8 ~ "Safe Haven",
+        ProjectType == 9 ~ "Permanent Supportive Housing", 
+        ProjectType == 12 ~ "Prevention",  
+        ProjectType == 13 ~ "Rapid Rehousing"
+      )) %>% unique()
+    
+    title <- paste0("Non-Cash Benefits at Exit\n", 
+                    input$radioQPR_NCB_PTC, "\n",
+                    ReportStart, " to ", ReportEnd)
+    
+    region <- parse_number(input$QPRNCBRegionSelect)
+    
+    stagingNCBs <- NCBsAtExit %>%
+      left_join(NCBGoal, by = "ProjectType") %>%
+      filter(ProjectType == input$radioQPR_NCB_PTC, Region %in% region) %>%
+      mutate(
+        hover = paste0(
+          FriendlyProjectName, 
+          "\nReceiving Non-Cash Benefits at Exit: ", BenefitsAtExit, 
+          "\nTotal Households: ", TotalHHs, 
+          "\n", as.integer(Percent * 100), "%",
+          sep = "\n"
+        )
+      )
+    
+    if(nrow(stagingNCBs) > 0) {
+      plot_ly(
+        stagingNCBs,
+        x = ~ FriendlyProjectName,
+        y = ~ Percent,
+        text = ~ hover,
+        hoverinfo = 'text',
+        type = "bar"
+      ) %>%
+        layout(
+          xaxis = list(title = ""),
+          yaxis = list(title = "Households",
+                       tickformat = "%"),
+          title = list(
+            text = title,
+            font = list(
+              size = 15
+            )),
+          margin = list(
+            l = 50,
+            r = 50,
+            b = 100,
+            t = 100,
+            pad = 4
+          ),
+          shapes = list(
+            type = "rect",
+            name = "CoC Goal",
+            fillcolor = "#008000",
+            line = list(color = "white", width = .01),
+            layer = "below",
+            xref = "paper",
+            yref = "y",
+            x0 = 0,
+            x1 = 1,
+            y0 = ~ Goal[1],
+            y1 = 1,
+            opacity = .2
+          ),
+          title = "Accessing Mainstream Benefits: Non-Cash Benefits at Exit"
+        )}
+    else{
+      
+    }
+  })
+  
   # QPR Rapid Placement into RRH
   output$DaysToHouse <- 
     renderPlotly({
@@ -986,4 +1132,6 @@ function(input, output, session) {
           title = "Days to House"
         )
     })
+  
+  
 }
