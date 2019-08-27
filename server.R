@@ -400,7 +400,6 @@ function(input, output, session) {
   
   output$SPDATScoresByCounty <-
     renderPlot({
-      # ReportStart <- format.Date(mdy(paste0("01-01-", input$y)), "%m-%d-%Y")
       ReportStart <- format.Date(ymd(paste0(
         substr(input$spdatSlider, 1, 4),
         "-01-01"
@@ -1049,6 +1048,296 @@ function(input, output, session) {
             opacity = .2
           ),
           title = "Accessing Mainstream Benefits: Non-Cash Benefits at Exit"
+        )}
+    else{
+      
+    }
+  })
+  
+  # QPR Health Insurance
+  
+  output$headerQPRHI <- renderUI({
+    ReportStart <- format.Date(ymd(paste0(
+      substr(input$QPRHIDateSlider, 1, 4),
+      "-01-01"
+    )), "%m-%d-%Y")
+    ReportEnd <- format.Date(mdy(paste0(
+      case_when(
+        substr(input$QPRHIDateSlider, 7, 7) == 1 ~ "03-31-",
+        substr(input$QPRHIDateSlider, 7, 7) == 2 ~ "06-30-",
+        substr(input$QPRHIDateSlider, 7, 7) == 3 ~ "09-30-",
+        substr(input$QPRHIDateSlider, 7, 7) == 4 ~ "12-31-"
+      ),
+      substr(input$QPRHIDateSlider, 1, 4)
+    )), "%m-%d-%Y")
+    
+    list(h2("Quarterly Performance Report"),
+         h3("Access to Mainstream Benefits: Health Insurance"),
+         h4(ReportStart, "-", ReportEnd))
+  })  
+  
+  output$QPRHIs <- renderPlotly({
+    ReportStart <- format.Date(ymd(paste0(
+      substr(input$QPRHIDateSlider, 1, 4),
+      "-01-01"
+    )), "%m-%d-%Y")
+    ReportEnd <- format.Date(mdy(paste0(
+      case_when(
+        substr(input$QPRHIDateSlider, 7, 7) == 1 ~ "03-31-",
+        substr(input$QPRHIDateSlider, 7, 7) == 2 ~ "06-30-",
+        substr(input$QPRHIDateSlider, 7, 7) == 3 ~ "09-30-",
+        substr(input$QPRHIDateSlider, 7, 7) == 4 ~ "12-31-"
+      ),
+      substr(input$QPRHIDateSlider, 1, 4)
+    )), "%m-%d-%Y")
+    
+    meeting_objective <- QPR_MainstreamBenefits %>%
+      filter(
+        Region %in% parse_number(input$QPRHIRegionSelect) &
+          ProjectType == input$radioQPR_HI_PTC &
+          exited_between(., ReportStart, ReportEnd) &
+          InsuranceFromAnySource == 1
+      ) %>% 
+      group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+      summarise(InsuranceAtExit = n())
+    
+    # calculating the total households for comparison
+    all_hhs <- QPR_MainstreamBenefits %>%
+      filter(Region %in% parse_number(input$QPRHIRegionSelect) &
+               ProjectType == input$radioQPR_HI_PTC &
+               exited_between(., ReportStart, ReportEnd)) %>%
+      group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+      summarise(TotalHHs = n()) 
+    
+    HIAtExit <- all_hhs %>%
+      left_join(
+        meeting_objective,
+        by = c("FriendlyProjectName", "ProjectType", "County", "Region")
+      )
+    
+    HIAtExit[is.na(HIAtExit)] <- 0
+    
+    HIAtExit <- HIAtExit %>%
+      mutate(Percent = InsuranceAtExit / TotalHHs)
+    
+    HIGoal <-
+      goals %>%
+      filter(Measure == "Health Insurance at Exit") %>%
+      mutate(ProjectType = case_when(
+        ProjectType == 1 ~ "Emergency Shelters", 
+        ProjectType == 2 ~ "Transitional Housing", 
+        ProjectType == 3 ~ "Permanent Supportive Housing", 
+        ProjectType == 4 ~ "Street Outreach", 
+        ProjectType == 8 ~ "Safe Haven",
+        ProjectType == 9 ~ "Permanent Supportive Housing", 
+        ProjectType == 12 ~ "Prevention",  
+        ProjectType == 13 ~ "Rapid Rehousing"
+      )) %>% unique()
+    
+    title <- paste0("Health Insurance at Exit\n", 
+                    input$radioQPR_NCB_PTC, "\n",
+                    ReportStart, " to ", ReportEnd)
+    
+    region <- parse_number(input$QPRHIRegionSelect)
+    
+    stagingHI <- HIAtExit %>%
+      left_join(HIGoal, by = "ProjectType") %>%
+      filter(ProjectType == input$radioQPR_HI_PTC, Region %in% region) %>%
+      mutate(
+        hover = paste0(
+          FriendlyProjectName, 
+          "\nHealth Insurance at Exit: ", InsuranceAtExit, 
+          "\nTotal Households: ", TotalHHs, 
+          "\n", as.integer(Percent * 100), "%",
+          sep = "\n"
+        )
+      )
+    
+    if(nrow(stagingHI) > 0) {
+      plot_ly(
+        stagingHI,
+        x = ~ FriendlyProjectName,
+        y = ~ Percent,
+        text = ~ hover,
+        hoverinfo = 'text',
+        type = "bar"
+      ) %>%
+        layout(
+          xaxis = list(title = ""),
+          yaxis = list(title = "Households",
+                       tickformat = "%"),
+          title = list(
+            text = title,
+            font = list(
+              size = 15
+            )),
+          margin = list(
+            l = 50,
+            r = 50,
+            b = 100,
+            t = 100,
+            pad = 4
+          ),
+          shapes = list(
+            type = "rect",
+            name = "CoC Goal",
+            fillcolor = "#008000",
+            line = list(color = "white", width = .01),
+            layer = "below",
+            xref = "paper",
+            yref = "y",
+            x0 = 0,
+            x1 = 1,
+            y0 = ~ Goal[1],
+            y1 = 1,
+            opacity = .2
+          ),
+          title = "Accessing Mainstream Benefits: Health Insurance at Exit"
+        )}
+    else{
+      
+    }
+  })
+  
+  # QPR Increase Income
+  
+  output$headerQPRIncome <- renderUI({
+    ReportStart <- format.Date(ymd(paste0(
+      substr(input$QPRIncomeDateSlider, 1, 4),
+      "-01-01"
+    )), "%m-%d-%Y")
+    ReportEnd <- format.Date(mdy(paste0(
+      case_when(
+        substr(input$QPRIncomeDateSlider, 7, 7) == 1 ~ "03-31-",
+        substr(input$QPRIncomeDateSlider, 7, 7) == 2 ~ "06-30-",
+        substr(input$QPRIncomeDateSlider, 7, 7) == 3 ~ "09-30-",
+        substr(input$QPRIncomeDateSlider, 7, 7) == 4 ~ "12-31-"
+      ),
+      substr(input$QPRIncomeDateSlider, 1, 4)
+    )), "%m-%d-%Y")
+    
+    list(h2("Quarterly Performance Report"),
+         h3("Access to Mainstream Benefits: Increased Income"),
+         h4(ReportStart, "-", ReportEnd))
+  })  
+  
+  output$QPRIncome <- renderPlotly({
+    ReportStart <- format.Date(ymd(paste0(
+      substr(input$QPRIncomeDateSlider, 1, 4),
+      "-01-01"
+    )), "%m-%d-%Y")
+    ReportEnd <- format.Date(mdy(paste0(
+      case_when(
+        substr(input$QPRIncomeDateSlider, 7, 7) == 1 ~ "03-31-",
+        substr(input$QPRIncomeDateSlider, 7, 7) == 2 ~ "06-30-",
+        substr(input$QPRIncomeDateSlider, 7, 7) == 3 ~ "09-30-",
+        substr(input$QPRIncomeDateSlider, 7, 7) == 4 ~ "12-31-"
+      ),
+      substr(input$QPRIncomeDateSlider, 1, 4)
+    )), "%m-%d-%Y")
+    
+    meeting_objective <- QPR_Income %>%
+      filter(
+        Region %in% parse_number(input$QPRIncomeRegionSelect) &
+          ProjectType == input$radioQPR_Income_PTC &
+          exited_between(., ReportStart, ReportEnd) &
+          Difference > 0
+      ) %>% 
+      group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+      summarise(Increased = n())
+    
+    # calculating the total households for comparison
+    all_hhs <- QPR_Income %>%
+      filter(Region %in% parse_number(input$QPRIncomeRegionSelect) &
+               ProjectType == input$radioQPR_Income_PTC &
+               exited_between(., ReportStart, ReportEnd)) %>%
+      group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+      summarise(TotalHHs = n()) 
+    
+    IncreasedIncome <- all_hhs %>%
+      left_join(
+        meeting_objective,
+        by = c("FriendlyProjectName", "ProjectType", "County", "Region")
+      )
+    
+    IncreasedIncome[is.na(IncreasedIncome)] <- 0
+    
+    IncreasedIncome <- IncreasedIncome %>%
+      mutate(Percent = Increased / TotalHHs)
+    
+    IncomeGoal <-
+      goals %>%
+      filter(Measure == "Gain or Increase Income") %>%
+      mutate(ProjectType = case_when(
+        ProjectType == 1 ~ "Emergency Shelters", 
+        ProjectType == 2 ~ "Transitional Housing", 
+        ProjectType == 3 ~ "Permanent Supportive Housing", 
+        ProjectType == 4 ~ "Street Outreach", 
+        ProjectType == 8 ~ "Safe Haven",
+        ProjectType == 9 ~ "Permanent Supportive Housing", 
+        ProjectType == 12 ~ "Prevention",  
+        ProjectType == 13 ~ "Rapid Rehousing"
+      )) %>% unique()
+    
+    title <- paste0("Increased Income\n", 
+                    input$radioQPR_Income_PTC, "\n",
+                    ReportStart, " to ", ReportEnd)
+    
+    region <- parse_number(input$QPRIncomeRegionSelect)
+    
+    stagingIncome <- IncreasedIncome %>%
+      left_join(IncomeGoal, by = "ProjectType") %>%
+      filter(ProjectType == input$radioQPR_Income_PTC, Region %in% region) %>%
+      mutate(
+        hover = paste0(
+          FriendlyProjectName, 
+          "\nIncreased Income: ", Increased, 
+          "\nTotal Households: ", TotalHHs, 
+          "\n", as.integer(Percent * 100), "%",
+          sep = "\n"
+        )
+      )
+    
+    if(nrow(stagingIncome) > 0) {
+      plot_ly(
+        stagingIncome,
+        x = ~ FriendlyProjectName,
+        y = ~ Percent,
+        text = ~ hover,
+        hoverinfo = 'text',
+        type = "bar"
+      ) %>%
+        layout(
+          xaxis = list(title = ""),
+          yaxis = list(title = "Households",
+                       tickformat = "%"),
+          title = list(
+            text = title,
+            font = list(
+              size = 15
+            )),
+          margin = list(
+            l = 50,
+            r = 50,
+            b = 100,
+            t = 100,
+            pad = 4
+          ),
+          shapes = list(
+            type = "rect",
+            name = "CoC Goal",
+            fillcolor = "#008000",
+            line = list(color = "white", width = .01),
+            layer = "below",
+            xref = "paper",
+            yref = "y",
+            x0 = 0,
+            x1 = 1,
+            y0 = ~ Goal[1],
+            y1 = 1,
+            opacity = .2
+          ),
+          title = "Accessing Mainstream Benefits: Health Insurance at Exit"
         )}
     else{
       
