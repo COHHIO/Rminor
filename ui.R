@@ -149,11 +149,96 @@ tagList(
                 plotlyOutput("ExitsToPHOutreach")
         ),
         tabItem(tabName = "NCBTab",
-                HTML("<h1>Under Construction</h1>")),
+                fluidRow(box(htmlOutput("headerQPRNCBs"), width = 12)),
+                setSliderColor("#56B4E9", 1),
+                sliderTextInput("QPRNCBDateSlider",
+                                "",
+                                c(
+                                  unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
+                                ),
+                                selected = Sys.yearqtr() - 1 / 4),
+                pickerInput(
+                  inputId = "QPRNCBRegionSelect",
+                  "Select Region(s)",
+                  choices = choices_regions,
+                  options = list(`actions-box` = TRUE),
+                  multiple = TRUE,
+                  selected = sample(choices_regions, 1)
+                ),
+                prettyRadioButtons(
+                  inputId = "radioQPR_NCB_PTC",
+                  label = "Program Type",
+                  thick = TRUE,
+                  animation = "pulse",
+                  status = "info",
+                  choices = c("Emergency Shelters", "Transitional Housing",
+                              "Safe Haven", "Prevention", "Rapid Rehousing", 
+                              "Permanent Supportive Housing", "Street Outreach"),
+                  selected = "Emergency Shelters"
+                ),
+                plotlyOutput("QPRNCBs"),
+                br()
+        ),
         tabItem(tabName = "HITab",
-                HTML("<h1>Under Construction</h1>")),
+                fluidRow(box(htmlOutput("headerQPRHI"), width = 12)),
+                setSliderColor("#56B4E9", 1),
+                sliderTextInput("QPRHIDateSlider",
+                                "",
+                                c(
+                                  unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
+                                ),
+                                selected = Sys.yearqtr() - 1 / 4),
+                pickerInput(
+                  inputId = "QPRHIRegionSelect",
+                  "Select Region(s)",
+                  choices = choices_regions,
+                  options = list(`actions-box` = TRUE),
+                  multiple = TRUE,
+                  selected = sample(choices_regions, 1)
+                ),
+                prettyRadioButtons(
+                  inputId = "radioQPR_HI_PTC",
+                  label = "Program Type",
+                  thick = TRUE,
+                  animation = "pulse",
+                  status = "info",
+                  choices = c("Emergency Shelters", "Transitional Housing",
+                              "Safe Haven", "Prevention", "Rapid Rehousing", 
+                              "Permanent Supportive Housing", "Street Outreach"),
+                  selected = "Emergency Shelters"
+                ),
+                plotlyOutput("QPRHIs"),
+                br()),
         tabItem(tabName = "incomeTab",
-                HTML("<h1>Under Construction</h1>")),
+                fluidRow(box(htmlOutput("headerQPRIncome"), width = 12)),
+                setSliderColor("#56B4E9", 1),
+                sliderTextInput("QPRIncomeDateSlider",
+                                "",
+                                c(
+                                  unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
+                                ),
+                                selected = Sys.yearqtr() - 1 / 4),
+                pickerInput(
+                  inputId = "QPRIncomeRegionSelect",
+                  "Select Region(s)",
+                  choices = choices_regions,
+                  options = list(`actions-box` = TRUE),
+                  multiple = TRUE,
+                  selected = sample(choices_regions, 1)
+                ),
+                prettyRadioButtons(
+                  inputId = "radioQPR_Income_PTC",
+                  label = "Program Type",
+                  thick = TRUE,
+                  animation = "pulse",
+                  status = "info",
+                  choices = c("Emergency Shelters", "Transitional Housing",
+                              "Safe Haven", "Prevention", "Rapid Rehousing", 
+                              "Permanent Supportive Housing", "Street Outreach"),
+                  selected = "Emergency Shelters"
+                ),
+                plotlyOutput("QPRIncome"),
+                br()),
         tabItem(tabName = "recurrenceTab",
                 HTML("<h1>Under Construction</h1>")),
         tabItem(tabName = "rapidTab",
