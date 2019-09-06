@@ -23,7 +23,7 @@ library(zoo)
 
 load("data/Utilization.RData")
 
-filebeginningdate <- updatedate - years(2)
+filebeginningdate <- update_date - years(2)
 
 load("data/QPR_SPDATs.RData")
 
