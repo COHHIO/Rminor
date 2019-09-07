@@ -23,7 +23,7 @@ library(zoo)
 
 load("data/Utilization.RData")
 
-filebeginningdate <- updatedate - years(2)
+filebeginningdate <- update_date - years(2)
 
 load("data/QPR_SPDATs.RData")
 
@@ -42,7 +42,14 @@ choices_month <-
 
 choices_regions <- unique(Regions$RegionName)
 
-providers <- sort(validation$ProjectName) %>% unique() 
+providers <- validation %>%
+  filter(str_detect(ProjectName, "zz", negate = TRUE) == TRUE)
+# the sample() function was pulling in a zz'd provider in the Provider Dashboard
+# so I'm filtering out the zz'd providers because why would they ever need to
+# check their Provider Dashboard? they wouldn't.
+providers <- 
+  sort(providers$ProjectName) %>% 
+  unique() 
 
 choices_project_type <- c(
   "Emergency Shelter", 
