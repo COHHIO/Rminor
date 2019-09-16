@@ -278,7 +278,7 @@ tagList(
           ),
           # verbatimTextOutput("res"),
           # sliderInput(
-          plotOutput("bedPlot")
+          plotlyOutput("bedPlot")
         ),
         # tabItem utilizationTab
         tabItem(
