@@ -39,12 +39,12 @@ tagList(
                       tabName = "HITab"),
           menuSubItem("Income Growth",
                       tabName = "incomeTab"),
-          menuSubItem("Recurrence",
-                      tabName = "recurrenceTab"),
+          # menuSubItem("Recurrence",
+          #             tabName = "recurrenceTab"),
           menuSubItem("Rapid Placement for RRH",
-                      tabName = "rapidTab"),
-          menuSubItem("RRH HP Spending",
-                      tabName = "spendingTab")
+                      tabName = "rapidTab")#,
+          # menuSubItem("RRH HP Spending",
+          #             tabName = "spendingTab")
         )
       ),
       HTML(paste0(
@@ -102,7 +102,6 @@ tagList(
           # verbatimTextOutput("res"),
           plotlyOutput("bedPlot")
         ),
-        # tabItem providerDashboard
         # tabItem(tabName = "cocCompetitionTab",
         #         HTML("<h1>Under Construction</h1>")),
         tabItem(
@@ -144,7 +143,6 @@ tagList(
           # verbatimTextOutput("res"),
           plotlyOutput("QPRLoSPlot")
         ),
-        # tabItem LengthOfStay LoS
         tabItem(tabName = "PHTab",
                 fluidRow(box(htmlOutput("headerQPRExitsToPH"), width = 12)),
                 setSliderColor("#56B4E9", 1),
@@ -269,8 +267,8 @@ tagList(
                 ),
                 plotlyOutput("QPRIncome"),
                 br()),
-        tabItem(tabName = "recurrenceTab",
-                HTML("<h1>Under Construction</h1>")),
+        # tabItem(tabName = "recurrenceTab",
+                # HTML("<h1>Under Construction</h1>")),
         tabItem(tabName = "rapidTab",
                 setSliderColor("#56B4E9", 1),
                 sliderTextInput("RapidRRHDateSlider",
@@ -288,8 +286,8 @@ tagList(
                   selected = sample(choices_regions, 1)
                 ),
                 plotlyOutput("DaysToHouse")),
-        tabItem(tabName = "spendingTab",
-                HTML("<h1>Under Construction</h1>")),
+        # tabItem(tabName = "spendingTab",
+        #         HTML("<h1>Under Construction</h1>")),
         
         tabItem(
           tabName = "spdatTab",
