@@ -100,7 +100,25 @@ tagList(
             width = 12
           )), 
           # verbatimTextOutput("res"),
-          plotlyOutput("bedPlot")
+          plotlyOutput("bedPlot"),
+          fluidRow(box(
+            textOutput("bedNote"),
+            title = "What is Bed Utilization?",
+            collapsible = TRUE,
+            collapsed = TRUE
+          ),
+          box(
+            textOutput("unitNote"),
+            title = "What is Unit Utilization?",
+            collapsible = TRUE,
+            collapsed = TRUE
+          ),
+          box(
+            textOutput("utilizationNote"),
+            title = "Methodology",
+            collapsible = TRUE,
+            collapsed = TRUE
+          ))
         ),
         # tabItem(tabName = "cocCompetitionTab",
         #         HTML("<h1>Under Construction</h1>")),
@@ -308,7 +326,7 @@ tagList(
                           selected = Sys.yearqtr() - 1 / 4),
           plotOutput("SPDATScoresByCounty"),
           HTML("<br>"),
-          box(
+          fluidRow(box(
             textOutput("CountyScoresText"),
             title = "The Lines",
             collapsible = TRUE,
@@ -325,7 +343,7 @@ tagList(
             title = "A Note about Data Quality",
             collapsible = TRUE,
             collapsed = TRUE
-          )
+          ))
         ) #tabItem SPDAT tab
       ) # tabItems
     )
