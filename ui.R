@@ -72,6 +72,36 @@ tagList(
           uiOutput("ShelterExitsToRRH"),
           uiOutput("CurrentlyAwaitingPH")
         ), 
+        tabItem(
+          tabName = "utilizationTab",
+          fluidRow(box(htmlOutput("headerUtilization"), width = 12)),
+          fluidRow(box(
+            pickerInput(
+              inputId = "providerListUtilization",
+              choices = c(sort(BedUtilization$ProjectName)),
+              options = list(`live-search` = TRUE),
+              width = "100%"
+            ),
+            airDatepickerInput(
+              inputId = "utilizationDate",
+              label = "Report End Month",
+              max =
+                ymd(floor_date(update_date, unit = "month") - days(1)),
+              min =
+                ymd(floor_date(update_date - days(335), unit = "month")),
+              dateFormat = "MM yyyy",
+              view = "month",
+              value =
+                ymd(floor_date(update_date, unit = "month") - days(1)),
+              minView = "months",
+              addon = "none",
+              autoClose = TRUE
+            ),
+            width = 12
+          )), 
+          # verbatimTextOutput("res"),
+          plotlyOutput("bedPlot")
+        ),
         # tabItem providerDashboard
         # tabItem(tabName = "cocCompetitionTab",
         #         HTML("<h1>Under Construction</h1>")),
@@ -260,27 +290,7 @@ tagList(
                 plotlyOutput("DaysToHouse")),
         tabItem(tabName = "spendingTab",
                 HTML("<h1>Under Construction</h1>")),
-        tabItem(
-          tabName = "utilizationTab",
-          fluidRow(box(htmlOutput("headerUtilization"), width = 12)),
-          pickerInput(
-            inputId = "providerListUtilization",
-            choices = c(sort(BedUtilization$ProjectName)),
-            options = list(`live-search` = TRUE),
-            width = "100%"
-          ),
-          setSliderColor("#56B4E9", 1),
-          sliderTextInput(
-            "utilizationSlider",
-            label = "Select END DATE",
-            choices = choices_month,
-            selected = choices_month[24]
-          ),
-          # verbatimTextOutput("res"),
-          # sliderInput(
-          plotlyOutput("bedPlot")
-        ),
-        # tabItem utilizationTab
+        
         tabItem(
           tabName = "spdatTab",
           fluidRow(box(htmlOutput("headerQPRCommunityNeed"), width = 12)),

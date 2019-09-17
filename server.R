@@ -14,24 +14,11 @@
 
 function(input, output, session) {
   # output$res <- renderPrint({
-  #  # input$LoSRegionSelect
+  #  input$utilizationDate
   # cat("Length of Stay", input$LoSRegionSelect)
   # })
   output$headerUtilization <- renderUI({
-    ReportEnd <- ymd(paste0(
-      substr(
-        input$utilizationSlider,
-        str_length(input$utilizationSlider) - 4,
-        str_length(input$utilizationSlider)
-      ),
-      substr(
-        input$utilizationSlider,
-        1,
-        str_length(input$utilizationSlider) - 5
-      ),
-      "01"
-    )) +
-      months(1) - 1
+    ReportEnd <- ceiling_date(ymd(input$utilizationDate), unit = "month") - days(1)
     ReportStart <- floor_date(ymd(ReportEnd), unit = "month") -
       years(1) +
       months(1)
@@ -292,20 +279,7 @@ function(input, output, session) {
   
   output$bedPlot <-
     renderPlotly({
-      ReportEnd <- ymd(paste0(
-        substr(
-          input$utilizationSlider,
-          str_length(input$utilizationSlider) - 4,
-          str_length(input$utilizationSlider)
-        ),
-        substr(
-          input$utilizationSlider,
-          1,
-          str_length(input$utilizationSlider) - 5
-        ),
-        "01"
-      )) +
-        months(1) - 1
+      ReportEnd <- ymd(input$utilizationDate) 
       ReportStart <- floor_date(ymd(ReportEnd), unit = "month") -
         years(1) +
         months(1)
