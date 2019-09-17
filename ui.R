@@ -101,20 +101,21 @@ tagList(
           )), 
           # verbatimTextOutput("res"),
           plotlyOutput("bedPlot"),
+          br(),
           fluidRow(box(
-            textOutput("bedNote"),
+            uiOutput("bedNote"),
             title = "What is Bed Utilization?",
             collapsible = TRUE,
             collapsed = TRUE
           ),
           box(
-            textOutput("unitNote"),
+            uiOutput("unitNote"),
             title = "What is Unit Utilization?",
             collapsible = TRUE,
             collapsed = TRUE
           ),
           box(
-            textOutput("utilizationNote"),
+            uiOutput("utilizationNote"),
             title = "Methodology",
             collapsible = TRUE,
             collapsed = TRUE

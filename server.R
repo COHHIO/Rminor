@@ -18,10 +18,10 @@ function(input, output, session) {
   # cat("Length of Stay", input$LoSRegionSelect)
   # })
   output$headerUtilization <- renderUI({
-    ReportEnd <- ceiling_date(ymd(input$utilizationDate), unit = "month") - days(1)
-    ReportStart <- floor_date(ymd(ReportEnd), unit = "month") -
-      years(1) +
-      months(1)
+    ReportEnd <- 
+      ceiling_date(ymd(input$utilizationDate), unit = "month") - days(1)
+    ReportStart <- 
+      floor_date(ymd(ReportEnd), unit = "month") - years(1) + months(1)
     
     ReportStart <- format.Date(ymd(ReportStart), "%B %d, %Y")
     ReportEnd <- format.Date(ymd(ReportEnd), "%B %d, %Y")
@@ -350,13 +350,13 @@ function(input, output, session) {
     })  
   
   output$unitNote <-
-    renderText(unit_utilization_note)
+    renderUI(unit_utilization_note)
   
   output$bedNote <-
-    renderText(bed_utilization_note)
+    renderUI(bed_utilization_note)
   
   output$utilizationNote <-
-    renderText(calculation_note)
+    renderUI(HTML(calculation_note))
   
   output$headerQPRCommunityNeed <- renderUI({
     ReportStart <- format.Date(ymd(paste0(
