@@ -349,6 +349,15 @@ function(input, output, session) {
       
     })  
   
+  output$unitNote <-
+    renderText(unit_utilization_note)
+  
+  output$bedNote <-
+    renderText(bed_utilization_note)
+  
+  output$utilizationNote <-
+    renderText(calculation_note)
+  
   output$headerQPRCommunityNeed <- renderUI({
     ReportStart <- format.Date(ymd(paste0(
       substr(input$spdatSlider, 1, 4),
