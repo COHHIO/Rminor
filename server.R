@@ -14,27 +14,14 @@
 
 function(input, output, session) {
   # output$res <- renderPrint({
-  #  # input$LoSRegionSelect
+  #  input$utilizationDate
   # cat("Length of Stay", input$LoSRegionSelect)
   # })
   output$headerUtilization <- renderUI({
-    ReportEnd <- ymd(paste0(
-      substr(
-        input$utilizationSlider,
-        str_length(input$utilizationSlider) - 4,
-        str_length(input$utilizationSlider)
-      ),
-      substr(
-        input$utilizationSlider,
-        1,
-        str_length(input$utilizationSlider) - 5
-      ),
-      "01"
-    )) +
-      months(1) - 1
-    ReportStart <- floor_date(ymd(ReportEnd), unit = "month") -
-      years(1) +
-      months(1)
+    ReportEnd <- 
+      ceiling_date(ymd(input$utilizationDate), unit = "month") - days(1)
+    ReportStart <- 
+      floor_date(ymd(ReportEnd), unit = "month") - years(1) + months(1)
     
     ReportStart <- format.Date(ymd(ReportStart), "%B %d, %Y")
     ReportEnd <- format.Date(ymd(ReportEnd), "%B %d, %Y")
@@ -291,25 +278,14 @@ function(input, output, session) {
   })
   
   output$bedPlot <-
-    renderPlot({
-      ReportEnd <- ymd(paste0(
-        substr(
-          input$utilizationSlider,
-          str_length(input$utilizationSlider) - 4,
-          str_length(input$utilizationSlider)
-        ),
-        substr(
-          input$utilizationSlider,
-          1,
-          str_length(input$utilizationSlider) - 5
-        ),
-        "01"
-      )) +
-        months(1) - 1
+    renderPlotly({
+      ReportEnd <- ymd(input$utilizationDate) 
       ReportStart <- floor_date(ymd(ReportEnd), unit = "month") -
         years(1) +
         months(1)
       ReportingPeriod <- interval(ymd(ReportStart), ymd(ReportEnd))
+      
+      Provider <- input$providerListUtilization
       
       bedPlot <- BedUtilization %>% select(-FilePeriod) %>%
         gather("Month",
@@ -317,7 +293,7 @@ function(input, output, session) {
                -ProjectID,
                -ProjectName,
                -ProjectType) %>%
-        filter(ProjectName == input$providerListUtilization,
+        filter(ProjectName == Provider,
                mdy(Month) %within% ReportingPeriod) %>%
         mutate(
           Month = floor_date(mdy(Month), unit = "month"),
@@ -331,7 +307,7 @@ function(input, output, session) {
                -ProjectID,
                -ProjectName,
                -ProjectType) %>%
-        filter(ProjectName == input$providerListUtilization,
+        filter(ProjectName == Provider,
                mdy(Month) %within% ReportingPeriod) %>%
         mutate(
           Month = floor_date(mdy(Month), unit = "month"),
@@ -341,41 +317,46 @@ function(input, output, session) {
       
       utilizationPlot <- unitPlot %>%
         full_join(bedPlot,
-                  by = c("ProjectID", "ProjectName", "ProjectType", "Month")) %>%
-        gather("UtilizationType",
-               "Utilization",
-               -ProjectID,-ProjectName,-ProjectType,-Month) %>%
-        arrange(Month)
+                  by = c("ProjectID", "ProjectName", "ProjectType", "Month")) 
       
-      ggplot(utilizationPlot,
-             aes(x = Month,
-                 y = Utilization,
-                 color = UtilizationType)) +
-        theme_light() +
-        geom_line(size = 1) +
-        geom_point(size = 2) +
-        scale_y_continuous(limits = c(0, 2),
-                           labels = scales::percent_format(accuracy = 1)) +
-        scale_x_date(
-          date_labels = "%B %Y",
-          date_breaks = "3 months",
-          minor_breaks = "1 month"
-        ) +
-        scale_colour_manual(values = c("#56B4E9", "#6be956")) +
-        labs(
-          title = input$providerListUtilization,
-          subtitle = paste(
-            "Date Range:",
-            format.Date(ymd(ReportStart), "%b %Y"),
-            "to",
-            format.Date(ymd(ReportEnd), "%b %Y")
-          ),
-          caption = "Client and household enrollment data comes from the Ohio
-          Balance of State CoC HMIS. This visualization was created by the
-          COHHIO HMIS team."
-        )
+      plot_ly(utilizationPlot, 
+              x = ~Month) %>%
+        add_trace(y = ~ Unit,
+                  name = "Unit Utilization",
+                  type = "scatter",
+                  mode = "lines+markers",
+                  hoverinfo = 'y') %>%
+        add_trace(y = ~Bed,
+                  name = "Bed Utilization",
+                  type = "scatter",
+                  mode = "lines+markers",
+                  hoverinfo = 'y') %>%
+        layout(yaxis = list(
+          title = "Utilization",
+          tickformat = "%",
+          range = c(0, 2)
+        ),
+        margin = list(
+          t = 100
+        ),
+        title = paste("Bed and Unit Utilization",
+                      "\n", 
+                      Provider,
+                      "\n", 
+                      format(ymd(ReportStart), "%B %Y"), 
+                      "to", 
+                      format(ymd(ReportEnd), "%B %Y")))
       
     })  
+  
+  output$unitNote <-
+    renderUI(unit_utilization_note)
+  
+  output$bedNote <-
+    renderUI(bed_utilization_note)
+  
+  output$utilizationNote <-
+    renderUI(HTML(calculation_note))
   
   output$headerQPRCommunityNeed <- renderUI({
     ReportStart <- format.Date(ymd(paste0(
