@@ -1221,7 +1221,7 @@ function(input, output, session) {
       filter(
         Region %in% parse_number(input$QPRIncomeRegionSelect) &
           ProjectType == input$radioQPR_Income_PTC &
-          served_between(., ReportStart, ReportEnd) &
+          stayed_between(., ReportStart, ReportEnd) &
           Difference > 0
       ) %>% 
       group_by(FriendlyProjectName, ProjectType, County, Region) %>%
@@ -1231,7 +1231,7 @@ function(input, output, session) {
     all_hhs <- QPR_Income %>%
       filter(Region %in% parse_number(input$QPRIncomeRegionSelect) &
                ProjectType == input$radioQPR_Income_PTC &
-               served_between(., ReportStart, ReportEnd)) %>%
+               stayed_between(., ReportStart, ReportEnd)) %>%
       group_by(FriendlyProjectName, ProjectType, County, Region) %>%
       summarise(TotalHHs = n()) 
     
