@@ -42,9 +42,9 @@ tagList(
           # menuSubItem("Recurrence",
           #             tabName = "recurrenceTab"),
           menuSubItem("Rapid Placement for RRH",
-                      tabName = "rapidTab")#,
-          # menuSubItem("RRH HP Spending",
-          #             tabName = "spendingTab")
+                      tabName = "rapidTab"),
+          menuSubItem("RRH vs HP Spending",
+                      tabName = "spendingTab")
         )
       ),
       HTML(paste0(
@@ -313,9 +313,26 @@ tagList(
                   selected = sample(choices_regions, 1)
                 ),
                 plotlyOutput("DaysToHouse")),
-        # tabItem(tabName = "spendingTab",
-        #         HTML("<h1>Under Construction</h1>")),
-        
+        tabItem(tabName = "spendingTab",
+                fluidRow(box(htmlOutput("headerRRHSpending"), width = 12)),
+                chooseSliderSkin("Round"),
+                setSliderColor("#56B4E9", 1),
+                sliderTextInput("RRHSpendingDateSlider",
+                                "",
+                                c(
+                                  unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
+                                ),
+                                selected = Sys.yearqtr() - 1 / 4),
+                pickerInput(
+                  inputId = "RRHRegion",
+                  "Select Region(s)",
+                  choices = choices_regions,
+                  options = list(`actions-box` = TRUE),
+                  multiple = TRUE,
+                  selected = sample(choices_regions, 1)
+                ),
+                plotlyOutput("RRHSpending")
+                ),
         tabItem(
           tabName = "spdatTab",
           fluidRow(box(htmlOutput("headerQPRCommunityNeed"), width = 12)),

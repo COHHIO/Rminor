@@ -1458,5 +1458,153 @@ function(input, output, session) {
         )
     })
   
+  output$headerRRHSpending <- renderUI({
+    ReportStart <- format.Date(ymd(paste0(
+      substr(input$RRHSpendingDateSlider, 1, 4),
+      "-01-01"
+    )), "%m-%d-%Y")
+
+    ReportEnd <- format.Date(mdy(paste0(
+      case_when(
+        substr(input$RRHSpendingDateSlider, 7, 7) == 1 ~ "03-31-",
+        substr(input$RRHSpendingDateSlider, 7, 7) == 2 ~ "06-30-",
+        substr(input$RRHSpendingDateSlider, 7, 7) == 3 ~ "09-30-",
+        substr(input$RRHSpendingDateSlider, 7, 7) == 4 ~ "12-31-"
+      ),
+      substr(input$RRHSpendingDateSlider, 1, 4)
+    )), "%m-%d-%Y")
+
+    list(h2("Quarterly Performance Report"),
+         h3("Rapid Placement into Rapid Rehousing"),
+         h4(input$RRHRegion),
+         h4(ReportStart, "-", ReportEnd))
+  })
+
+  # QPR HP vs RRH Spending
+  output$RRHSpending <-
+    renderPlotly({
+      ReportStart <- format.Date(ymd(paste0(
+        substr(input$RRHSpendingDateSlider, 1, 4),
+        "-01-01"
+      )), "%m-%d-%Y")
+      
+      ReportEnd <- format.Date(mdy(paste0(
+        case_when(
+          substr(input$RRHSpendingDateSlider, 7, 7) == 1 ~ "03-31-",
+          substr(input$RRHSpendingDateSlider, 7, 7) == 2 ~ "06-30-",
+          substr(input$RRHSpendingDateSlider, 7, 7) == 3 ~ "09-30-",
+          substr(input$RRHSpendingDateSlider, 7, 7) == 4 ~ "12-31-"
+        ),
+        substr(input$RRHSpendingDateSlider, 1, 4)
+      )), "%m-%d-%Y")
+
+      rrhSpending <- QPR_RRH_HP_Spending %>%
+        filter(
+          !is.na(OrganizationName) &
+            Region %in% c(input$RapidRRHRegion) &
+            entered_between(., ReportStart, ReportEnd)
+        ) %>%
+        mutate(ProjectType = if_else(ProjectType == 12,
+                                     "HP",
+                                     "RRH"))
+      
+      x <- QPR_RRH_HP_Spending %>% 
+        filter(
+          !is.na(OrganizationName) &
+            Region %in% c(input$RapidRRHRegion) &
+            entered_between(., ReportStart, ReportEnd)
+        ) %>%
+        select(OrganizationName, Region) %>% 
+        unique() %>%
+        arrange(OrganizationName)
+      
+      y <- data.frame(ProjectType = c("HP", "RRH"))
+      
+      z <- cbind(x, y)
+      
+      rrhSpending <- rrhSpending %>% right_join(z, by = c("OrganizationName",
+                                                  "Region",
+                                                  "ProjectType")) %>%
+        mutate(PersonalID = if_else(is.na(PersonalID), 4216, PersonalID),
+               EntryDate = if_else(PersonalID == 4216, 
+                                   mdy(ReportStart), 
+                                   ymd(EntryDate)), 
+               MoveInDateAdjust = if_else(PersonalID == 4216, 
+                                          mdy(ReportStart), 
+                                          ymd(EntryDate)),
+               ExitDate = if_else(PersonalID == 4216, 
+                                  mdy(ReportEnd), 
+                                  ymd(EntryDate)))
+      
+      
+      rrhSpending <- rrhSpending  %>%
+        group_by(OrganizationName, Region, ProjectType) %>%
+        summarise(Amount = sum(Amount),
+                  HHs = n()) %>%
+        ungroup() %>%
+        spread(ProjectType, Amount) 
+      
+      rrhSpending[is.na(rrhSpending)] <- 0
+      
+      rrhSpending <- rrhSpending %>%
+        group_by(OrganizationName, Region) %>%
+        summarise(HHs = sum(HHs),
+                  RRH = sum(RRH),
+                  HP = sum(HP)) %>%
+        ungroup() %>%
+        mutate(Goal = 0.75,
+               PercentRRH = percent(RRH/(RRH + HP)),
+               hover = paste0(
+                 OrganizationName,
+                 "\nPercent Spent on RRH: ",
+                 PercentRRH,
+                 "\nTotal Households: ",
+                 HHs,
+                 sep = "\n"
+               ))
+      
+      title <- paste0("Average Days to House\nRapid Rehousing\n",
+                      ReportStart, " to ", ReportEnd)
+
+      plot_ly(
+        rrhSpending,
+        x = ~ OrganizationName,
+        y = ~ PercentRRH,
+        text = ~ hover,
+        hoverinfo = 'text',
+        type = "bar"
+      ) %>%
+        layout(
+          xaxis = list(title = ~ OrganizationName),
+          yaxis = list(title = "Percent Spent on Rapid Rehousing"),
+          title = list(
+            text = title,
+            font = list(
+              size = 15
+            )),
+          margin = list(
+            l = 50,
+            r = 50,
+            b = 100,
+            t = 100,
+            pad = 4
+          ),
+          shapes = list(
+            type = "rect",
+            name = "CoC Goal",
+            fillcolor = "#008000",
+            line = list(color = "white", width = .01),
+            layer = "below",
+            xref = "paper",
+            yref = "y",
+            x0 = 0,
+            x1 = 1,
+            y0 = ~ Goal[1],
+            y1 = 0,
+            opacity = .2
+          ),
+          title = "Percent Spent on RRH"
+        )
+    })
   
 }
