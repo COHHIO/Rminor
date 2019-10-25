@@ -14,6 +14,9 @@ rrhSpending <- QPR_RRH_HP_Spending %>%
                                "HP",
                                "RRH"))
 
+# here's help on this: 
+#https://stackoverflow.com/questions/30468412/dplyr-join-warning-joining-factors-with-different-levels
+
 x <- QPR_RRH_HP_Spending %>%
   filter(
     !is.na(OrganizationName) &
