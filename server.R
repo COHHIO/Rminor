@@ -461,6 +461,29 @@ function(input, output, session) {
   
   output$NoteToUsers <-
     renderText(noteToUsers)
+  
+  output$headerLengthOfStay <- renderUI({
+    ReportStart <- format.Date(ymd(paste0(
+      substr(input$LoSSlider, 1, 4),
+      "-01-01"
+    )), "%m-%d-%Y")
+    ReportEnd <- format.Date(mdy(paste0(
+      case_when(
+        substr(input$LoSSlider, 7, 7) == 1 ~ "03-31-",
+        substr(input$LoSSlider, 7, 7) == 2 ~ "06-30-",
+        substr(input$LoSSlider, 7, 7) == 3 ~ "09-30-",
+        substr(input$LoSSlider, 7, 7) == 4 ~ "12-31-"
+      ),
+      substr(input$LoSSlider, 1, 4)
+    )), "%m-%d-%Y")
+    
+    list(h2("Quarterly Performance Report"),
+         h3(paste(input$radioAvgMeanLoS, "Length of Stay")),
+         h4(input$LoSRegionSelect),
+         h4(ReportStart, "-", ReportEnd))
+  })  
+  
+  
   # QPR Length of Stay
   observeEvent(c(input$LoSRegionSelect, input$LoSSlider, input$radioLoSPTC),
                {
@@ -1324,6 +1347,28 @@ function(input, output, session) {
       
     }
   })
+  
+  output$headerRRHRapidPlacement <- renderUI({
+    ReportStart <- format.Date(ymd(paste0(
+      substr(input$RapidRRHDateSlider, 1, 4),
+      "-01-01"
+    )), "%m-%d-%Y")
+    
+    ReportEnd <- format.Date(mdy(paste0(
+      case_when(
+        substr(input$RapidRRHDateSlider, 7, 7) == 1 ~ "03-31-",
+        substr(input$RapidRRHDateSlider, 7, 7) == 2 ~ "06-30-",
+        substr(input$RapidRRHDateSlider, 7, 7) == 3 ~ "09-30-",
+        substr(input$RapidRRHDateSlider, 7, 7) == 4 ~ "12-31-"
+      ),
+      substr(input$RapidRRHDateSlider, 1, 4)
+    )), "%m-%d-%Y")
+    
+    list(h2("Quarterly Performance Report"),
+         h3("Rapid Placement into Rapid Rehousing"),
+         h4(input$RapidRRHRegion),
+         h4(ReportStart, "-", ReportEnd))
+  })  
   
   # QPR Rapid Placement into RRH
   output$DaysToHouse <- 
