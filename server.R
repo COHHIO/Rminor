@@ -1479,15 +1479,15 @@ function(input, output, session) {
   #        h4(input$RRHRegion),
   #        h4(ReportStart, "-", ReportEnd))
   # })
-  # 
-  # # QPR HP vs RRH Spending
+
+  # QPR HP vs RRH Spending
   # output$RRHSpending <-
   #   renderPlotly({
   #     ReportStart <- format.Date(ymd(paste0(
   #       substr(input$RRHSpendingDateSlider, 1, 4),
   #       "-01-01"
   #     )), "%m-%d-%Y")
-  #     
+  # 
   #     ReportEnd <- format.Date(mdy(paste0(
   #       case_when(
   #         substr(input$RRHSpendingDateSlider, 7, 7) == 1 ~ "03-31-",
@@ -1507,45 +1507,45 @@ function(input, output, session) {
   #       mutate(ProjectType = if_else(ProjectType == 12,
   #                                    "HP",
   #                                    "RRH"))
-  #     
-  #     x <- QPR_RRH_HP_Spending %>% 
+  # 
+  #     x <- QPR_RRH_HP_Spending %>%
   #       filter(
   #         !is.na(OrganizationName) &
   #           Region %in% c(input$RapidRRHRegion) &
   #           entered_between(., ReportStart, ReportEnd)
   #       ) %>%
-  #       select(OrganizationName, Region) %>% 
+  #       select(OrganizationName, Region) %>%
   #       unique() %>%
   #       arrange(OrganizationName)
-  #     
+  # 
   #     y <- data.frame(ProjectType = c("HP", "RRH"))
-  #     
+  # 
   #     z <- cbind(x, y)
-  #     
+  # 
   #     rrhSpending <- rrhSpending %>% right_join(z, by = c("OrganizationName",
   #                                                 "Region",
   #                                                 "ProjectType")) %>%
   #       mutate(PersonalID = if_else(is.na(PersonalID), 4216, PersonalID),
-  #              EntryDate = if_else(PersonalID == 4216, 
-  #                                  mdy(ReportStart), 
-  #                                  ymd(EntryDate)), 
-  #              MoveInDateAdjust = if_else(PersonalID == 4216, 
-  #                                         mdy(ReportStart), 
+  #              EntryDate = if_else(PersonalID == 4216,
+  #                                  mdy(ReportStart),
+  #                                  ymd(EntryDate)),
+  #              MoveInDateAdjust = if_else(PersonalID == 4216,
+  #                                         mdy(ReportStart),
   #                                         ymd(EntryDate)),
-  #              ExitDate = if_else(PersonalID == 4216, 
-  #                                 mdy(ReportEnd), 
+  #              ExitDate = if_else(PersonalID == 4216,
+  #                                 mdy(ReportEnd),
   #                                 ymd(EntryDate)))
-  #     
-  #     
+  # 
+  # 
   #     rrhSpending <- rrhSpending  %>%
   #       group_by(OrganizationName, Region, ProjectType) %>%
   #       summarise(Amount = sum(Amount),
   #                 HHs = n()) %>%
   #       ungroup() %>%
-  #       spread(ProjectType, Amount) 
-  #     
+  #       spread(ProjectType, Amount)
+  # 
   #     rrhSpending[is.na(rrhSpending)] <- 0
-  #     
+  # 
   #     rrhSpending <- rrhSpending %>%
   #       group_by(OrganizationName, Region) %>%
   #       summarise(HHs = sum(HHs),
@@ -1562,7 +1562,7 @@ function(input, output, session) {
   #                HHs,
   #                sep = "\n"
   #              ))
-  #     
+  # 
   #     title <- paste0("Average Days to House\nRapid Rehousing\n",
   #                     ReportStart, " to ", ReportEnd)
   # 
@@ -1605,6 +1605,6 @@ function(input, output, session) {
   #         ),
   #         title = "Percent Spent on RRH"
   #       )
-    # })
+  # })
   
 }
