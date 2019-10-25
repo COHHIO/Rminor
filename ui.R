@@ -57,7 +57,7 @@ tagList(
       tabItems(
         tabItem(
           tabName = "providerDashboardTab",
-          pickerInput(
+          fluidPage(box(pickerInput(
             inputId = "providerList",
             choices = providers,
             options = list(`live-search` = TRUE),
@@ -71,7 +71,7 @@ tagList(
           uiOutput("veteranEngagement"),
           uiOutput("ShelterExitsToRRH"),
           uiOutput("CurrentlyAwaitingPH")
-        ), 
+        ))), 
         tabItem(
           tabName = "utilizationTab",
           fluidRow(box(htmlOutput("headerUtilization"), width = 12)),
@@ -125,6 +125,8 @@ tagList(
         #         HTML("<h1>Under Construction</h1>")),
         tabItem(
           tabName = "LoSTab",
+          fluidRow(box(htmlOutput("headerLengthOfStay"), width = 12)),
+          chooseSliderSkin("Round"),
           setSliderColor("#56B4E9", 1),
           sliderTextInput("LoSSlider",
                           "",
@@ -164,6 +166,7 @@ tagList(
         ),
         tabItem(tabName = "PHTab",
                 fluidRow(box(htmlOutput("headerQPRExitsToPH"), width = 12)),
+                chooseSliderSkin("Round"),
                 setSliderColor("#56B4E9", 1),
                 sliderTextInput("ExitsToPHSlider",
                                 "",
@@ -197,6 +200,7 @@ tagList(
         ),
         tabItem(tabName = "NCBTab",
                 fluidRow(box(htmlOutput("headerQPRNCBs"), width = 12)),
+                chooseSliderSkin("Round"),
                 setSliderColor("#56B4E9", 1),
                 sliderTextInput("QPRNCBDateSlider",
                                 "",
@@ -228,6 +232,7 @@ tagList(
         ),
         tabItem(tabName = "HITab",
                 fluidRow(box(htmlOutput("headerQPRHI"), width = 12)),
+                chooseSliderSkin("Round"),
                 setSliderColor("#56B4E9", 1),
                 sliderTextInput("QPRHIDateSlider",
                                 "",
@@ -258,6 +263,7 @@ tagList(
                 br()),
         tabItem(tabName = "incomeTab",
                 fluidRow(box(htmlOutput("headerQPRIncome"), width = 12)),
+                chooseSliderSkin("Round"),
                 setSliderColor("#56B4E9", 1),
                 sliderTextInput("QPRIncomeDateSlider",
                                 "",
@@ -289,6 +295,8 @@ tagList(
         # tabItem(tabName = "recurrenceTab",
                 # HTML("<h1>Under Construction</h1>")),
         tabItem(tabName = "rapidTab",
+                fluidRow(box(htmlOutput("headerRRHRapidPlacement"), width = 12)),
+                chooseSliderSkin("Round"),
                 setSliderColor("#56B4E9", 1),
                 sliderTextInput("RapidRRHDateSlider",
                                 "",
