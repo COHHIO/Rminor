@@ -313,26 +313,26 @@ tagList(
                   selected = sample(choices_regions, 1)
                 ),
                 plotlyOutput("DaysToHouse")),
-        # tabItem(tabName = "spendingTab",
-        #         fluidRow(box(htmlOutput("headerRRHSpending"), width = 12)),
-        #         chooseSliderSkin("Round"),
-        #         setSliderColor("#56B4E9", 1),
-        #         sliderTextInput("RRHSpendingDateSlider",
-        #                         "",
-        #                         c(
-        #                           unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
-        #                         ),
-        #                         selected = Sys.yearqtr() - 1 / 4),
-        #         pickerInput(
-        #           inputId = "RRHRegion",
-        #           "Select Region(s)",
-        #           choices = choices_regions,
-        #           options = list(`actions-box` = TRUE),
-        #           multiple = TRUE,
-        #           selected = sample(choices_regions, 1)
-        #         ),
-        #         plotlyOutput("RRHSpending")
-        #         ),
+        tabItem(tabName = "spendingTab",
+                fluidRow(box(htmlOutput("headerRRHSpending"), width = 12)),
+                chooseSliderSkin("Round"),
+                setSliderColor("#56B4E9", 1),
+                sliderTextInput("RRHSpendingDateSlider",
+                                "",
+                                c(
+                                  unique(Sys.yearqtr() - 6 / 4:Sys.yearqtr() + 1 / 4)
+                                ),
+                                selected = Sys.yearqtr() - 1 / 4),
+                pickerInput(
+                  inputId = "RRHRegion",
+                  "Select Region(s)",
+                  choices = choices_regions,
+                  options = list(`actions-box` = TRUE),
+                  multiple = TRUE,
+                  selected = sample(choices_regions, 1)
+                ),
+                plotlyOutput("RRHSpending")
+                ),
         tabItem(
           tabName = "spdatTab",
           fluidRow(box(htmlOutput("headerQPRCommunityNeed"), width = 12)),
