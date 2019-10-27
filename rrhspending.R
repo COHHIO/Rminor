@@ -12,7 +12,8 @@ rrhSpending <- QPR_RRH_HP_Spending %>%
   ) %>%
   mutate(ProjectType = if_else(ProjectType == 12,
                                "HP",
-                               "RRH"))
+                               "RRH"),
+         ProjectType = factor(ProjectType, levels = c("HP", "RRH")))
 
 # here's help on this: 
 #https://stackoverflow.com/questions/30468412/dplyr-join-warning-joining-factors-with-different-levels
@@ -74,7 +75,7 @@ rrhSpending <- rrhSpending %>%
            RRH,
            "\nTotal Spent on Prevention: $",
            HP,
-           "\nTotal Households: ",
+           "\nTotal HP & RRH Households: ",
            HHs,
            sep = "\n"
          ))
