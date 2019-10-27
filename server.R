@@ -1475,8 +1475,8 @@ function(input, output, session) {
     )), "%m-%d-%Y")
 
     list(h2("Quarterly Performance Report"),
-         h3("Rapid Placement into Rapid Rehousing"),
-         h4(input$RRHRegion),
+         h3("Rapid Rehousing Spending Goals"),
+         # h4(input$RRHRegion),
          h4(ReportStart, "-", ReportEnd))
   })
 
@@ -1499,19 +1499,22 @@ function(input, output, session) {
       )), "%m-%d-%Y")
 
       rrhSpending <- QPR_RRH_HP_Spending %>%
+        mutate(Region = paste("Homeless Planning Region", Region)) %>%
         filter(
           !is.na(OrganizationName) &
-            Region %in% c(input$RapidRRHRegion) &
+            Region %in% c(input$RRHRegion) &
             entered_between(., ReportStart, ReportEnd)
         ) %>%
         mutate(ProjectType = if_else(ProjectType == 12,
                                      "HP",
-                                     "RRH"))
+                                     "RRH"),
+               ProjectType = factor(ProjectType, levels = c("HP", "RRH")))
       
       x <- QPR_RRH_HP_Spending %>%
+        mutate(Region = paste("Homeless Planning Region", Region)) %>%
         filter(
           !is.na(OrganizationName) &
-            Region %in% c(input$RapidRRHRegion) &
+            Region %in% c(input$RRHRegion) &
             entered_between(., ReportStart, ReportEnd)
         ) %>%
         select(OrganizationName, Region) %>%
