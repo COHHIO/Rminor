@@ -1613,8 +1613,7 @@ function(input, output, session) {
             y0 = ~ Goal[1],
             y1 = 1,
             opacity = .2
-          ),
-          title = "Percent Spent on RRH"
+          )
         )
   })
   
