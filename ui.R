@@ -95,7 +95,8 @@ tagList(
                 ymd(floor_date(update_date, unit = "month") - days(1)),
               minView = "months",
               addon = "none",
-              autoClose = TRUE
+              autoClose = TRUE,
+              width = '25%'
             ),
             width = 12
           )), 
