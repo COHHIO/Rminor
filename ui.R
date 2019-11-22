@@ -12,7 +12,6 @@
 #GNU Affero General Public License for more details at 
 #<https://www.gnu.org/licenses/>.
 
-tagList(
   dashboardPage(
     skin = "black",
     dashboardHeader(title = "R minor"),
@@ -45,7 +44,9 @@ tagList(
                       tabName = "rapidTab"),
           menuSubItem("RRH vs HP Spending",
                       tabName = "spendingTab")
-        )
+        ),
+        menuItem("About",
+                 tabName = "aboutTab")
       ),
       HTML(paste0(
         "<br>&emsp;Data last refreshed:&emsp;<br>&emsp;",
@@ -55,23 +56,25 @@ tagList(
     ),
     dashboardBody(
       tabItems(
-        tabItem(
-          tabName = "providerDashboardTab",
-          fluidPage(box(pickerInput(
-            inputId = "providerList",
-            choices = providers,
-            options = list(`live-search` = TRUE),
-            width = "100%",
-            selected = sample(providers, 1)
-          ),
-          uiOutput("CurrentClientCount"),
-          uiOutput("CurrentHHCount"),          
-          uiOutput("currentUnitUtilization"),
-          uiOutput("currentBedUtilization"),
-          uiOutput("veteranEngagement"),
-          uiOutput("ShelterExitsToRRH"),
-          uiOutput("CurrentlyAwaitingPH")
-        ))), 
+        tabItem(tabName = "providerDashboardTab",
+                fluidRow(
+                  box(
+                    pickerInput(
+                      inputId = "providerList",
+                      choices = providers,
+                      options = list(`live-search` = TRUE),
+                      width = "100%",
+                      selected = sample(providers, 1)
+                    ),
+                    uiOutput("CurrentClientCount"),
+                    uiOutput("CurrentHHCount"),
+                    uiOutput("currentUnitUtilization"),
+                    uiOutput("currentBedUtilization"),
+                    uiOutput("veteranEngagement"),
+                    uiOutput("ShelterExitsToRRH"),
+                    uiOutput("CurrentlyAwaitingPH")
+                  )
+                )), 
         tabItem(
           tabName = "utilizationTab",
           fluidRow(box(htmlOutput("headerUtilization"), width = 12)),
@@ -95,7 +98,8 @@ tagList(
                 ymd(floor_date(update_date, unit = "month") - days(1)),
               minView = "months",
               addon = "none",
-              autoClose = TRUE
+              autoClose = TRUE,
+              width = '25%'
             ),
             width = 12
           )), 
@@ -370,26 +374,75 @@ tagList(
             collapsible = TRUE,
             collapsed = TRUE
           ))
-        ) #tabItem SPDAT tab
+        ), #tabItem SPDAT tab
+        tabItem(tabName = "aboutTab",
+                fluidRow(
+                box(
+                  title = "Ohio Balance of State CoC Homeless Planning Regions",
+                  HTML("The solid-colored counties are all part of the Ohio
+                       Balance of State CoC. The Ohio Development Services 
+                       Agency (ODSA) further divided the counties in the Balance
+                       of State into 17 Homeless Planning Regions to make
+                       implementation of state-funded programs in the Balance of
+                       State more localized.
+                       <p> Throughout R minor, you will notice references to 
+                       Homeless Planning Regions. Please consult this map if you 
+                       are unsure what Region your county is in."),
+                  img(
+                    src =
+                      "Homeless-Region-Map-for-COHHIO-2017.png",
+                    height = '100%',
+                    width = '100%'
+                  ),
+                  width = 6
+                ),
+                box(HTML("The Ohio Balance of State Continuum of Care (BoSCoC) 
+                         represents 80 of the 88 counties in Ohio and is the
+                         planning body for homeless services in the area. The Ohio 
+                         Development Services Agency (ODSA) and the Coalition on 
+                         Homelessness and Housing in Ohio (COHHIO) serve as the 
+                         lead staffing agencies and co-chairs of the Steering 
+                         Committee for the Ohio BoSCoC. ODSA serves as the Ohio 
+                         BoSCoC Collaborative Applicant (submits the annual 
+                         consolidated CoC Application) while COHHIO serves as 
+                         the HMIS Lead Agency."),
+                    title = "Ohio Balance of State CoC"),
+                box(
+                  HTML(
+                    "<p>R minor is a free and open source project created and 
+                    maintained by the HMIS team at Coalition on Homelessness and 
+                    Ohio (COHHIO). Please find the code here: 
+                    <a href=\"https://github.com/orgs/COHHIO/Rminor\">R minor code</a>
+
+                    <p>This project would not exist were it not for the 
+                    existence of other quality free and open source products. 
+                    Following are citations for the products R minor relies on."
+                  ),
+                  title = "About R minor"
+                ),
+                box(
+                  HTML(
+                    "<p>R Core Team (2019). R: A language and environment for 
+                    statistical computing. R Foundation for Statistical 
+                    Computing, Vienna, Austria.
+                    <a href=\"https://www.R-project.org/\">R programming language</a>.
+                    
+                    <p>Hadley Wickham (2017). tidyverse: Easily Install and Load 
+                    the 'Tidyverse'. R package version 1.2.1.
+                    <a href=\"https://CRAN.R-project.org/package=tidyverse\">Tidyverse package</a>
+                    
+                    <p>Winston Chang, Joe Cheng, JJ Allaire, Yihui Xie and 
+                    Jonathan McPherson (2019). shiny: Web Application Framework 
+                    for R. R package version 1.3.2. 
+                    <a href=\"https://CRAN.R-project.org/package=shiny\">R Shiny packaage</a>
+                    and shinydashboard: Create Dashboards with 'Shiny'. R 
+                    package version 0.7.1.
+                    <a href=\"https://CRAN.R-project.org/package=shinydashboard\">shinydashboard packaage</a>"
+                  ),
+                  title = "Citations"
+                )
+                )
+                ) # aboutTab
       ) # tabItems
     )
-  ),
-  tags$footer(
-    HTML(
-      "<p>R minor is created and maintained by the Coalition on Homelessness and
-  Housing in Ohio (COHHIO)'s HMIS team.
-  <p>R Core Team (2019). R: A language and environment for statistical
-  computing. R Foundation for Statistical Computing, Vienna, Austria. URL
-  https://www.R-project.org/.
-  <p>Hadley Wickham (2017). tidyverse: Easily Install and Load the
-  'Tidyverse'. R package version 1.2.1.
-  https://CRAN.R-project.org/package=tidyverse
-  <p>Winston Chang, Joe Cheng, JJ Allaire, Yihui Xie and Jonathan McPherson
-  (2019). shiny: Web Application Framework for R. R package version
-  1.3.2. https://CRAN.R-project.org/package=shiny and shinydashboard: Create
-  Dashboards with 'Shiny'. R package version 0.7.1.
-  https://CRAN.R-project.org/package=shinydashboard"
-    ),
-    style = "width:100%; color: white; padding: 10px; background-color: black"
   )
-)
