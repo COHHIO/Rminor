@@ -376,35 +376,37 @@
           ))
         ), #tabItem SPDAT tab
         tabItem(tabName = "aboutTab",
-                fluidRow(box(HTML("The Ohio Balance of State Continuum of Care (BoSCoC) 
-                         represents the 80 non-urban counties in Ohio. The Ohio 
-                         Development Services Agency’s Office of Community 
-                         Development (ODSA) and the Coalition on Homelessness 
-                         and Housing in Ohio (COHHIO) serve as the lead staffing 
-                         agencies and co-chairs of the Steering Committee for 
-                         the Ohio BoSCoC. ODSA serves as the Ohio BoSCoC 
-                         Collaborative Applicant (submits the annual 
-                         consolidated CoC Application) while COHHIO serves as 
-                         the HMIS Lead Agency."),
-                    title = "Ohio Balance of State CoC"),
+                fluidRow(
                 box(
-                  title = "Homeless Planning Regions",
+                  title = "Ohio Balance of State CoC Homeless Planning Regions",
                   HTML("The solid-colored counties are all part of the Ohio
                        Balance of State CoC. The Ohio Development Services 
                        Agency (ODSA) further divided the counties in the Balance
                        of State into 17 Homeless Planning Regions to make
-                       implementation of state-funded programs more localized.
+                       implementation of state-funded programs in the Balance of
+                       State more localized.
                        <p> Throughout R minor, you will notice references to 
                        Homeless Planning Regions. Please consult this map if you 
                        are unsure what Region your county is in."),
                   img(
                     src =
-                      "https://cohhio.org/wp-content/uploads/2019/07/Homeless-Region-Map-for-COHHIO-2017.png",
+                      "Homeless-Region-Map-for-COHHIO-2017.png",
                     height = '100%',
                     width = '100%'
                   ),
-                  width = 12
+                  width = 6
                 ),
+                box(HTML("The Ohio Balance of State Continuum of Care (BoSCoC) 
+                         represents 80 of the 88 counties in Ohio and is the
+                         planning body for homeless services in the area. The Ohio 
+                         Development Services Agency (ODSA) and the Coalition on 
+                         Homelessness and Housing in Ohio (COHHIO) serve as the 
+                         lead staffing agencies and co-chairs of the Steering 
+                         Committee for the Ohio BoSCoC. ODSA serves as the Ohio 
+                         BoSCoC Collaborative Applicant (submits the annual 
+                         consolidated CoC Application) while COHHIO serves as 
+                         the HMIS Lead Agency."),
+                    title = "Ohio Balance of State CoC"),
                 box(
                   HTML(
                     "<p>R minor is a free and open source project created and 
