@@ -520,7 +520,7 @@ function(input, output, session) {
                                 ProjectType %in% c(input$radioLoSPTC)) %>%
                        unique()
                      
-                     LoSDetail <- QPR_EEs %>%
+                     LoSDetail <- qpr_leavers %>%
                        filter(((!is.na(MoveInDateAdjust) &
                                   ProjectType %in% c(13)) |
                                  (ProjectType %in% c(1, 2, 8) &
@@ -676,7 +676,7 @@ function(input, output, session) {
                               "Exited to Permanent Housing",
                               "Remained in or Exited to PH")
         
-        SuccessfullyPlaced <- QPR_EEs %>%
+        SuccessfullyPlaced <- qpr_leavers %>%
           filter(((
             ProjectType %in% c(3, 9, 13) &
               !is.na(MoveInDateAdjust)
@@ -699,7 +699,7 @@ function(input, output, session) {
           summarise(SuccessfullyPlacedHHs = n())
         
         # calculating the total households to compare successful placements to
-        TotalHHsSuccessfulPlacement <- QPR_EEs %>%
+        TotalHHsSuccessfulPlacement <- qpr_leavers %>%
           filter((
             served_between(., ReportStart, ReportEnd) &
               ProjectType %in% c(3, 9, 12) # PSH & HP
@@ -818,13 +818,13 @@ function(input, output, session) {
               substr(input$ExitsToPHSlider, 1, 4)
             )), "%m-%d-%Y")
             
-            totalServed <- QPR_EEs %>%
+            totalServed <- qpr_leavers %>%
               filter(exited_between(., ReportStart, ReportEnd) &
                     ProjectType == 4) %>%
               group_by(FriendlyProjectName, ProjectType, County, Region) %>%
               summarise(TotalHHs = n())
             
-            notUnsheltered <- QPR_EEs %>%
+            notUnsheltered <- qpr_leavers %>%
               filter(
                 ProjectType == 4 &
                   Destination != 16 &
