@@ -1240,7 +1240,7 @@ function(input, output, session) {
       substr(input$QPRIncomeDateSlider, 1, 4)
     )), "%m-%d-%Y")
     
-    meeting_objective <- QPR_Income %>%
+    meeting_objective <- qpr_income %>%
       filter(
         Region %in% parse_number(input$QPRIncomeRegionSelect) &
           ProjectType == input$radioQPR_Income_PTC &
@@ -1251,7 +1251,7 @@ function(input, output, session) {
       summarise(Increased = n())
     
     # calculating the total households for comparison
-    all_hhs <- QPR_Income %>%
+    all_hhs <- qpr_income %>%
       filter(Region %in% parse_number(input$QPRIncomeRegionSelect) &
                ProjectType == input$radioQPR_Income_PTC &
                stayed_between(., ReportStart, ReportEnd)) %>%
@@ -1498,7 +1498,7 @@ function(input, output, session) {
         substr(input$RRHSpendingDateSlider, 1, 4)
       )), "%m-%d-%Y")
 
-      rrhSpending <- QPR_RRH_HP_Spending %>%
+      rrhSpending <- qpr_spending %>%
         mutate(Region = paste("Homeless Planning Region", Region)) %>%
         filter(
           !is.na(OrganizationName) &
@@ -1510,7 +1510,7 @@ function(input, output, session) {
                                      "RRH"),
                ProjectType = factor(ProjectType, levels = c("HP", "RRH")))
       
-      x <- QPR_RRH_HP_Spending %>%
+      x <- qpr_spending %>%
         mutate(Region = paste("Homeless Planning Region", Region)) %>%
         filter(
           !is.na(OrganizationName) &
