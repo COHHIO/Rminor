@@ -950,7 +950,7 @@ function(input, output, session) {
       substr(input$QPRNCBDateSlider, 1, 4)
     )), "%m-%d-%Y")
     
-    meeting_objective <- QPR_MainstreamBenefits %>%
+    meeting_objective <- qpr_benefits %>%
       filter(
         Region %in% parse_number(input$QPRNCBRegionSelect) &
           ProjectType == input$radioQPR_NCB_PTC &
@@ -961,7 +961,7 @@ function(input, output, session) {
       summarise(BenefitsAtExit = n())
     
     # calculating the total households for comparison
-    all_hhs <- QPR_MainstreamBenefits %>%
+    all_hhs <- qpr_benefits %>%
       filter(Region %in% parse_number(input$QPRNCBRegionSelect) &
                ProjectType == input$radioQPR_NCB_PTC &
                exited_between(., ReportStart, ReportEnd)) %>%
@@ -1095,7 +1095,7 @@ function(input, output, session) {
       substr(input$QPRHIDateSlider, 1, 4)
     )), "%m-%d-%Y")
     
-    meeting_objective <- QPR_MainstreamBenefits %>%
+    meeting_objective <- qpr_benefits %>%
       filter(
         Region %in% parse_number(input$QPRHIRegionSelect) &
           ProjectType == input$radioQPR_HI_PTC &
@@ -1106,7 +1106,7 @@ function(input, output, session) {
       summarise(InsuranceAtExit = n())
     
     # calculating the total households for comparison
-    all_hhs <- QPR_MainstreamBenefits %>%
+    all_hhs <- qpr_benefits %>%
       filter(Region %in% parse_number(input$QPRHIRegionSelect) &
                ProjectType == input$radioQPR_HI_PTC &
                exited_between(., ReportStart, ReportEnd)) %>%
