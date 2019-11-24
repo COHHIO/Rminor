@@ -350,13 +350,13 @@ function(input, output, session) {
     })  
   
   output$unitNote <-
-    renderUI(unit_utilization_note)
+    renderUI(note_unit_utilization)
   
   output$bedNote <-
-    renderUI(bed_utilization_note)
+    renderUI(note_bed_utilization)
   
   output$utilizationNote <-
-    renderUI(HTML(calculation_note))
+    renderUI(HTML(note_calculation_utilization))
   
   output$headerQPRCommunityNeed <- renderUI({
     ReportStart <- format.Date(ymd(paste0(
@@ -460,7 +460,7 @@ function(input, output, session) {
     renderText(hhsHousedInCounty)
   
   output$NoteToUsers <-
-    renderText(noteToUsers)
+    renderText(note_qpr_dq_community_need)
   
   output$headerLengthOfStay <- renderUI({
     ReportStart <- format.Date(ymd(paste0(
