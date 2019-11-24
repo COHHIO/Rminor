@@ -35,7 +35,7 @@ function(input, output, session) {
   
   observeEvent(c(input$providerList), {
     output$currentUnitUtilization <-
-      if (nrow(Utilization %>%
+      if (nrow(utilization %>%
                filter(
                  ProjectName == input$providerList &
                  ProjectType %in% c(1, 2, 3, 8, 9)
@@ -45,18 +45,18 @@ function(input, output, session) {
           infoBox(
             title = "Current Unit Utilization",
             subtitle = paste(
-              Utilization %>%
+              utilization %>%
                 filter(ProjectName == input$providerList) %>%
                 select(Households),
               "Households in",
-              Utilization %>%
+              utilization %>%
                 filter(ProjectName == input$providerList) %>%
                 select(UnitCount),
               "Units"
             ),
             color = "aqua",
             icon = icon("building"),
-            value = Utilization %>%
+            value = utilization %>%
               filter(ProjectName == input$providerList) %>%
               select(UnitUtilization)
           )
@@ -67,7 +67,7 @@ function(input, output, session) {
     }
     
     output$currentBedUtilization <-
-      if (nrow(Utilization %>%
+      if (nrow(utilization %>%
                filter(
                  ProjectName == input$providerList &
                  ProjectType %in% c(1:3, 8, 9)
@@ -76,20 +76,20 @@ function(input, output, session) {
           infoBox(
             title = "Current Bed Utilization",
             subtitle = paste(
-              Utilization %>%
+              utilization %>%
                 filter(ProjectName == input$providerList) %>%
                 select(Clients),
               "Clients in",
-              Utilization %>%
+              utilization %>%
                 filter(ProjectName == input$providerList) %>%
                 select(BedCount),
               "Beds"
             ),
             color = "purple",
             icon = icon("bed"),
-            Utilization %>%
+            utilization %>%
               filter(ProjectName == input$providerList) %>%
-              select(BedUtilization)
+              select(utilization_bed)
           )
         })
       }
@@ -287,7 +287,7 @@ function(input, output, session) {
       
       Provider <- input$providerListUtilization
       
-      bedPlot <- BedUtilization %>% select(-FilePeriod) %>%
+      bedPlot <- utilization_bed %>% select(-FilePeriod) %>%
         gather("Month",
                "Utilization",
                -ProjectID,
@@ -301,7 +301,7 @@ function(input, output, session) {
           Utilization = NULL
         )
       
-      unitPlot <- UnitUtilization %>% select(-FilePeriod) %>%
+      unitPlot <- utilization_unit %>% select(-FilePeriod) %>%
         gather("Month",
                "Utilization",
                -ProjectID,
@@ -395,8 +395,8 @@ function(input, output, session) {
         substr(input$spdatSlider, 1, 4)
       )), "%m-%d-%Y")
       # counting all households who were scored AND SERVED between the report dates
-      CountyAverageScores <- CountyData %>%
-        filter(served_between(CountyData,
+      CountyAverageScores <- qpr_spdats_county %>%
+        filter(served_between(qpr_spdats_county,
                               ReportStart,
                               ReportEnd)) %>%
         select(CountyServed, PersonalID, Score) %>%
@@ -405,8 +405,8 @@ function(input, output, session) {
         summarise(AverageScore = round(mean(Score), 1),
                   HHsLHinCounty = n())
       # counting all households who ENTERED either RRH or PSH between the report dates
-      CountyHousedAverageScores <- SPDATsByProject %>%
-        filter(entered_between(SPDATsByProject,
+      CountyHousedAverageScores <- qpr_spdats_project %>%
+        filter(entered_between(qpr_spdats_project,
                                ReportStart,
                                ReportEnd)) %>%
         group_by(CountyServed) %>%
@@ -418,7 +418,7 @@ function(input, output, session) {
                   CountyHousedAverageScores,
                   by = "CountyServed") %>%
         arrange(CountyServed) %>%
-        left_join(., Regions, by = c("CountyServed" = "County")) %>%
+        left_join(., regions, by = c("CountyServed" = "County")) %>%
         filter(RegionName == input$regionList)
       # the plot
       ggplot(Compare, aes(x = CountyServed, y = AverageScore)) +

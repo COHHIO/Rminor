@@ -81,7 +81,7 @@
           fluidRow(box(
             pickerInput(
               inputId = "providerListUtilization",
-              choices = c(sort(BedUtilization$ProjectName)),
+              choices = c(sort(utilization_bed$ProjectName)),
               options = list(`live-search` = TRUE),
               width = "100%"
             ),
@@ -342,7 +342,7 @@
           fluidRow(box(htmlOutput("headerQPRCommunityNeed"), width = 12)),
           pickerInput(
             inputId = "regionList",
-            choices = c(unique(Regions$RegionName)),
+            choices = c(unique(regions$RegionName)),
             options = list(`live-search` = TRUE),
             width = "70%"
           ),
