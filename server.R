@@ -1389,7 +1389,7 @@ function(input, output, session) {
         substr(input$RapidRRHDateSlider, 1, 4)
       )), "%m-%d-%Y")
       
-      daysToHouse <- RRHEnterers %>%
+      daysToHouse <- qpr_rrh_enterers %>%
         filter(
             !is.na(MoveInDateAdjust) &
             Region %in% c(input$RapidRRHRegion) &
