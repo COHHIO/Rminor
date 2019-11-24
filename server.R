@@ -454,10 +454,10 @@ function(input, output, session) {
     })
   
   output$CountyScoresText <-
-    renderText(hhsServedInCounty)
+    renderText(note_qpr_served_county)
   
   output$HHsServedScoresText <-
-    renderText(hhsHousedInCounty)
+    renderText(note_qpr_housed_county)
   
   output$NoteToUsers <-
     renderText(note_qpr_dq_community_need)
