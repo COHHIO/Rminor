@@ -99,7 +99,7 @@ function(input, output, session) {
     
     output$veteranEngagement <-
       if (nrow(
-        CurrentVeteranCounts %>%
+        veteran_current_in_project %>%
         filter(ProjectName == input$providerList) %>%
         select(Veterans)
       ) > 0) {
@@ -110,7 +110,7 @@ function(input, output, session) {
               filter(ProjectName == input$providerList) %>% pull(Summary),
             color = "green",
             icon = icon("ribbon"),
-            CurrentVeteranCounts %>%
+            veteran_current_in_project %>%
               filter(ProjectName == input$providerList) %>%
               select(Veterans)
           )
