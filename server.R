@@ -89,7 +89,7 @@ function(input, output, session) {
             icon = icon("bed"),
             utilization %>%
               filter(ProjectName == input$providerList) %>%
-              select(utilization_bed)
+              select(BedUtilization)
           )
         })
       }
@@ -99,18 +99,18 @@ function(input, output, session) {
     
     output$veteranEngagement <-
       if (nrow(
-        CurrentVeteranCounts %>%
+        veteran_current_in_project %>%
         filter(ProjectName == input$providerList) %>%
         select(Veterans)
       ) > 0) {
         renderInfoBox({
           infoBox(
             title = "Current Veterans",
-            subtitle = VetEngagementSummary %>%
+            subtitle = veteran_current_in_project %>%
               filter(ProjectName == input$providerList) %>% pull(Summary),
             color = "green",
             icon = icon("ribbon"),
-            CurrentVeteranCounts %>%
+            veteran_current_in_project %>%
               filter(ProjectName == input$providerList) %>%
               select(Veterans)
           )
