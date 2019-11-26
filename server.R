@@ -35,7 +35,7 @@ function(input, output, session) {
   
   observeEvent(c(input$providerList), {
     output$currentUnitUtilization <-
-      if (nrow(Utilization %>%
+      if (nrow(utilization %>%
                filter(
                  ProjectName == input$providerList &
                  ProjectType %in% c(1, 2, 3, 8, 9)
@@ -45,18 +45,18 @@ function(input, output, session) {
           infoBox(
             title = "Current Unit Utilization",
             subtitle = paste(
-              Utilization %>%
+              utilization %>%
                 filter(ProjectName == input$providerList) %>%
                 select(Households),
               "Households in",
-              Utilization %>%
+              utilization %>%
                 filter(ProjectName == input$providerList) %>%
                 select(UnitCount),
               "Units"
             ),
             color = "aqua",
             icon = icon("building"),
-            value = Utilization %>%
+            value = utilization %>%
               filter(ProjectName == input$providerList) %>%
               select(UnitUtilization)
           )
@@ -67,7 +67,7 @@ function(input, output, session) {
     }
     
     output$currentBedUtilization <-
-      if (nrow(Utilization %>%
+      if (nrow(utilization %>%
                filter(
                  ProjectName == input$providerList &
                  ProjectType %in% c(1:3, 8, 9)
@@ -76,18 +76,18 @@ function(input, output, session) {
           infoBox(
             title = "Current Bed Utilization",
             subtitle = paste(
-              Utilization %>%
+              utilization %>%
                 filter(ProjectName == input$providerList) %>%
                 select(Clients),
               "Clients in",
-              Utilization %>%
+              utilization %>%
                 filter(ProjectName == input$providerList) %>%
                 select(BedCount),
               "Beds"
             ),
             color = "purple",
             icon = icon("bed"),
-            Utilization %>%
+            utilization %>%
               filter(ProjectName == input$providerList) %>%
               select(BedUtilization)
           )
@@ -99,18 +99,18 @@ function(input, output, session) {
     
     output$veteranEngagement <-
       if (nrow(
-        CurrentVeteranCounts %>%
+        veteran_current_in_project %>%
         filter(ProjectName == input$providerList) %>%
         select(Veterans)
       ) > 0) {
         renderInfoBox({
           infoBox(
             title = "Current Veterans",
-            subtitle = VetEngagementSummary %>%
+            subtitle = veteran_current_in_project %>%
               filter(ProjectName == input$providerList) %>% pull(Summary),
             color = "green",
             icon = icon("ribbon"),
-            CurrentVeteranCounts %>%
+            veteran_current_in_project %>%
               filter(ProjectName == input$providerList) %>%
               select(Veterans)
           )
@@ -287,7 +287,7 @@ function(input, output, session) {
       
       Provider <- input$providerListUtilization
       
-      bedPlot <- BedUtilization %>% select(-FilePeriod) %>%
+      bedPlot <- utilization_bed %>% select(-FilePeriod) %>%
         gather("Month",
                "Utilization",
                -ProjectID,
@@ -301,7 +301,7 @@ function(input, output, session) {
           Utilization = NULL
         )
       
-      unitPlot <- UnitUtilization %>% select(-FilePeriod) %>%
+      unitPlot <- utilization_unit %>% select(-FilePeriod) %>%
         gather("Month",
                "Utilization",
                -ProjectID,
@@ -350,13 +350,13 @@ function(input, output, session) {
     })  
   
   output$unitNote <-
-    renderUI(unit_utilization_note)
+    renderUI(note_unit_utilization)
   
   output$bedNote <-
-    renderUI(bed_utilization_note)
+    renderUI(note_bed_utilization)
   
   output$utilizationNote <-
-    renderUI(HTML(calculation_note))
+    renderUI(HTML(note_calculation_utilization))
   
   output$headerQPRCommunityNeed <- renderUI({
     ReportStart <- format.Date(ymd(paste0(
@@ -395,8 +395,8 @@ function(input, output, session) {
         substr(input$spdatSlider, 1, 4)
       )), "%m-%d-%Y")
       # counting all households who were scored AND SERVED between the report dates
-      CountyAverageScores <- CountyData %>%
-        filter(served_between(CountyData,
+      CountyAverageScores <- qpr_spdats_county %>%
+        filter(served_between(qpr_spdats_county,
                               ReportStart,
                               ReportEnd)) %>%
         select(CountyServed, PersonalID, Score) %>%
@@ -405,8 +405,8 @@ function(input, output, session) {
         summarise(AverageScore = round(mean(Score), 1),
                   HHsLHinCounty = n())
       # counting all households who ENTERED either RRH or PSH between the report dates
-      CountyHousedAverageScores <- SPDATsByProject %>%
-        filter(entered_between(SPDATsByProject,
+      CountyHousedAverageScores <- qpr_spdats_project %>%
+        filter(entered_between(qpr_spdats_project,
                                ReportStart,
                                ReportEnd)) %>%
         group_by(CountyServed) %>%
@@ -418,7 +418,7 @@ function(input, output, session) {
                   CountyHousedAverageScores,
                   by = "CountyServed") %>%
         arrange(CountyServed) %>%
-        left_join(., Regions, by = c("CountyServed" = "County")) %>%
+        left_join(., regions, by = c("CountyServed" = "County")) %>%
         filter(RegionName == input$regionList)
       # the plot
       ggplot(Compare, aes(x = CountyServed, y = AverageScore)) +
@@ -454,13 +454,13 @@ function(input, output, session) {
     })
   
   output$CountyScoresText <-
-    renderText(hhsServedInCounty)
+    renderText(note_qpr_served_county)
   
   output$HHsServedScoresText <-
-    renderText(hhsHousedInCounty)
+    renderText(note_qpr_housed_county)
   
   output$NoteToUsers <-
-    renderText(noteToUsers)
+    renderText(note_qpr_dq_community_need)
   
   output$headerLengthOfStay <- renderUI({
     ReportStart <- format.Date(ymd(paste0(
@@ -520,7 +520,7 @@ function(input, output, session) {
                                 ProjectType %in% c(input$radioLoSPTC)) %>%
                        unique()
                      
-                     LoSDetail <- QPR_EEs %>%
+                     LoSDetail <- qpr_leavers %>%
                        filter(((!is.na(MoveInDateAdjust) &
                                   ProjectType %in% c(13)) |
                                  (ProjectType %in% c(1, 2, 8) &
@@ -676,7 +676,7 @@ function(input, output, session) {
                               "Exited to Permanent Housing",
                               "Remained in or Exited to PH")
         
-        SuccessfullyPlaced <- QPR_EEs %>%
+        SuccessfullyPlaced <- qpr_leavers %>%
           filter(((
             ProjectType %in% c(3, 9, 13) &
               !is.na(MoveInDateAdjust)
@@ -699,7 +699,7 @@ function(input, output, session) {
           summarise(SuccessfullyPlacedHHs = n())
         
         # calculating the total households to compare successful placements to
-        TotalHHsSuccessfulPlacement <- QPR_EEs %>%
+        TotalHHsSuccessfulPlacement <- qpr_leavers %>%
           filter((
             served_between(., ReportStart, ReportEnd) &
               ProjectType %in% c(3, 9, 12) # PSH & HP
@@ -818,13 +818,13 @@ function(input, output, session) {
               substr(input$ExitsToPHSlider, 1, 4)
             )), "%m-%d-%Y")
             
-            totalServed <- QPR_EEs %>%
+            totalServed <- qpr_leavers %>%
               filter(exited_between(., ReportStart, ReportEnd) &
                     ProjectType == 4) %>%
               group_by(FriendlyProjectName, ProjectType, County, Region) %>%
               summarise(TotalHHs = n())
             
-            notUnsheltered <- QPR_EEs %>%
+            notUnsheltered <- qpr_leavers %>%
               filter(
                 ProjectType == 4 &
                   Destination != 16 &
@@ -950,7 +950,7 @@ function(input, output, session) {
       substr(input$QPRNCBDateSlider, 1, 4)
     )), "%m-%d-%Y")
     
-    meeting_objective <- QPR_MainstreamBenefits %>%
+    meeting_objective <- qpr_benefits %>%
       filter(
         Region %in% parse_number(input$QPRNCBRegionSelect) &
           ProjectType == input$radioQPR_NCB_PTC &
@@ -961,7 +961,7 @@ function(input, output, session) {
       summarise(BenefitsAtExit = n())
     
     # calculating the total households for comparison
-    all_hhs <- QPR_MainstreamBenefits %>%
+    all_hhs <- qpr_benefits %>%
       filter(Region %in% parse_number(input$QPRNCBRegionSelect) &
                ProjectType == input$radioQPR_NCB_PTC &
                exited_between(., ReportStart, ReportEnd)) %>%
@@ -1095,7 +1095,7 @@ function(input, output, session) {
       substr(input$QPRHIDateSlider, 1, 4)
     )), "%m-%d-%Y")
     
-    meeting_objective <- QPR_MainstreamBenefits %>%
+    meeting_objective <- qpr_benefits %>%
       filter(
         Region %in% parse_number(input$QPRHIRegionSelect) &
           ProjectType == input$radioQPR_HI_PTC &
@@ -1106,7 +1106,7 @@ function(input, output, session) {
       summarise(InsuranceAtExit = n())
     
     # calculating the total households for comparison
-    all_hhs <- QPR_MainstreamBenefits %>%
+    all_hhs <- qpr_benefits %>%
       filter(Region %in% parse_number(input$QPRHIRegionSelect) &
                ProjectType == input$radioQPR_HI_PTC &
                exited_between(., ReportStart, ReportEnd)) %>%
@@ -1240,7 +1240,7 @@ function(input, output, session) {
       substr(input$QPRIncomeDateSlider, 1, 4)
     )), "%m-%d-%Y")
     
-    meeting_objective <- QPR_Income %>%
+    meeting_objective <- qpr_income %>%
       filter(
         Region %in% parse_number(input$QPRIncomeRegionSelect) &
           ProjectType == input$radioQPR_Income_PTC &
@@ -1251,7 +1251,7 @@ function(input, output, session) {
       summarise(Increased = n())
     
     # calculating the total households for comparison
-    all_hhs <- QPR_Income %>%
+    all_hhs <- qpr_income %>%
       filter(Region %in% parse_number(input$QPRIncomeRegionSelect) &
                ProjectType == input$radioQPR_Income_PTC &
                stayed_between(., ReportStart, ReportEnd)) %>%
@@ -1389,7 +1389,7 @@ function(input, output, session) {
         substr(input$RapidRRHDateSlider, 1, 4)
       )), "%m-%d-%Y")
       
-      daysToHouse <- RRHEnterers %>%
+      daysToHouse <- qpr_rrh_enterers %>%
         filter(
             !is.na(MoveInDateAdjust) &
             Region %in% c(input$RapidRRHRegion) &
@@ -1498,7 +1498,7 @@ function(input, output, session) {
         substr(input$RRHSpendingDateSlider, 1, 4)
       )), "%m-%d-%Y")
 
-      rrhSpending <- QPR_RRH_HP_Spending %>%
+      rrhSpending <- qpr_spending %>%
         mutate(Region = paste("Homeless Planning Region", Region)) %>%
         filter(
           !is.na(OrganizationName) &
@@ -1510,7 +1510,7 @@ function(input, output, session) {
                                      "RRH"),
                ProjectType = factor(ProjectType, levels = c("HP", "RRH")))
       
-      x <- QPR_RRH_HP_Spending %>%
+      x <- qpr_spending %>%
         mutate(Region = paste("Homeless Planning Region", Region)) %>%
         filter(
           !is.na(OrganizationName) &

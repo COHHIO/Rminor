@@ -81,7 +81,7 @@
           fluidRow(box(
             pickerInput(
               inputId = "providerListUtilization",
-              choices = c(sort(BedUtilization$ProjectName)),
+              choices = c(sort(utilization_bed$ProjectName)),
               options = list(`live-search` = TRUE),
               width = "100%"
             ),
@@ -342,7 +342,7 @@
           fluidRow(box(htmlOutput("headerQPRCommunityNeed"), width = 12)),
           pickerInput(
             inputId = "regionList",
-            choices = c(unique(Regions$RegionName)),
+            choices = c(unique(regions$RegionName)),
             options = list(`live-search` = TRUE),
             width = "70%"
           ),
@@ -434,10 +434,10 @@
                     <p>Winston Chang, Joe Cheng, JJ Allaire, Yihui Xie and 
                     Jonathan McPherson (2019). shiny: Web Application Framework 
                     for R. R package version 1.3.2. 
-                    <a href=\"https://CRAN.R-project.org/package=shiny\">R Shiny packaage</a>
+                    <a href=\"https://CRAN.R-project.org/package=shiny\">R Shiny package</a>
                     and shinydashboard: Create Dashboards with 'Shiny'. R 
                     package version 0.7.1.
-                    <a href=\"https://CRAN.R-project.org/package=shinydashboard\">shinydashboard packaage</a>"
+                    <a href=\"https://CRAN.R-project.org/package=shinydashboard\">shinydashboard package</a>"
                   ),
                   title = "Citations"
                 )

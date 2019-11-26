@@ -40,7 +40,7 @@ choices_month <-
     length.out = 24
   ), "%b %Y")
 
-choices_regions <- unique(Regions$RegionName)
+choices_regions <- unique(regions$RegionName)
 
 providers <- validation %>%
   filter(str_detect(ProjectName, "zz", negate = TRUE) == TRUE)
