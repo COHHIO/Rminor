@@ -479,7 +479,7 @@ function(input, output, session) {
     
     list(h2("Quarterly Performance Report"),
          h3(paste(input$radioAvgMeanLoS, "Length of Stay")),
-         h4(input$LoSRegionSelect),
+         # h4(input$LoSRegionSelect),
          h4(ReportStart, "-", ReportEnd))
   })  
   
@@ -569,8 +569,7 @@ function(input, output, session) {
                          "\nTotal Leavers: ", Leavers, 
                          "\nDays: ", Days,
                          sep = "\n"))
-                     
-                     
+
                      if (nrow(LoSDetail) > 0) {
                        plot_ly(data = LoSSummary,
                                x = ~ FriendlyProjectName,
