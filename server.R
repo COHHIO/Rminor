@@ -1365,7 +1365,7 @@ function(input, output, session) {
     
     list(h2("Quarterly Performance Report"),
          h3("Rapid Placement into Rapid Rehousing"),
-         h4(input$RapidRRHRegion),
+         # h4(input$RapidRRHRegion),
          h4(ReportStart, "-", ReportEnd))
   })  
   
