@@ -396,9 +396,7 @@ function(input, output, session) {
       )), "%m-%d-%Y")
       # counting all households who were scored AND SERVED between the report dates
       CountyAverageScores <- qpr_spdats_county %>%
-        filter(served_between(qpr_spdats_county,
-                              ReportStart,
-                              ReportEnd)) %>%
+        filter(served_between(., ReportStart, ReportEnd)) %>%
         select(CountyServed, PersonalID, Score) %>%
         distinct() %>%
         group_by(CountyServed) %>%
@@ -406,9 +404,7 @@ function(input, output, session) {
                   HHsLHinCounty = n())
       # counting all households who ENTERED either RRH or PSH between the report dates
       CountyHousedAverageScores <- qpr_spdats_project %>%
-        filter(entered_between(qpr_spdats_project,
-                               ReportStart,
-                               ReportEnd)) %>%
+        filter(entered_between(., ReportStart, ReportEnd)) %>%
         group_by(CountyServed) %>%
         summarise(HousedAverageScore = round(mean(ScoreAdjusted), 1),
                   HHsHousedInCounty = n())
@@ -538,7 +534,7 @@ function(input, output, session) {
                            ProjectType == 13 ~ "Rapid Rehousing"
                          )
                        ) %>%
-                       filter(Region %in% c(input$LoSRegionSelect) &
+                       filter(ProjectRegion %in% c(input$LoSRegionSelect) &
                                 ProjectType %in% c(input$radioLoSPTC)) # this filter needs
                      # to be here so the selection text matches the mutated data
                      TotalLeavers <- LoSDetail %>%
@@ -551,8 +547,8 @@ function(input, output, session) {
                      
                      LoSSummary <- LoSDetail %>%
                        group_by(FriendlyProjectName,
-                                Region,
-                                County,
+                                ProjectRegion,
+                                ProjectCounty,
                                 ProjectType) %>%
                        summarise(
                          Days = case_when(
@@ -694,7 +690,7 @@ function(input, output, session) {
                   exited_between(., ReportStart, ReportEnd)
               )
             )) %>% # ES, TH, SH, RRH, OUT) %>%
-          group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+          group_by(FriendlyProjectName, ProjectType, ProjectCounty, ProjectRegion) %>%
           summarise(SuccessfullyPlacedHHs = n())
         
         # calculating the total households to compare successful placements to
@@ -707,14 +703,14 @@ function(input, output, session) {
               exited_between(., ReportStart, ReportEnd) &
                 ProjectType %in% c(1, 2, 4, 8, 13) # ES, TH, SH, OUT, RRH
             )) %>%
-          group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+          group_by(FriendlyProjectName, ProjectType, ProjectCounty, ProjectRegion) %>%
           summarise(TotalHHs = n()) # For PSH & HP, it's total hhs served;
         # otherwise, it's total hhs *exited* during the reporting period
         
         SuccessfulPlacement <- TotalHHsSuccessfulPlacement %>%
           left_join(
             SuccessfullyPlaced,
-            by = c("FriendlyProjectName", "ProjectType", "County", "Region")
+            by = c("FriendlyProjectName", "ProjectType", "ProjectCounty", "ProjectRegion")
           ) %>%
           mutate(Percent = SuccessfullyPlacedHHs / TotalHHs)
         
@@ -744,7 +740,7 @@ function(input, output, session) {
         
         stagingExitsToPH <- SuccessfulPlacement %>%
           left_join(PlacementGoal, by = "ProjectType") %>%
-          filter(ProjectType %in% ptc, Region %in% region) %>%
+          filter(ProjectType %in% ptc, ProjectRegion %in% region) %>%
           mutate(
             hover = paste0(
               FriendlyProjectName, 
@@ -820,7 +816,7 @@ function(input, output, session) {
             totalServed <- qpr_leavers %>%
               filter(exited_between(., ReportStart, ReportEnd) &
                     ProjectType == 4) %>%
-              group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+              group_by(FriendlyProjectName, ProjectType, ProjectCounty, ProjectRegion) %>%
               summarise(TotalHHs = n())
             
             notUnsheltered <- qpr_leavers %>%
@@ -830,7 +826,7 @@ function(input, output, session) {
                   DestinationGroup %in% c("Temporary", "Permanent") &
                   exited_between(., ReportStart, ReportEnd)
               ) %>% 
-              group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+              group_by(FriendlyProjectName, ProjectType, ProjectCounty, ProjectRegion) %>%
               summarise(NotUnsheltered = n())
             
             goalOutreach <- goals %>%
@@ -842,8 +838,8 @@ function(input, output, session) {
               left_join(totalServed,
                         by = c("FriendlyProjectName",
                                "ProjectType",
-                               "County",
-                               "Region")) %>%
+                               "ProjectCounty",
+                               "ProjectRegion")) %>%
               mutate(
                 Percent = NotUnsheltered / TotalHHs,
                 hover = paste0(
@@ -858,7 +854,7 @@ function(input, output, session) {
                   sep = "\n"
                 )
               ) %>%
-              filter(Region %in% c(input$ExitsToPHRegionSelect))
+              filter(ProjectRegion %in% c(input$ExitsToPHRegionSelect))
             
             title <- paste0("Exits to Temporary or Permanent Housing\n", 
                             "Street Outreach\n",
@@ -951,26 +947,26 @@ function(input, output, session) {
     
     meeting_objective <- qpr_benefits %>%
       filter(
-        Region %in% parse_number(input$QPRNCBRegionSelect) &
+        ProjectRegion %in% parse_number(input$QPRNCBRegionSelect) &
           ProjectType == input$radioQPR_NCB_PTC &
           exited_between(., ReportStart, ReportEnd) &
           BenefitsFromAnySource == 1
       ) %>% 
-      group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+      group_by(FriendlyProjectName, ProjectType, ProjectCounty, ProjectRegion) %>%
       summarise(BenefitsAtExit = n())
     
     # calculating the total households for comparison
     all_hhs <- qpr_benefits %>%
-      filter(Region %in% parse_number(input$QPRNCBRegionSelect) &
+      filter(ProjectRegion %in% parse_number(input$QPRNCBRegionSelect) &
                ProjectType == input$radioQPR_NCB_PTC &
                exited_between(., ReportStart, ReportEnd)) %>%
-      group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+      group_by(FriendlyProjectName, ProjectType, ProjectCounty, ProjectRegion) %>%
       summarise(TotalHHs = n()) 
     
     NCBsAtExit <- all_hhs %>%
       left_join(
         meeting_objective,
-        by = c("FriendlyProjectName", "ProjectType", "County", "Region")
+        by = c("FriendlyProjectName", "ProjectType", "ProjectCounty", "ProjectRegion")
       )
     
     NCBsAtExit[is.na(NCBsAtExit)] <- 0
@@ -1000,7 +996,7 @@ function(input, output, session) {
     
     stagingNCBs <- NCBsAtExit %>%
       left_join(NCBGoal, by = "ProjectType") %>%
-      filter(ProjectType == input$radioQPR_NCB_PTC, Region %in% region) %>%
+      filter(ProjectType == input$radioQPR_NCB_PTC, ProjectRegion %in% region) %>%
       mutate(
         hover = paste0(
           FriendlyProjectName, 
@@ -1096,26 +1092,26 @@ function(input, output, session) {
     
     meeting_objective <- qpr_benefits %>%
       filter(
-        Region %in% parse_number(input$QPRHIRegionSelect) &
+        ProjectRegion %in% parse_number(input$QPRHIRegionSelect) &
           ProjectType == input$radioQPR_HI_PTC &
           exited_between(., ReportStart, ReportEnd) &
           InsuranceFromAnySource == 1
       ) %>% 
-      group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+      group_by(FriendlyProjectName, ProjectType, ProjectCounty, ProjectRegion) %>%
       summarise(InsuranceAtExit = n())
     
     # calculating the total households for comparison
     all_hhs <- qpr_benefits %>%
-      filter(Region %in% parse_number(input$QPRHIRegionSelect) &
+      filter(ProjectRegion %in% parse_number(input$QPRHIRegionSelect) &
                ProjectType == input$radioQPR_HI_PTC &
                exited_between(., ReportStart, ReportEnd)) %>%
-      group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+      group_by(FriendlyProjectName, ProjectType, ProjectCounty, ProjectRegion) %>%
       summarise(TotalHHs = n()) 
     
     HIAtExit <- all_hhs %>%
       left_join(
         meeting_objective,
-        by = c("FriendlyProjectName", "ProjectType", "County", "Region")
+        by = c("FriendlyProjectName", "ProjectType", "ProjectCounty", "ProjectRegion")
       )
     
     HIAtExit[is.na(HIAtExit)] <- 0
@@ -1145,7 +1141,7 @@ function(input, output, session) {
     
     stagingHI <- HIAtExit %>%
       left_join(HIGoal, by = "ProjectType") %>%
-      filter(ProjectType == input$radioQPR_HI_PTC, Region %in% region) %>%
+      filter(ProjectType == input$radioQPR_HI_PTC, ProjectRegion %in% region) %>%
       mutate(
         hover = paste0(
           FriendlyProjectName, 
@@ -1241,26 +1237,26 @@ function(input, output, session) {
     
     meeting_objective <- qpr_income %>%
       filter(
-        Region %in% parse_number(input$QPRIncomeRegionSelect) &
+        ProjectRegion %in% parse_number(input$QPRIncomeRegionSelect) &
           ProjectType == input$radioQPR_Income_PTC &
           stayed_between(., ReportStart, ReportEnd) &
           Difference > 0
       ) %>% 
-      group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+      group_by(FriendlyProjectName, ProjectType, ProjectCounty, ProjectRegion) %>%
       summarise(Increased = n())
     
     # calculating the total households for comparison
     all_hhs <- qpr_income %>%
-      filter(Region %in% parse_number(input$QPRIncomeRegionSelect) &
+      filter(ProjectRegion %in% parse_number(input$QPRIncomeRegionSelect) &
                ProjectType == input$radioQPR_Income_PTC &
                stayed_between(., ReportStart, ReportEnd)) %>%
-      group_by(FriendlyProjectName, ProjectType, County, Region) %>%
+      group_by(FriendlyProjectName, ProjectType, ProjectCounty, ProjectRegion) %>%
       summarise(TotalHHs = n()) 
     
     IncreasedIncome <- all_hhs %>%
       left_join(
         meeting_objective,
-        by = c("FriendlyProjectName", "ProjectType", "County", "Region")
+        by = c("FriendlyProjectName", "ProjectType", "ProjectCounty", "ProjectRegion")
       )
     
     IncreasedIncome[is.na(IncreasedIncome)] <- 0
@@ -1290,7 +1286,7 @@ function(input, output, session) {
     
     stagingIncome <- IncreasedIncome %>%
       left_join(IncomeGoal, by = "ProjectType") %>%
-      filter(ProjectType == input$radioQPR_Income_PTC, Region %in% region) %>%
+      filter(ProjectType == input$radioQPR_Income_PTC, ProjectRegion %in% region) %>%
       mutate(
         hover = paste0(
           FriendlyProjectName, 
@@ -1391,7 +1387,7 @@ function(input, output, session) {
       daysToHouse <- qpr_rrh_enterers %>%
         filter(
             !is.na(MoveInDateAdjust) &
-            Region %in% c(input$RapidRRHRegion) &
+            ProjectRegion %in% c(input$RapidRRHRegion) &
             entered_between(., ReportStart, ReportEnd)
         )
       
@@ -1400,7 +1396,7 @@ function(input, output, session) {
         select(ProjectType, Goal)
       
       summaryDays <- daysToHouse %>%
-        group_by(FriendlyProjectName, County, Region, ProjectType) %>%
+        group_by(FriendlyProjectName, ProjectCounty, ProjectRegion, ProjectType) %>%
         summarise(AvgDays = as.integer(mean(DaysToHouse)),
                   TotalHHs = n()) %>%
         left_join(RRHgoal, by = "ProjectType") %>%
@@ -1498,10 +1494,9 @@ function(input, output, session) {
       )), "%m-%d-%Y")
 
       rrhSpending <- qpr_spending %>%
-        mutate(Region = paste("Homeless Planning Region", Region)) %>%
         filter(
           !is.na(OrganizationName) &
-            Region %in% c(input$RRHRegion) &
+            ProjectRegion %in% c(input$RRHRegion) &
             entered_between(., ReportStart, ReportEnd)
         ) %>%
         mutate(ProjectType = if_else(ProjectType == 12,
@@ -1510,13 +1505,12 @@ function(input, output, session) {
                ProjectType = factor(ProjectType, levels = c("HP", "RRH")))
       
       x <- qpr_spending %>%
-        mutate(Region = paste("Homeless Planning Region", Region)) %>%
         filter(
           !is.na(OrganizationName) &
-            Region %in% c(input$RRHRegion) &
+            ProjectRegion %in% c(input$RRHRegion) &
             entered_between(., ReportStart, ReportEnd)
         ) %>%
-        select(OrganizationName, Region) %>%
+        select(OrganizationName, ProjectRegion) %>%
         unique() %>%
         arrange(OrganizationName)
       
@@ -1527,7 +1521,7 @@ function(input, output, session) {
       z <- cbind(x, y)
       
       rrhSpending <- rrhSpending %>% right_join(z, by = c("OrganizationName",
-                                                          "Region",
+                                                          "ProjectRegion",
                                                           "ProjectType")) %>%
         mutate(PersonalID = if_else(is.na(PersonalID), 4216, PersonalID),
                EntryDate = if_else(PersonalID == 4216,
@@ -1542,7 +1536,7 @@ function(input, output, session) {
       
       
       rrhSpending <- rrhSpending  %>%
-        group_by(OrganizationName, Region, ProjectType) %>%
+        group_by(OrganizationName, ProjectRegion, ProjectType) %>%
         summarise(Amount = sum(Amount),
                   HHs = n()) %>%
         ungroup() %>%
@@ -1551,7 +1545,7 @@ function(input, output, session) {
       rrhSpending[is.na(rrhSpending)] <- 0
       
       rrhSpending <- rrhSpending %>%
-        group_by(OrganizationName, Region) %>%
+        group_by(OrganizationName, ProjectRegion) %>%
         summarise(HHs = sum(HHs),
                   RRH = sum(RRH),
                   HP = sum(HP)) %>%
