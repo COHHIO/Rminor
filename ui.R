@@ -62,7 +62,8 @@
                     pickerInput(
                       inputId = "providerList",
                       choices = providers,
-                      options = list(`live-search` = TRUE),
+                      options = pickerOptions(dropupAuto = FALSE,
+                                              liveSearch = TRUE),
                       width = "100%",
                       selected = sample(providers, 1)
                     ),
@@ -82,7 +83,8 @@
             pickerInput(
               inputId = "providerListUtilization",
               choices = c(sort(utilization_bed$ProjectName)),
-              options = list(`live-search` = TRUE),
+              options = pickerOptions(dropupAuto = FALSE,
+                                      liveSearch = TRUE),              
               width = "100%"
             ),
             airDatepickerInput(
@@ -152,7 +154,8 @@
             inputId = "LoSRegionSelect",
             "Select Region(s)",
             choices = choices_regions,
-            options = list(`actions-box` = TRUE),
+            options = pickerOptions(dropupAuto = FALSE,
+                                    actionsBox = TRUE),
             multiple = TRUE,
             selected = sample(choices_regions, 1)
           ),
@@ -182,7 +185,8 @@
                   inputId = "ExitsToPHRegionSelect",
                   "Select Region(s)",
                   choices = choices_regions,
-                  options = list(`actions-box` = TRUE),
+                  options = pickerOptions(dropupAuto = FALSE,
+                                          actionsBox = TRUE),
                   multiple = TRUE,
                   selected = sample(choices_regions, 1)
                 ),
@@ -216,7 +220,8 @@
                   inputId = "QPRNCBRegionSelect",
                   "Select Region(s)",
                   choices = choices_regions,
-                  options = list(`actions-box` = TRUE),
+                  options = pickerOptions(dropupAuto = FALSE,
+                                          actionsBox = TRUE),
                   multiple = TRUE,
                   selected = sample(choices_regions, 1)
                 ),
@@ -248,7 +253,8 @@
                   inputId = "QPRHIRegionSelect",
                   "Select Region(s)",
                   choices = choices_regions,
-                  options = list(`actions-box` = TRUE),
+                  options = pickerOptions(dropupAuto = FALSE,
+                                          actionsBox = TRUE),
                   multiple = TRUE,
                   selected = sample(choices_regions, 1)
                 ),
@@ -279,7 +285,8 @@
                   inputId = "QPRIncomeRegionSelect",
                   "Select Region(s)",
                   choices = choices_regions,
-                  options = list(`actions-box` = TRUE),
+                  options = pickerOptions(dropupAuto = FALSE,
+                                          actionsBox = TRUE),
                   multiple = TRUE,
                   selected = sample(choices_regions, 1)
                 ),
@@ -312,7 +319,8 @@
                   inputId = "RapidRRHRegion",
                   "Select Region(s)",
                   choices = choices_regions,
-                  options = list(`actions-box` = TRUE),
+                  options = pickerOptions(dropupAuto = FALSE,
+                                          actionsBox = TRUE),
                   multiple = TRUE,
                   selected = sample(choices_regions, 1)
                 ),
@@ -331,7 +339,8 @@
                   inputId = "RRHRegion",
                   "Select Region(s)",
                   choices = choices_regions,
-                  options = list(`actions-box` = TRUE),
+                  options = pickerOptions(dropupAuto = FALSE,
+                                          actionsBox = TRUE),
                   multiple = TRUE,
                   selected = sample(choices_regions, 1)
                 ),
@@ -343,7 +352,8 @@
           pickerInput(
             inputId = "regionList",
             choices = c(unique(regions$RegionName)),
-            options = list(`live-search` = TRUE),
+            options = pickerOptions(dropupAuto = FALSE,
+                                    liveSearch = TRUE),
             width = "70%"
           ),
           chooseSliderSkin("Round"),
