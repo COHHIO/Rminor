@@ -43,12 +43,20 @@ choices_month <-
 choices_regions <- unique(regions$RegionName)
 
 providers <- validation %>%
-  filter(str_detect(ProjectName, "zz", negate = TRUE) == TRUE)
+  filter(str_detect(ProjectName, "zz", negate = TRUE) == TRUE &
+           ProjectType %in% c(1, 2, 3, 8, 12, 13))
 # the sample() function was pulling in a zz'd provider in the Provider Dashboard
 # so I'm filtering out the zz'd providers because why would they ever need to
-# check their Provider Dashboard? they wouldn't.
-providers <- 
+# check their Provider Dashboard? they wouldn't. Also we don't want to see APs.
+provider_dash_choices <- 
   sort(providers$ProjectName) %>% 
+  unique() 
+
+providers_to_show <- providers %>%
+  filter(is.na(ExitDate))
+
+provider_dash_selected <-  
+  sort(providers_to_show$ProjectName) %>% 
   unique() 
 
 choices_project_type <- c(

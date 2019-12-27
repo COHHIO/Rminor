@@ -61,11 +61,11 @@
                   box(
                     pickerInput(
                       inputId = "providerList",
-                      choices = providers,
+                      choices = provider_dash_choices,
                       options = pickerOptions(dropupAuto = FALSE,
                                               liveSearch = TRUE),
                       width = "100%",
-                      selected = sample(providers, 1)
+                      selected = sample(provider_dash_selected, 1)
                     ),
                     uiOutput("CurrentClientCount"),
                     uiOutput("CurrentHHCount"),
