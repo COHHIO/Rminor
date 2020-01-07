@@ -25,7 +25,7 @@
         menuItem("Bed and Unit Utilization",
                       tabName = "utilizationTab"),
         menuItem(
-          "Performance and Outcomes",
+          "Quarterly Performance Report",
           menuSubItem("Community Need (by County)",
                       tabName = "spdatTab"),
           menuSubItem("Length of Stay",
@@ -50,8 +50,9 @@
       ),
       HTML(paste0(
         "<br>&emsp;Data last refreshed:&emsp;<br>&emsp;",
-        format(update_date, "%m-%d-%Y %I:%M %p", tz = "US/Eastern"),
-              "<p><p>&emsp;Happy Holidays!"
+        format(update_date, "%m-%d-%Y %I:%M %p", tz = "US/Eastern")
+        # ,
+        #       "<p><p>&emsp;Happy Holidays!"
       ))
     ),
     dashboardBody(
