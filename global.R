@@ -33,6 +33,8 @@ load("data/Veterans.RData")
 
 load("data/Data_Quality.RData")
 
+load("data/SPM_data.RData")
+
 choices_month <-
   format(seq.Date(
     from = as.Date(floor_date(today(), unit = "month") - years(2)),
