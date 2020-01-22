@@ -97,6 +97,20 @@ function(input, output, session) {
       
     }
     
+    output$headerSPMs <- renderUI({
+      ReportStart <- spm_current_start_date
+      ReportEnd <- spm_current_end_date - days(1)
+      
+      ReportStart <- format.Date(ymd(ReportStart), "%B %d, %Y")
+      ReportEnd <- format.Date(ymd(ReportEnd), "%B %d, %Y")
+      
+      list(
+        h2("HUD System Performance Measures"),
+        h4("Ohio Balance of State Continuum of Care"),
+        h4(ReportStart, "-", ReportEnd)
+      )
+    })
+    
     output$veteranEngagement <-
       if (nrow(
         veteran_current_in_project %>%

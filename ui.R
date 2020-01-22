@@ -26,6 +26,8 @@
                       tabName = "utilizationTab"),
         menuItem(
           "Quarterly Performance Report",
+          menuSubItem("System Performance Measures",
+                      tabName = "SPMs"),
           menuSubItem("Community Need (by County)",
                       tabName = "spdatTab"),
           menuSubItem("Length of Stay",
@@ -130,6 +132,11 @@
         ),
         # tabItem(tabName = "cocCompetitionTab",
         #         HTML("<h1>Under Construction</h1>")),
+        tabItem(
+          tabName = "SPMs",
+          fluidRow(box(htmlOutput("headerSPMs"), width = 12)),
+          HTML("<h1>Under Construction</h1>")
+        ),
         tabItem(
           tabName = "LoSTab",
           fluidRow(box(htmlOutput("headerLengthOfStay"), width = 12)),
