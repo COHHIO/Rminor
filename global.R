@@ -20,6 +20,7 @@ library(lubridate)
 library(scales)
 library(plotly)
 library(zoo)
+library(DT)
 
 load("data/Utilization.RData")
 
