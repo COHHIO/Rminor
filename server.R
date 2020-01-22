@@ -373,6 +373,82 @@ function(input, output, session) {
   output$utilizationNote <-
     renderUI(HTML(note_calculation_utilization))
   
+  output$spmLoTH <- DT::renderDataTable({
+    
+    a <- spm_1b_loth_self_report %>%
+      filter(Metric1b == "Persons in ES, SH, TH, and PH") %>%
+      mutate(AvgLoT = as.integer(AvgLoT),
+             Prior_AvgLoT = as.integer(Prior_AvgLoT)) %>%
+      select(
+        "Clients Served (Prior)" = Prior_ClientCount,
+        "Clients Served (Current)" = ClientCount,
+        "Average Length in Days (Prior)" = Prior_AvgLoT,
+        "Average Length in Days (Current)" = AvgLoT,
+        "Median Length in Days (Prior)" = Prior_MedLoT,
+        "Median Length in Days (Current)" = MedLoT
+      )
+    
+    datatable(a,
+              rownames = FALSE,
+              options = list(dom = 't'))
+    
+  })
+  
+  output$spmRecurrence <- DT::renderDataTable({
+    
+    a <- spm_2_recurrence %>%
+      filter(ProjectType == "TOTAL Returns to Homelessness") %>%
+      mutate_at(vars(-ProjectType), as.integer) %>%
+      mutate(
+        Percent6moPrior = percent(Prior_LessThan6mo / Prior_ExitedToPHPast2Yrs,
+                                  accuracy = .1),
+        Percent6moCurrent = percent(LessThan6mo / ExitedToPHPast2Yrs,
+                                    accuracy = .1),
+        Percent2yrPrior = percent(Prior_ThirteenTo24mo / Prior_ExitedToPHPast2Yrs,
+                                  accuracy = .1),
+        Percent2yrCurrent = percent(ThirteenTo24mo / ExitedToPHPast2Yrs,
+                                    accuracy = .1)
+      ) %>%
+      select(
+        "Recurred in 6 months or less (Prior)" = Percent6moPrior,
+        "Recurred in 6 months or less (Current)" = Percent6moCurrent,
+        "Recurred up to 2 Years After Permanent Exit (Prior)" = Percent2yrPrior,
+        "Recurred up to 2 Years After Permanent Exit (Current)" = Percent2yrCurrent
+      )
+    
+    datatable(a,
+              rownames = FALSE,
+              options = list(dom = 't'))
+    
+  })
+  
+  output$spmExitsToPH <- DT::renderDataTable({
+    
+    a <- spm_7b1_exits_lh %>%
+      filter(Metric7b1 == "% Successful exits") %>%
+      mutate(Metric7b1 = "ES, TH, SH, RRH: Successful Exits") %>%
+      select(
+        "Metric" = Metric7b1,
+        "Prior Year" = PriorYear,
+        "Current Year" = CurrentYear)
+    
+    b <- spm_7b2_exits_ph %>%
+      filter(Metric7b2 == "% Successful exits/retention") %>%
+      mutate(Metric7b2 = "PSH: Successful Exits/Retention of Housing in PSH") %>%
+      select(
+        "Metric" = Metric7b2,
+        "Prior Year" = PriorYear,
+        "Current Year" = CurrentYear
+      )
+    
+    c <- rbind(a, b)
+    
+    datatable(c,
+              rownames = FALSE,
+              options = list(dom = 't'))
+    
+  })
+  
   output$headerQPRCommunityNeed <- renderUI({
     ReportStart <- format.Date(ymd(paste0(
       substr(input$spdatSlider, 1, 4),

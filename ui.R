@@ -135,7 +135,24 @@
         tabItem(
           tabName = "SPMs",
           fluidRow(box(htmlOutput("headerSPMs"), width = 12)),
-          HTML("<h1>Under Construction</h1>")
+          fluidRow(box(
+            DT::dataTableOutput("spmLoTH"),
+            title = "Length of Time Homeless",
+            footer = "Metrics 2a1 & 2b1, Persons in ES, SH, TH, RRH, and PSH",
+            width = 12
+          )),
+          fluidRow(box(
+            DT::dataTableOutput("spmRecurrence"),
+            title = "Clients Returning to Homelessness After Successful Placement",
+            footer = "Metric 1b, Persons in ES, SH, TH, Outreach, RRH, and PSH",
+            width = 12
+          )),
+          fluidRow(box(
+            DT::dataTableOutput("spmExitsToPH"),
+            title = "Exits to or Retention of Permanent Housing",
+            footer = "Metrics 7b1 & 7b2",
+            width = 12
+          ))
         ),
         tabItem(
           tabName = "LoSTab",
