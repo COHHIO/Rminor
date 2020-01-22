@@ -104,10 +104,32 @@ function(input, output, session) {
       ReportStart <- format.Date(ymd(ReportStart), "%B %d, %Y")
       ReportEnd <- format.Date(ymd(ReportEnd), "%B %d, %Y")
       
+      PriorReportStart <- spm_prior_start_date
+      PriorReportEnd <- spm_prior_end_date - days(1)
+      
+      PriorReportStart <- format.Date(ymd(PriorReportStart), "%B %d, %Y")
+      PriorReportEnd <- format.Date(ymd(PriorReportEnd), "%B %d, %Y")
+      
       list(
         h2("HUD System Performance Measures"),
         h4("Ohio Balance of State Continuum of Care"),
-        h4(ReportStart, "-", ReportEnd)
+        h4(ReportStart, "-", ReportEnd),
+        p(
+          "The data here is based on the HUD System Performance Measures. For a
+          great primer as to what these measures are, you can view the following",
+          a(href = "https://www.hudexchange.info/trainings/system-performance-measures/",
+            target = "blank",
+            "introductory videos"),
+          " created by HUD."
+        ),
+        p("Prior Reporting Period ->",
+          PriorReportStart,
+          "to",
+          PriorReportEnd),
+        p("Current Reporting Period ->",
+          ReportStart,
+          "to",
+          ReportEnd)
       )
     })
     
@@ -444,6 +466,34 @@ function(input, output, session) {
     c <- rbind(a, b)
     
     datatable(c,
+              rownames = FALSE,
+              options = list(dom = 't'))
+    
+  })
+  
+  output$spmPIT <- DT::renderDataTable({
+    
+    a <- tribble(
+      ~Population, ~January2018Count, ~January2019Count,
+      "Total", 3133, 3479,
+      "Sheltered", 2500, 2665,
+      "Veterans", 162, 159,
+      "Chronic", 196, 330
+    ) %>%
+      mutate(
+        Difference = percent((January2019Count - January2018Count)
+                             /January2018Count,
+                             accuracy = .1),
+        Difference = if_else(str_starts(Difference, "-"),
+                             Difference,
+                             paste0("+", Difference))
+      ) %>%
+      select(Population,
+             "January 2018 Count" = January2018Count,
+             "January 2019 Count" = January2019Count,
+             Difference)
+    
+    datatable(a,
               rownames = FALSE,
               options = list(dom = 't'))
     
