@@ -43,6 +43,8 @@ choices_month <-
 choices_regions <- unique(regions$RegionName)
 
 providers <- validation %>%
+  select(ProjectName, ProjectType) %>%
+  unique() %>%
   filter(str_detect(ProjectName, "zz", negate = TRUE) == TRUE &
            ProjectType %in% c(1, 2, 3, 8, 12, 13))
 # the sample() function was pulling in a zz'd provider in the Provider Dashboard
@@ -52,12 +54,12 @@ provider_dash_choices <-
   sort(providers$ProjectName) %>% 
   unique() 
 
-providers_to_show <- providers %>%
-  filter(is.na(ExitDate))
-
-provider_dash_selected <-  
-  sort(providers_to_show$ProjectName) %>% 
-  unique() 
+provider_dash_selected <- providers %>%
+  left_join(validation, by = c("ProjectName", "ProjectType")) %>%
+  filter(is.na(ExitDate)) %>% 
+  select(ProjectName) %>%
+  unique() %>%
+  arrange(ProjectName)
 
 choices_project_type <- c(
   "Emergency Shelter", 
