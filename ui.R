@@ -25,7 +25,9 @@
         menuItem("Bed and Unit Utilization",
                       tabName = "utilizationTab"),
         menuItem(
-          "Performance and Outcomes",
+          "Quarterly Performance Report",
+          menuSubItem("System Performance Measures",
+                      tabName = "SPMs"),
           menuSubItem("Community Need (by County)",
                       tabName = "spdatTab"),
           menuSubItem("Length of Stay",
@@ -50,8 +52,9 @@
       ),
       HTML(paste0(
         "<br>&emsp;Data last refreshed:&emsp;<br>&emsp;",
-        format(update_date, "%m-%d-%Y %I:%M %p", tz = "US/Eastern"),
-              "<p><p>&emsp;Happy Holidays!"
+        format(update_date, "%m-%d-%Y %I:%M %p", tz = "US/Eastern")
+        # ,
+        #       "<p><p>&emsp;Happy Holidays!"
       ))
     ),
     dashboardBody(
@@ -61,10 +64,11 @@
                   box(
                     pickerInput(
                       inputId = "providerList",
-                      choices = providers,
-                      options = list(`live-search` = TRUE),
+                      choices = provider_dash_choices,
+                      options = pickerOptions(dropupAuto = FALSE,
+                                              liveSearch = TRUE),
                       width = "100%",
-                      selected = sample(providers, 1)
+                      selected = sample(provider_dash_selected, 1)
                     ),
                     uiOutput("CurrentClientCount"),
                     uiOutput("CurrentHHCount"),
@@ -82,7 +86,8 @@
             pickerInput(
               inputId = "providerListUtilization",
               choices = c(sort(utilization_bed$ProjectName)),
-              options = list(`live-search` = TRUE),
+              options = pickerOptions(dropupAuto = FALSE,
+                                      liveSearch = TRUE),              
               width = "100%"
             ),
             airDatepickerInput(
@@ -128,6 +133,37 @@
         # tabItem(tabName = "cocCompetitionTab",
         #         HTML("<h1>Under Construction</h1>")),
         tabItem(
+          tabName = "SPMs",
+          fluidRow(box(htmlOutput("headerSPMs"), width = 12)),
+          fluidRow(box(
+            DT::dataTableOutput("spmLoTH"),
+            title = "Length of Time Homeless",
+            footer = "Metric 1b, Persons in ES, SH, TH, RRH, and PSH.
+            CoC goal = no more than 90 days average and median",
+            width = 12
+          )),
+          fluidRow(box(
+            DT::dataTableOutput("spmRecurrence"),
+            title = "Clients Returning to Homelessness After Successful Placement",
+            footer = "Metrics 2a1 & 2b1, Persons in ES, SH, TH, Outreach, RRH, and PSH.
+            6 month goal = <10%, 24 month goal = <20%",
+            width = 12
+          )),
+          fluidRow(box(
+            DT::dataTableOutput("spmExitsToPH"),
+            title = "Exits to or Retention of Permanent Housing",
+            footer = "Metrics 7b1 & 7b2. PSH Goal: 90%, ES, SH, TH, RRH Goal: 75%",
+            width = 12
+          )),
+          fluidRow(box(
+            DT::dataTableOutput("spmPIT"),
+            title = "January 2018 and January 2019 PIT Counts",
+            footer = "Metric 3.1. Total and Sheltered goals: reduce by 4% annually.
+            Veteran and Chronic goals: reduce by 10% annually.",
+            width = 12
+          ))
+        ),
+        tabItem(
           tabName = "LoSTab",
           fluidRow(box(htmlOutput("headerLengthOfStay"), width = 12)),
           chooseSliderSkin("Round"),
@@ -152,7 +188,8 @@
             inputId = "LoSRegionSelect",
             "Select Region(s)",
             choices = choices_regions,
-            options = list(`actions-box` = TRUE),
+            options = pickerOptions(dropupAuto = FALSE,
+                                    actionsBox = TRUE),
             multiple = TRUE,
             selected = sample(choices_regions, 1)
           ),
@@ -182,7 +219,8 @@
                   inputId = "ExitsToPHRegionSelect",
                   "Select Region(s)",
                   choices = choices_regions,
-                  options = list(`actions-box` = TRUE),
+                  options = pickerOptions(dropupAuto = FALSE,
+                                          actionsBox = TRUE),
                   multiple = TRUE,
                   selected = sample(choices_regions, 1)
                 ),
@@ -216,7 +254,8 @@
                   inputId = "QPRNCBRegionSelect",
                   "Select Region(s)",
                   choices = choices_regions,
-                  options = list(`actions-box` = TRUE),
+                  options = pickerOptions(dropupAuto = FALSE,
+                                          actionsBox = TRUE),
                   multiple = TRUE,
                   selected = sample(choices_regions, 1)
                 ),
@@ -248,7 +287,8 @@
                   inputId = "QPRHIRegionSelect",
                   "Select Region(s)",
                   choices = choices_regions,
-                  options = list(`actions-box` = TRUE),
+                  options = pickerOptions(dropupAuto = FALSE,
+                                          actionsBox = TRUE),
                   multiple = TRUE,
                   selected = sample(choices_regions, 1)
                 ),
@@ -279,7 +319,8 @@
                   inputId = "QPRIncomeRegionSelect",
                   "Select Region(s)",
                   choices = choices_regions,
-                  options = list(`actions-box` = TRUE),
+                  options = pickerOptions(dropupAuto = FALSE,
+                                          actionsBox = TRUE),
                   multiple = TRUE,
                   selected = sample(choices_regions, 1)
                 ),
@@ -312,7 +353,8 @@
                   inputId = "RapidRRHRegion",
                   "Select Region(s)",
                   choices = choices_regions,
-                  options = list(`actions-box` = TRUE),
+                  options = pickerOptions(dropupAuto = FALSE,
+                                          actionsBox = TRUE),
                   multiple = TRUE,
                   selected = sample(choices_regions, 1)
                 ),
@@ -331,7 +373,8 @@
                   inputId = "RRHRegion",
                   "Select Region(s)",
                   choices = choices_regions,
-                  options = list(`actions-box` = TRUE),
+                  options = pickerOptions(dropupAuto = FALSE,
+                                          actionsBox = TRUE),
                   multiple = TRUE,
                   selected = sample(choices_regions, 1)
                 ),
@@ -343,7 +386,8 @@
           pickerInput(
             inputId = "regionList",
             choices = c(unique(regions$RegionName)),
-            options = list(`live-search` = TRUE),
+            options = pickerOptions(dropupAuto = FALSE,
+                                    liveSearch = TRUE),
             width = "70%"
           ),
           chooseSliderSkin("Round"),
