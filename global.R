@@ -20,6 +20,7 @@ library(lubridate)
 library(scales)
 library(plotly)
 library(zoo)
+library(DT)
 
 load("data/Utilization.RData")
 
@@ -32,6 +33,8 @@ load("data/QPR_EEs.RData")
 load("data/Veterans.RData")
 
 load("data/Data_Quality.RData")
+
+load("data/SPM_data.RData")
 
 choices_month <-
   format(seq.Date(

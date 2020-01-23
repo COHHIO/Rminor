@@ -26,6 +26,8 @@
                       tabName = "utilizationTab"),
         menuItem(
           "Quarterly Performance Report",
+          menuSubItem("System Performance Measures",
+                      tabName = "SPMs"),
           menuSubItem("Community Need (by County)",
                       tabName = "spdatTab"),
           menuSubItem("Length of Stay",
@@ -130,6 +132,37 @@
         ),
         # tabItem(tabName = "cocCompetitionTab",
         #         HTML("<h1>Under Construction</h1>")),
+        tabItem(
+          tabName = "SPMs",
+          fluidRow(box(htmlOutput("headerSPMs"), width = 12)),
+          fluidRow(box(
+            DT::dataTableOutput("spmLoTH"),
+            title = "Length of Time Homeless",
+            footer = "Metric 1b, Persons in ES, SH, TH, RRH, and PSH.
+            CoC goal = no more than 90 days average and median",
+            width = 12
+          )),
+          fluidRow(box(
+            DT::dataTableOutput("spmRecurrence"),
+            title = "Clients Returning to Homelessness After Successful Placement",
+            footer = "Metrics 2a1 & 2b1, Persons in ES, SH, TH, Outreach, RRH, and PSH.
+            6 month goal = <10%, 24 month goal = <20%",
+            width = 12
+          )),
+          fluidRow(box(
+            DT::dataTableOutput("spmExitsToPH"),
+            title = "Exits to or Retention of Permanent Housing",
+            footer = "Metrics 7b1 & 7b2. PSH Goal: 90%, ES, SH, TH, RRH Goal: 75%",
+            width = 12
+          )),
+          fluidRow(box(
+            DT::dataTableOutput("spmPIT"),
+            title = "January 2018 and January 2019 PIT Counts",
+            footer = "Metric 3.1. Total and Sheltered goals: reduce by 4% annually.
+            Veteran and Chronic goals: reduce by 10% annually.",
+            width = 12
+          ))
+        ),
         tabItem(
           tabName = "LoSTab",
           fluidRow(box(htmlOutput("headerLengthOfStay"), width = 12)),
