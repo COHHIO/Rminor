@@ -399,20 +399,21 @@ function(input, output, session) {
     
     a <- spm_1b_loth_self_report %>%
       filter(Metric1b == "Persons in ES, SH, TH, and PH") %>%
-      mutate(AvgLoT = as.integer(AvgLoT),
-             Prior_AvgLoT = as.integer(Prior_AvgLoT)) %>%
+      mutate(AvgLoT = paste(as.integer(AvgLoT), "days"),
+             Prior_AvgLoT = paste(as.integer(Prior_AvgLoT), "days"),
+             MedLoT = paste(MedLoT, "days"),
+             Prior_MedLoT = paste(Prior_MedLoT, "days")) %>%
       select(
-        "Clients Served (Prior)" = Prior_ClientCount,
-        "Clients Served (Current)" = ClientCount,
-        "Average Length in Days (Prior)" = Prior_AvgLoT,
-        "Average Length in Days (Current)" = AvgLoT,
-        "Median Length in Days (Prior)" = Prior_MedLoT,
-        "Median Length in Days (Current)" = MedLoT
+        "Prior Year<br>Average" = Prior_AvgLoT,
+        "Current Year<br>Average" = AvgLoT,
+        "Prior Year<br>Median" = Prior_MedLoT,
+        "Current Year<br>Median" = MedLoT
       )
     
     datatable(a,
               rownames = FALSE,
-              options = list(dom = 't'))
+              options = list(dom = 't'),
+              escape = FALSE)
     
   })
   
@@ -432,15 +433,16 @@ function(input, output, session) {
                                     accuracy = .1)
       ) %>%
       select(
-        "Recurred in 6 months or less (Prior)" = Percent6moPrior,
-        "Recurred in 6 months or less (Current)" = Percent6moCurrent,
-        "Recurred up to 2 Years After Permanent Exit (Prior)" = Percent2yrPrior,
-        "Recurred up to 2 Years After Permanent Exit (Current)" = Percent2yrCurrent
+        "Prior Year<br>Recurred in 6 months or less" = Percent6moPrior,
+        "Current Year<br>Recurred in 6 months or less" = Percent6moCurrent,
+        "Prior Year<br>Recurred up to 2 Years After Permanent Exit" = Percent2yrPrior,
+        "Current Year<br>Recurred up to 2 Years After Permanent Exit" = Percent2yrCurrent
       )
     
     datatable(a,
               rownames = FALSE,
-              options = list(dom = 't'))
+              options = list(dom = 't'),
+              escape = FALSE)
     
   })
   
