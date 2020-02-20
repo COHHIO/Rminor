@@ -337,8 +337,6 @@
                 ),
                 plotlyOutput("QPRIncome"),
                 br()),
-        # tabItem(tabName = "recurrenceTab",
-                # HTML("<h1>Under Construction</h1>")),
         tabItem(tabName = "rapidTab",
                 fluidRow(box(htmlOutput("headerRRHRapidPlacement"), width = 12)),
                 chooseSliderSkin("Round"),
@@ -385,7 +383,7 @@
           fluidRow(box(htmlOutput("headerQPRCommunityNeed"), width = 12)),
           pickerInput(
             inputId = "regionList",
-            choices = c(unique(regions$RegionName)),
+            choices = choices_regions,
             options = pickerOptions(dropupAuto = FALSE,
                                     liveSearch = TRUE),
             width = "70%"
