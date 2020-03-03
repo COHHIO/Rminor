@@ -454,7 +454,7 @@
                     "<p>R minor is a free and open source project created and 
                     maintained by the HMIS team at Coalition on Homelessness 
                     and Housing in Ohio (COHHIO). Please find the code here: 
-                    <a href=\"https://github.com/orgs/COHHIO/Rminor\">R minor code</a>
+                    <a href=\"https://github.com/COHHIO/Rminor\">R minor code</a>
 
                     <p>This project would not exist were it not for the 
                     existence of other quality free and open source products. 
