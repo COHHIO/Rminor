@@ -324,7 +324,7 @@ function(input, output, session) {
       
       Provider <- input$providerListUtilization
       
-      bedPlot <- utilization_bed %>% select(-FilePeriod) %>%
+      bedPlot <- utilization_bed %>% 
         gather("Month",
                "Utilization",
                -ProjectID,
@@ -338,7 +338,7 @@ function(input, output, session) {
           Utilization = NULL
         )
       
-      unitPlot <- utilization_unit %>% select(-FilePeriod) %>%
+      unitPlot <- utilization_unit %>% 
         gather("Month",
                "Utilization",
                -ProjectID,
