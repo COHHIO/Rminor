@@ -24,7 +24,7 @@ library(DT)
 
 load("data/Utilization.RData")
 
-filebeginningdate <- update_date - years(2)
+# filebeginningdate <- update_date - years(2)
 
 load("data/QPR_SPDATs.RData")
 
