@@ -68,7 +68,7 @@
                       options = pickerOptions(dropupAuto = FALSE,
                                               liveSearch = TRUE),
                       width = "100%",
-                      selected = sample(provider_dash_selected, 1)
+                      selected = sample_n(provider_dash_selected, 1)
                     ),
                     uiOutput("CurrentClientCount"),
                     uiOutput("CurrentHHCount"),
@@ -87,7 +87,8 @@
               inputId = "providerListUtilization",
               choices = c(sort(utilization_bed$ProjectName)),
               options = pickerOptions(dropupAuto = FALSE,
-                                      liveSearch = TRUE),              
+                                      liveSearch = TRUE),   
+              selected = sample_n(utilization_bed %>% select(ProjectName), 1),
               width = "100%"
             ),
             airDatepickerInput(
