@@ -1,16 +1,16 @@
-#COHHIO_HMIS
-#Copyright (C) 2019  Coalition on Homelessness and Housing in Ohio (COHHIO)
-
-#This program is free software: you can redistribute it and/or modify
-#it under the terms of the GNU Affero General Public License as published
-#by the Free Software Foundation, either version 3 of the License, or
-#any later version.
-
-#This program is distributed in the hope that it will be useful,
-#but WITHOUT ANY WARRANTY; without even the implied warranty of
-#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-#GNU Affero General Public License for more details at 
-#<https://www.gnu.org/licenses/>.
+# COHHIO_HMIS
+# Copyright (C) 2020  Coalition on Homelessness and Housing in Ohio (COHHIO)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Affero General Public License for more details at
+# <https://www.gnu.org/licenses/>.
 
   dashboardPage(
     skin = "black",
@@ -53,8 +53,8 @@
       HTML(paste0(
         "<br>&emsp;Data last refreshed:&emsp;<br>&emsp;",
         format(update_date, "%m-%d-%Y %I:%M %p", tz = "US/Eastern")
-        # ,
-        #       "<p><p>&emsp;Happy Holidays!"
+        ,
+              "<p><p>&emsp;Wash your hands!"
       ))
     ),
     dashboardBody(
@@ -68,7 +68,7 @@
                       options = pickerOptions(dropupAuto = FALSE,
                                               liveSearch = TRUE),
                       width = "100%",
-                      selected = sample(provider_dash_selected, 1)
+                      selected = sample_n(provider_dash_selected, 1)
                     ),
                     uiOutput("CurrentClientCount"),
                     uiOutput("CurrentHHCount"),
@@ -87,7 +87,8 @@
               inputId = "providerListUtilization",
               choices = c(sort(utilization_bed$ProjectName)),
               options = pickerOptions(dropupAuto = FALSE,
-                                      liveSearch = TRUE),              
+                                      liveSearch = TRUE),   
+              selected = sample_n(utilization_bed %>% select(ProjectName), 1),
               width = "100%"
             ),
             airDatepickerInput(
