@@ -82,6 +82,16 @@
         tabItem(
           tabName = "utilizationTab",
           fluidRow(box(htmlOutput("headerUtilization"), width = 12)),
+          fluidRow(
+            box(
+              title = "NOTICE",
+              status = "warning",
+              solidHeader = TRUE,
+              "During this time, congregate facilities should be aiming to deconcentrate. If this causes fluctuations in Utilization, that is okay. Please continue to keep your clients safe."
+              ,
+              width = 6
+            )
+          ), 
           fluidRow(box(
             pickerInput(
               inputId = "providerListUtilization",
