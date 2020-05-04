@@ -43,7 +43,7 @@ choices_month <-
     length.out = 24
   ), "%b %Y")
 
-choices_regions <- unique(regions$RegionName)
+choices_regions <- unique(regions$RegionName[regions$County != "Mahoning"])
 
 providers <- validation %>%
   select(ProjectName, ProjectType) %>%
