@@ -156,6 +156,28 @@ function(input, output, session) {
       
     }
     
+    output$TAYEngagement <-
+      if (nrow(
+        current_tay_hohs %>%
+        filter(ProjectName == input$providerList)
+      ) > 0) {
+        renderInfoBox({
+          infoBox(
+            title = "Current Transition Aged Youth Households",
+            subtitle = current_tay_hohs %>%
+              filter(ProjectName == input$providerList) %>% pull(Summary),
+            color = "black",
+            icon = icon("id-card"),
+            current_tay_hohs %>%
+              filter(ProjectName == input$providerList) %>%
+              select(TAYHHs)
+          )
+        })
+      }
+    else {
+      
+    }
+    
     output$CurrentlyAwaitingPH <-
       if (nrow(validation %>%
                filter(ProjectType %in% c(3, 9, 13) &

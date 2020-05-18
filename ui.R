@@ -75,6 +75,7 @@
                     uiOutput("currentUnitUtilization"),
                     uiOutput("currentBedUtilization"),
                     uiOutput("veteranEngagement"),
+                    uiOutput("TAYEngagement"),
                     uiOutput("ShelterExitsToRRH"),
                     uiOutput("CurrentlyAwaitingPH")
                   )
