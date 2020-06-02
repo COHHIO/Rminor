@@ -20,8 +20,8 @@
         id = "sidebarmenuid",
         menuItem("Provider Dashboard",
                  tabName = "providerDashboardTab"),
-        menuItem("CoC Competition",
-                 tabName = "cocCompetitionTab"),
+        # menuItem("CoC Competition",
+        #          tabName = "cocCompetitionTab"),
         menuItem("Bed and Unit Utilization",
                       tabName = "utilizationTab"),
         menuItem(
