@@ -379,7 +379,8 @@ function(input, output, session) {
           infoBox(
             title = "Current Veterans",
             subtitle = veteran_current_in_project %>%
-              filter(ProjectName == input$providerList) %>% pull(Summary),
+              filter(ProjectName == input$providerList) %>% 
+              pull(Summary),
             color = "green",
             icon = icon("ribbon"),
             veteran_current_in_project %>%
