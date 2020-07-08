@@ -763,23 +763,23 @@ function(input, output, session) {
   output$spmPIT <- DT::renderDataTable({
     
     a <- tribble(
-      ~Population, ~January2018Count, ~January2019Count,
-      "Total", 3133, 3479,
-      "Sheltered", 2500, 2665,
-      "Veterans", 162, 159,
-      "Chronic", 196, 330
+      ~Population, ~January2019Count, ~January2020Count,
+      "Total", 3479, 3577,
+      "Sheltered", 2665, 3577 - 986,
+      "Veterans", 159, 162,
+      "Chronic", 330, 192
     ) %>%
       mutate(
-        Difference = percent((January2019Count - January2018Count)
-                             /January2018Count,
+        Difference = percent((January2020Count - January2019Count)
+                             /January2019Count,
                              accuracy = .1),
         Difference = if_else(str_starts(Difference, "-"),
                              Difference,
                              paste0("+", Difference))
       ) %>%
       select(Population,
-             "January 2018 Count" = January2018Count,
              "January 2019 Count" = January2019Count,
+             "January 2020 Count" = January2020Count,
              Difference)
     
     datatable(a,
