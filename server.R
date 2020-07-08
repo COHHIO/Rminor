@@ -710,9 +710,13 @@ function(input, output, session) {
                                   accuracy = .1),
         Percent6moCurrent = percent(LessThan6mo / ExitedToPHPast2Yrs,
                                     accuracy = .1),
-        Percent2yrPrior = percent(Prior_ThirteenTo24mo / Prior_ExitedToPHPast2Yrs,
+        Percent2yrPrior = percent((Prior_ThirteenTo24mo +
+                                     Prior_SixTo12mo +
+                                     Prior_LessThan6mo) / Prior_ExitedToPHPast2Yrs,
                                   accuracy = .1),
-        Percent2yrCurrent = percent(ThirteenTo24mo / ExitedToPHPast2Yrs,
+        Percent2yrCurrent = percent((ThirteenTo24mo +
+                                       LessThan6mo +
+                                       SixTo12mo) / ExitedToPHPast2Yrs,
                                     accuracy = .1)
       ) %>%
       select(
