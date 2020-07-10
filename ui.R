@@ -188,7 +188,7 @@
           )),
           fluidRow(box(
             DT::dataTableOutput("spmPIT"),
-            title = "Metric 3.1: January 2018 and January 2019 PIT Counts",
+            title = "Metric 3.1: January 2019 and January 2020 PIT Counts",
             footer = HTML("Total and Sheltered goals: reduce by 4% annually. <br>
             Veteran and Chronic goals: reduce by 10% annually."),
             width = 12
