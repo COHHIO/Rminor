@@ -90,7 +90,10 @@
             title = "Covid-19 Data Collection",
             collapsible = TRUE,
             collapsed = FALSE
-          ))
+          )),
+          fluidRow(box(plotOutput("covidStatus"),
+                       title = "Covid-19 Status at Last Screening",
+                       width = 12))
         ),
         tabItem(
           tabName = "utilizationTab",

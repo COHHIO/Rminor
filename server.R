@@ -608,7 +608,113 @@ function(input, output, session) {
     
   })
   
-  output$bedPlot <-
+output$covidStatus <- renderPlot({
+  get_res_prior <- validation %>%
+    select(PersonalID, EntryDate, ExitDate, LivingSituation) %>%
+    group_by(PersonalID) %>%
+    arrange(desc(EntryDate)) %>%
+    slice(1L)
+  
+  covid19_status <- covid19 %>%
+    left_join(get_res_prior, by = "PersonalID") %>%
+    filter(ymd(COVID19AssessmentDate) >= mdy("04012020") &
+             ymd(COVID19AssessmentDate) <= today()) %>%
+    mutate(
+      COVID19Status = case_when(
+        Tested == 1 &
+          TestResults == "Positive" &
+          ymd(TestDate) > ymd(COVID19AssessmentDate) - days(14) &
+          !is.na(TestDate) ~ "Positive",
+        # testing positive in the 14 days prior to assessment is the only way to
+        # land in this bucket
+        (
+          ContactWithConfirmedCOVID19Patient == 1 &
+            (
+              ymd(ContactWithConfirmedDate) >
+                ymd(COVID19AssessmentDate) - days(14) |
+                is.na(ContactWithConfirmedDate)
+            )
+          # compares contact date to date of the assessment
+        ) |
+          (
+            ContactWithUnderCOVID19Investigation == 1 &
+              (
+                ymd(ContactWithUnderInvestigationDate) >
+                  ymd(COVID19AssessmentDate) - days(14) |
+                  is.na(ContactWithUnderInvestigationDate)
+              )
+          ) |
+          (
+            Symptom1BreathingDifficult +
+              Symptom1Cough +
+              Symptom2Chills +
+              Symptom2SoreThroat +
+              Symptom2Fever +
+              Symptom2Headache +
+              Symptom2LostTasteSmell +
+              Symptom2MusclePain +
+              Symptom2Congestion +
+              Symptom2Nausea +
+              Symptom2Diarrhea +
+              Symptom2Weak
+          ) > 0
+        |
+          (
+            UnderInvestigation == 1 &
+              ymd(DateUnderInvestigation) > ymd(COVID19AssessmentDate) - days(14)
+          ) ~
+          "MayHaveCOVID19",
+        # being Under Investigation (past 14 days), any Symptom, or any Contact
+        # in the 14 days prior to the assessment date will land you here ^
+        TRUE ~ "NoCurrentIndications"
+        # everyone else lands here ^
+      ),
+      COVID19Status = factor(
+        COVID19Status,
+        levels = c("NoCurrentIndications",
+                   "MayHaveCOVID19",
+                   "Positive")
+      ),
+      Week = format.Date(COVID19AssessmentDate, "%U")
+    )
+  
+  plotlyplot <- plot_ly(covid19_status %>%
+                          group_by(Week, COVID19Status) %>%
+                          summarise(Clients = n()) %>%
+                          ungroup() %>%
+                          pivot_wider(names_from = COVID19Status,
+                                      values_from = Clients), 
+                        x = ~Week, y = ~NoCurrentIndications, 
+                        type = 'bar', 
+                        name = "No Current Indications") %>% 
+    add_trace(y = ~MayHaveCOVID19, name = "May Have Covid-19") %>%
+    add_trace(y = ~Positive, name = "Positive") %>%
+    layout(yaxis = list(title = 'Count'), barmode = 'stack')
+  
+  
+  
+  
+  
+  plot <- covid19_status %>%
+    select(PersonalID, Week, COVID19Status) %>%
+    group_by(Week, COVID19Status) %>%
+    summarise(Clients = n()) %>%
+    ggplot(aes(x = Week, y = Clients,
+               fill = COVID19Status)) +
+    geom_bar(stat = "identity", 
+             position = position_stack(reverse = TRUE)) +  
+    scale_fill_brewer(palette = "Dark2") +
+    theme_classic() +
+    labs(x = "Date of Assessment", y = "Clients Assessed") +
+    theme(legend.title=element_blank(),
+          legend.position = "top",
+          legend.key.height = unit(0.1, "cm"),
+          legend.key.width = unit(0.3, "cm"))
+  plot
+  
+})
+  
+    output$bedPlot <-
     renderPlotly({
       ReportEnd <- ymd(input$utilizationDate) 
       ReportStart <- floor_date(ymd(ReportEnd), unit = "month") -
