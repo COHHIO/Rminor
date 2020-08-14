@@ -33,6 +33,17 @@ function(input, output, session) {
     )
   })
   
+  output$headerCovid19 <- renderUI({
+
+    ReportStart <- format.Date(mdy("04012020"), "%B %d, %Y")
+    ReportEnd <- format.Date(ymd_hms(update_date), "%B %d, %Y")
+    
+    list(
+      h2("Ohio Balance of State CoC Covid-19 Data Analysis"),
+      h4(ReportStart, "-", ReportEnd)
+    )
+  })
+  
   output$headerCoCCompetitionProjectLevel <- renderUI({
     next_thing_due <- tribble(
       ~ DueDate, ~ Event,
@@ -671,6 +682,18 @@ function(input, output, session) {
   
   output$unitNote <-
     renderUI(note_unit_utilization)
+  
+  output$covidText <- renderUI(
+    HTML("The Ohio Balance of State CoC is collecting COVID-19 data based on the 
+         <a href=\"https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/symptoms.html\">CDC's guidelines</a>. 
+         We began collecting this data in April 2020. 
+         <p><br>While all Access Points into the Balance of State CoC
+         homeless system are required to screen every household for Covid-19, 
+         they are not required to enter that data into HMIS, so this data is
+         not representative of the entire Continuum of Care. 
+         <p>Please send inquiries to the COHHIO 
+         <a href = \"mailto:hmis@cohhio.org.\">HMIS team</a>.")
+  )
   
   output$bedNote <-
     renderUI(note_bed_utilization)
