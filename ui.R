@@ -89,7 +89,8 @@
             uiOutput("covidText"),
             title = "Covid-19 Data Collection",
             collapsible = TRUE,
-            collapsed = FALSE
+            collapsed = FALSE,
+            width = 12
           )),
           fluidRow(box(plotOutput("covidStatus"),
                        title = "Covid-19 Status at Last Screening",
