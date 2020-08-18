@@ -615,6 +615,8 @@ output$covidStatus <- renderPlot({
     arrange(desc(EntryDate)) %>%
     slice(1L)
   
+  current_week <- week(today())
+  
   covid19_status <- covid19 %>%
     left_join(get_res_prior, by = "PersonalID") %>%
     filter(ymd(COVID19AssessmentDate) >= mdy("04012020") &
@@ -676,40 +678,60 @@ output$covidStatus <- renderPlot({
                    "Positive")
       ),
       Week = format.Date(COVID19AssessmentDate, "%U"),
+      Week = as.numeric(Week),
       Month = format.Date(COVID19AssessmentDate, "%m"),
       MonthName = format.Date(COVID19AssessmentDate, "%B")
     ) %>% 
-    arrange(Month)
+    filter(Week != current_week)
   
   months_included <- covid19_status$MonthName %>% unique()
   
-  x <- covid19_status %>%
-    group_by(Week, MonthName, COVID19Status) %>%
+  week_names <- covid19_status %>%
+    group_by(Week, MonthName) %>%
     summarise(Clients = n()) %>%
     pivot_wider(names_from = MonthName,
                 values_from = Clients) %>%
     ungroup() %>%
-    mutate(vars_represented = case_when(
-      !is.na(months_included[1]) &
-        !is.na(months_included[2]) ~ paste(months_included[1], "-",
-                                           months_included[2])
-    ))
+    mutate(
+      April_yn = if_else(is.na(April), 0, 1),
+      May_yn = if_else(is.na(May), 0, 1),
+      June_yn = if_else(is.na(June), 0, 1),
+      July_yn = if_else(is.na(July), 0, 1),
+      August_yn = if_else(is.na(August), 0, 1),
+      how_many = April_yn + May_yn + June_yn + July_yn + August_yn,
+      month_name = case_when(
+        how_many == 1 & April_yn == 1 ~ "April",
+        how_many == 1 & May_yn == 1 ~ "May",
+        how_many == 1 & June_yn == 1 ~ "June",
+        how_many == 1 & July_yn == 1 ~ "July",
+        how_many == 1 & August_yn == 1 ~ "August",
+        April_yn + May_yn > 1 ~ "April-May",
+        May_yn + June_yn > 1 ~ "May-June",
+        June_yn + July_yn > 1 ~ "June-July",
+        July_yn + August_yn > 1 ~ "July-August"
+      ),
+      WeekName = paste(month_name, "Wk", Week),
+      Week = as.numeric(Week)
+    ) %>%
+    select(Week, WeekName)
+  
   
   plot <- covid19_status %>%
     select(PersonalID, Week, COVID19Status) %>%
     group_by(Week, COVID19Status) %>%
     summarise(Clients = n()) %>%
-    ggplot(aes(x = Week, y = Clients,
+    left_join(week_names, by = "Week") %>%
+    arrange(Week) %>%
+    ggplot(aes(x = reorder(WeekName, Week), y = Clients,
                fill = COVID19Status)) +
     geom_bar(stat = "identity", 
              position = position_stack(reverse = TRUE)) +  
     scale_fill_brewer(palette = "Dark2") +
-    theme_classic() +
-    labs(x = "Date of Assessment", y = "Clients Assessed") +
+    theme_minimal() +
+    labs(x = NULL, y = "Clients Assessed") +
     theme(legend.title=element_blank(),
           legend.position = "top",
-          legend.key.height = unit(0.1, "cm"),
-          legend.key.width = unit(0.3, "cm"))
+          axis.text.x = element_text(angle = 45, hjust=1))
   plot
   
 })
