@@ -20,8 +20,8 @@
         id = "sidebarmenuid",
         menuItem("Provider Dashboard",
                  tabName = "providerDashboardTab"),
-        menuItem("CoC Competition",
-                 tabName = "cocCompetitionTab"),
+        # menuItem("CoC Competition",
+        #          tabName = "cocCompetitionTab"),
         menuItem("Bed and Unit Utilization",
                       tabName = "utilizationTab"),
         menuItem(
@@ -142,33 +142,33 @@
             collapsed = TRUE
           ))
         ),
-        tabItem(tabName = "cocCompetitionTab",
-                fluidRow(box(
-                  htmlOutput("headerCoCCompetitionProjectLevel"),
-                  width = 12
-                )),
-                fluidRow(box(
-                  pickerInput(
-                    inputId = "pe_provider",
-                    label = "Select your CoC-funded Provider",
-                    choices = sort(pe_validation_summary$AltProjectName) %>%
-                      unique(),
-                    selected = sample(pe_validation_summary$AltProjectName, 1),
-                    options = list('live-search' = TRUE),
-                    width = "100%"
-                  ),
-                  width = 12
-                )),
-                fluidRow(
-                  box(
-                    DT::dataTableOutput("pe_ProjectSummary"),
-                    width = 12,
-                    title = "Score Summary",
-                    status = "info",
-                    solidHeader = TRUE,
-                    collapsible = TRUE
-                  )
-                )), 
+        # tabItem(tabName = "cocCompetitionTab",
+        #         fluidRow(box(
+        #           htmlOutput("headerCoCCompetitionProjectLevel"),
+        #           width = 12
+        #         )),
+        #         fluidRow(box(
+        #           pickerInput(
+        #             inputId = "pe_provider",
+        #             label = "Select your CoC-funded Provider",
+        #             choices = sort(pe_validation_summary$AltProjectName) %>%
+        #               unique(),
+        #             selected = sample(pe_validation_summary$AltProjectName, 1),
+        #             options = list('live-search' = TRUE),
+        #             width = "100%"
+        #           ),
+        #           width = 12
+        #         )),
+        #         fluidRow(
+        #           box(
+        #             DT::dataTableOutput("pe_ProjectSummary"),
+        #             width = 12,
+        #             title = "Score Summary",
+        #             status = "info",
+        #             solidHeader = TRUE,
+        #             collapsible = TRUE
+        #           )
+        #         )), 
         tabItem(
           tabName = "SPMs",
           fluidRow(box(htmlOutput("headerSPMs"), width = 12)),
