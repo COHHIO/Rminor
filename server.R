@@ -675,25 +675,25 @@ output$covidStatus <- renderPlot({
                    "MayHaveCOVID19",
                    "Positive")
       ),
-      Week = format.Date(COVID19AssessmentDate, "%U")
-    )
+      Week = format.Date(COVID19AssessmentDate, "%U"),
+      Month = format.Date(COVID19AssessmentDate, "%m"),
+      MonthName = format.Date(COVID19AssessmentDate, "%B")
+    ) %>% 
+    arrange(Month)
   
-  plotlyplot <- plot_ly(covid19_status %>%
-                          group_by(Week, COVID19Status) %>%
-                          summarise(Clients = n()) %>%
-                          ungroup() %>%
-                          pivot_wider(names_from = COVID19Status,
-                                      values_from = Clients), 
-                        x = ~Week, y = ~NoCurrentIndications, 
-                        type = 'bar', 
-                        name = "No Current Indications") %>% 
-    add_trace(y = ~MayHaveCOVID19, name = "May Have Covid-19") %>%
-    add_trace(y = ~Positive, name = "Positive") %>%
-    layout(yaxis = list(title = 'Count'), barmode = 'stack')
+  months_included <- covid19_status$MonthName %>% unique()
   
-  
-  
-  
+  x <- covid19_status %>%
+    group_by(Week, MonthName, COVID19Status) %>%
+    summarise(Clients = n()) %>%
+    pivot_wider(names_from = MonthName,
+                values_from = Clients) %>%
+    ungroup() %>%
+    mutate(vars_represented = case_when(
+      !is.na(months_included[1]) &
+        !is.na(months_included[2]) ~ paste(months_included[1], "-",
+                                           months_included[2])
+    ))
   
   plot <- covid19_status %>%
     select(PersonalID, Week, COVID19Status) %>%
