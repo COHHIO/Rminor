@@ -94,7 +94,10 @@
           )),
           fluidRow(box(plotOutput("covidStatus"),
                        title = "Covid-19 Status at Last Screening",
-                       width = 12))
+                       width = 6),
+                   box(plotOutput("covidPrioritization"),
+                       title = "Prioritization Category at Coordinated Entry",
+                       width = 6))
         ),
         tabItem(
           tabName = "utilizationTab",
