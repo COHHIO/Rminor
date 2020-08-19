@@ -187,7 +187,7 @@
                     solidHeader = TRUE,
                     collapsible = TRUE
                   )
-                )), 
+                )),
         tabItem(
           tabName = "SPMs",
           fluidRow(box(htmlOutput("headerSPMs"), width = 12)),

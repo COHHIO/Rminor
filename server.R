@@ -32,6 +32,7 @@ function(input, output, session) {
       h4(ReportStart, "-", ReportEnd)
     )
   })
+
   
   output$headerCovid19 <- renderUI({
 
@@ -43,7 +44,7 @@ function(input, output, session) {
       h4(ReportStart, "-", ReportEnd)
     )
   })
-  
+
   output$headerCoCCompetitionProjectLevel <- renderUI({
     next_thing_due <- tribble(
       ~ DueDate, ~ Event,
@@ -62,9 +63,9 @@ function(input, output, session) {
       ) %>%
       filter(today() %within% DateRange) %>%
       select(Event, DueDate)
-    
+
     list(
-      h2("2020 CoC Competition: Project Evaluation"), 
+      h2("2020 CoC Competition: Project Evaluation"),
       h4("Fixed Date Range: January 1, 2019 - December 31, 2019"),
       h4(strong("THE DATA ON THIS TAB DOES NOT SHOW CHANGES MADE ON OR AFTER
       JULY 21, 2020.")),
@@ -74,19 +75,19 @@ function(input, output, session) {
          format(ymd(next_thing_due$DueDate), "%A %b %e, %Y"),
          "| ",
          next_thing_due$Event),
-      p("Please consult the", 
+      p("Please consult the",
         a("CoC Competition Specifications and Timeline",
-          href = "https://cohhio.org/boscoc/coc-program/"), 
+          href = "https://cohhio.org/boscoc/coc-program/"),
         "for complete specifications and timeline.")
     )
   })
-  
+
   output$pe_ProjectSummary <-
     DT::renderDataTable({
       ptc <- summary_pe_final_scoring %>%
         filter(AltProjectName == input$pe_provider) %>%
         pull(ProjectType)
-      
+
       summary_pe_final_scoring <- summary_pe_final_scoring %>%
         mutate(
           ExitsToPHMath = str_replace(ExitsToPHMath, "/", "÷"),
@@ -106,7 +107,7 @@ function(input, output, session) {
           OnTrackSpendingMath = str_replace(OnTrackSpendingMath, "/", "÷"),
           UnspentFundsMath = str_replace(UnspentFundsMath, "/", "÷")
         )
-      
+
       a <- summary_pe_final_scoring %>%
         filter(AltProjectName == input$pe_provider) %>%
         select(
@@ -131,7 +132,7 @@ function(input, output, session) {
         pivot_longer(cols = everything(),
                      names_to = "Measure",
                      values_to = "Estimated Score")
-      
+
       b <- summary_pe_final_scoring %>%
         filter(AltProjectName == input$pe_provider) %>%
         select(
@@ -151,7 +152,7 @@ function(input, output, session) {
         pivot_longer(cols = everything(),
                      names_to = "Measure",
                      values_to = "DQflag")
-      
+
       c <- summary_pe_final_scoring %>%
         filter(AltProjectName == input$pe_provider) %>%
         select(
@@ -176,7 +177,7 @@ function(input, output, session) {
         pivot_longer(cols = everything(),
                      names_to = "Measure",
                      values_to = "Possible Score")
-      
+
       d <- summary_pe_final_scoring %>%
         filter(AltProjectName == input$pe_provider) %>%
         select(
@@ -201,7 +202,7 @@ function(input, output, session) {
         pivot_longer(cols = everything(),
                      names_to = "Measure",
                      values_to = "Calculation")
-      
+
       psh <- a %>% left_join(b, by = "Measure") %>%
         ungroup() %>%
         left_join(c, by = "Measure") %>%
@@ -221,7 +222,7 @@ function(input, output, session) {
                                "Average Length of Stay"),
                Calculation != "NOT SCORED in 2020 due to COVID-19.") %>%
         select(1, Calculation, 2, "Possible Score" = 4, "Data Quality" = DQ)
-      
+
       rrh <- a %>% left_join(b, by = "Measure") %>%
         ungroup() %>%
         left_join(c, by = "Measure") %>%
@@ -242,7 +243,7 @@ function(input, output, session) {
                    "Prioritization of Chronic"),
                Calculation != "NOT SCORED in 2020 due to COVID-19.") %>%
         select(1, Calculation, 2, "Possible Score" = 4, "Data Quality" = DQ)
-      
+
       th <- a %>% left_join(b, by = "Measure") %>%
         ungroup() %>%
         left_join(c, by = "Measure") %>%
@@ -264,7 +265,7 @@ function(input, output, session) {
         ),
         Calculation != "NOT SCORED in 2020 due to COVID-19.") %>%
         select(1, Calculation, 2, "Possible Score" = 4, "Data Quality" = DQ)
-      
+
       sh <- a %>% left_join(b, by = "Measure") %>%
         ungroup() %>%
         left_join(c, by = "Measure") %>%
@@ -287,7 +288,7 @@ function(input, output, session) {
         ),
         Calculation != "NOT SCORED in 2020 due to COVID-19.") %>%
         select(1, Calculation, 2, "Possible Score" = 4, "Data Quality" = DQ)
-      
+
       datatable(
         if (ptc == 3) {
           psh
