@@ -33,6 +33,18 @@ function(input, output, session) {
     )
   })
 
+  
+  output$headerCovid19 <- renderUI({
+
+    ReportStart <- format.Date(mdy("04012020"), "%B %d, %Y")
+    ReportEnd <- format.Date(ymd_hms(update_date), "%B %d, %Y")
+    
+    list(
+      h2("Ohio Balance of State CoC Covid-19 Data Analysis"),
+      h4(ReportStart, "-", ReportEnd)
+    )
+  })
+
   output$headerCoCCompetitionProjectLevel <- renderUI({
     next_thing_due <- tribble(
       ~ DueDate, ~ Event,
@@ -596,8 +608,272 @@ function(input, output, session) {
     }
     
   })
+output$covidPrioritization <- renderPlot({
+  get_res_prior <- validation %>%
+    select(PersonalID, EntryDate, ExitDate, LivingSituation) %>%
+    group_by(PersonalID) %>%
+    arrange(desc(EntryDate)) %>%
+    slice(1L)
   
-  output$bedPlot <-
+  current_week <- week(today())
+  
+  priority <- covid19 %>%
+    left_join(get_res_prior, by = "PersonalID") %>%
+    filter(ymd(COVID19AssessmentDate) >= mdy("04012020") &
+             ymd(COVID19AssessmentDate) <= today()) %>%
+    mutate(
+      Priority = case_when(
+        # if tested positive
+        (
+          Tested == 1 &
+            TestResults == "Positive" &
+            ymd(TestDate) > ymd(COVID19AssessmentDate) - days(14) &
+            !is.na(TestDate)
+        ) |
+          # if under investigation
+          (
+            UnderInvestigation == 1 &
+              ymd(DateUnderInvestigation) > ymd(COVID19AssessmentDate) - days(14)
+          ) |
+          # contact with COVID-19
+          (
+            ContactWithConfirmedCOVID19Patient == 1 &
+              (
+                ymd(ContactWithConfirmedDate) >
+                  ymd(COVID19AssessmentDate) - days(14) |
+                  is.na(ContactWithConfirmedDate)
+              )
+            # compares contact date to the assessment date too since we want to
+            # see severity at the time of assessment
+          ) |
+          (
+            ContactWithUnderCOVID19Investigation == 1 &
+              (
+                ymd(ContactWithUnderInvestigationDate) >
+                  ymd(COVID19AssessmentDate) - days(14) |
+                  is.na(ContactWithUnderInvestigationDate)
+              )
+          ) |
+          # if the client came from jail or nursing home
+          (
+            LivingSituation %in% c(7, 25) &
+              EntryDate > ymd(COVID19AssessmentDate) - days(14) &
+              EntryDate <= ymd(COVID19AssessmentDate)
+          ) |
+          # if the client has any symptoms at all
+          (
+            Symptom1BreathingDifficult +
+              Symptom1Cough +
+              Symptom2Chills +
+              Symptom2SoreThroat +
+              Symptom2Fever +
+              Symptom2Headache +
+              Symptom2LostTasteSmell +
+              Symptom2MusclePain +
+              Symptom2Congestion +
+              Symptom2Nausea +
+              Symptom2Diarrhea +
+              Symptom2Weak
+          ) > 0 ~ "Needs Isolation/Quarantine",
+        # if the client has any risks at all
+        (
+          HealthRiskHistoryOfRespiratoryIllness +
+            HealthRiskChronicIllness +
+            HealthRiskOver65 +
+            HealthRiskKidneyDisease +
+            HealthRiskImmunocompromised +
+            HealthRiskSmoke > 0
+        )  ~ "Has Health Risk(s)",
+        TRUE ~ "No Known Risks or Exposure"
+        # everyone else lands here ^
+        # in the report, there will be a third level: "Not Assessed Recently"
+      ),
+      Priority = factor(Priority, levels = c("Needs Isolation/Quarantine", 
+                                             "Has Health Risk(s)", 
+                                             "No Known Risks or Exposure")),
+      Week = format.Date(COVID19AssessmentDate, "%U"),
+      Week = as.numeric(Week),
+      Month = format.Date(COVID19AssessmentDate, "%m"),
+      MonthName = format.Date(COVID19AssessmentDate, "%B")
+    ) %>% 
+    filter(Week != current_week)
+  
+  week_names <- priority %>%
+    group_by(Week, MonthName) %>%
+    summarise(Clients = n()) %>%
+    pivot_wider(names_from = MonthName,
+                values_from = Clients) %>%
+    ungroup() %>%
+    mutate(
+      April_yn = if_else(is.na(April), 0, 1),
+      May_yn = if_else(is.na(May), 0, 1),
+      June_yn = if_else(is.na(June), 0, 1),
+      July_yn = if_else(is.na(July), 0, 1),
+      August_yn = if_else(is.na(August), 0, 1),
+      how_many = April_yn + May_yn + June_yn + July_yn + August_yn,
+      month_name = case_when(
+        how_many == 1 & April_yn == 1 ~ "April",
+        how_many == 1 & May_yn == 1 ~ "May",
+        how_many == 1 & June_yn == 1 ~ "June",
+        how_many == 1 & July_yn == 1 ~ "July",
+        how_many == 1 & August_yn == 1 ~ "August",
+        April_yn + May_yn > 1 ~ "April-May",
+        May_yn + June_yn > 1 ~ "May-June",
+        June_yn + July_yn > 1 ~ "June-July",
+        July_yn + August_yn > 1 ~ "July-August"
+      ),
+      WeekName = paste(month_name, "Wk", Week),
+      Week = as.numeric(Week)
+    ) %>%
+    select(Week, WeekName)
+  
+  priority_plot <- priority %>%
+    dplyr::select(PersonalID, Week, Priority) %>%
+    group_by(Week, Priority) %>%
+    summarise(Clients = n()) %>%
+    left_join(week_names, by = "Week") %>%
+    arrange(Week)
+  
+  priority_plot %>%
+    ggplot(aes(x = reorder(WeekName, Week), y = Clients,
+               fill = Priority, label = Clients)) +
+    scale_fill_brewer(palette = "GnBu", direction = -1) +
+    geom_bar(stat = "identity") +
+    theme_minimal() +
+    labs(x = NULL, y = "Clients Assessed") +
+    theme(legend.title=element_blank(),
+          legend.position = "top",
+          axis.text.x = element_text(angle = 45, hjust=1))
+})  
+
+output$covidStatus <- renderPlot({
+  get_res_prior <- validation %>%
+    select(PersonalID, EntryDate, ExitDate, LivingSituation) %>%
+    group_by(PersonalID) %>%
+    arrange(desc(EntryDate)) %>%
+    slice(1L)
+  
+  current_week <- week(today())
+  
+  covid19_status <- covid19 %>%
+    left_join(get_res_prior, by = "PersonalID") %>%
+    filter(ymd(COVID19AssessmentDate) >= mdy("04012020") &
+             ymd(COVID19AssessmentDate) <= today()) %>%
+    mutate(
+      COVID19Status = case_when(
+        Tested == 1 &
+          TestResults == "Positive" &
+          ymd(TestDate) > ymd(COVID19AssessmentDate) - days(14) &
+          !is.na(TestDate) ~ "Positive",
+        # testing positive in the 14 days prior to assessment is the only way to
+        # land in this bucket
+        (
+          ContactWithConfirmedCOVID19Patient == 1 &
+            (
+              ymd(ContactWithConfirmedDate) >
+                ymd(COVID19AssessmentDate) - days(14) |
+                is.na(ContactWithConfirmedDate)
+            )
+          # compares contact date to date of the assessment
+        ) |
+          (
+            ContactWithUnderCOVID19Investigation == 1 &
+              (
+                ymd(ContactWithUnderInvestigationDate) >
+                  ymd(COVID19AssessmentDate) - days(14) |
+                  is.na(ContactWithUnderInvestigationDate)
+              )
+          ) |
+          (
+            Symptom1BreathingDifficult +
+              Symptom1Cough +
+              Symptom2Chills +
+              Symptom2SoreThroat +
+              Symptom2Fever +
+              Symptom2Headache +
+              Symptom2LostTasteSmell +
+              Symptom2MusclePain +
+              Symptom2Congestion +
+              Symptom2Nausea +
+              Symptom2Diarrhea +
+              Symptom2Weak
+          ) > 0
+        |
+          (
+            UnderInvestigation == 1 &
+              ymd(DateUnderInvestigation) > ymd(COVID19AssessmentDate) - days(14)
+          ) ~
+          "May Have COVID-19",
+        # being Under Investigation (past 14 days), any Symptom, or any Contact
+        # in the 14 days prior to the assessment date will land you here ^
+        TRUE ~ "No Current Indications"
+        # everyone else lands here ^
+      ),
+      COVID19Status = factor(
+        COVID19Status,
+        levels = c("No Current Indications",
+                   "May Have COVID-19",
+                   "Positive")
+      ),
+      Week = format.Date(COVID19AssessmentDate, "%U"),
+      Week = as.numeric(Week),
+      Month = format.Date(COVID19AssessmentDate, "%m"),
+      MonthName = format.Date(COVID19AssessmentDate, "%B")
+    ) %>% 
+    filter(Week != current_week)
+  
+  week_names <- covid19_status %>%
+    group_by(Week, MonthName) %>%
+    summarise(Clients = n()) %>%
+    pivot_wider(names_from = MonthName,
+                values_from = Clients) %>%
+    ungroup() %>%
+    mutate(
+      April_yn = if_else(is.na(April), 0, 1),
+      May_yn = if_else(is.na(May), 0, 1),
+      June_yn = if_else(is.na(June), 0, 1),
+      July_yn = if_else(is.na(July), 0, 1),
+      August_yn = if_else(is.na(August), 0, 1),
+      how_many = April_yn + May_yn + June_yn + July_yn + August_yn,
+      month_name = case_when(
+        how_many == 1 & April_yn == 1 ~ "April",
+        how_many == 1 & May_yn == 1 ~ "May",
+        how_many == 1 & June_yn == 1 ~ "June",
+        how_many == 1 & July_yn == 1 ~ "July",
+        how_many == 1 & August_yn == 1 ~ "August",
+        April_yn + May_yn > 1 ~ "April-May",
+        May_yn + June_yn > 1 ~ "May-June",
+        June_yn + July_yn > 1 ~ "June-July",
+        July_yn + August_yn > 1 ~ "July-August"
+      ),
+      WeekName = paste(month_name, "Wk", Week),
+      Week = as.numeric(Week)
+    ) %>%
+    select(Week, WeekName)
+  
+  
+  plot <- covid19_status %>%
+    select(PersonalID, Week, COVID19Status) %>%
+    group_by(Week, COVID19Status) %>%
+    summarise(Clients = n()) %>%
+    left_join(week_names, by = "Week") %>%
+    arrange(Week) %>%
+    ggplot(aes(x = reorder(WeekName, Week), y = Clients,
+               fill = COVID19Status)) +
+    geom_bar(stat = "identity", 
+             position = position_stack(reverse = TRUE)) +  
+    scale_fill_manual(values = c("#e0ecf4", "#9ebcda", "#8856a7")) +
+    theme_minimal() +
+    labs(x = NULL, y = "Clients Assessed") +
+    theme(legend.title=element_blank(),
+          legend.position = "top",
+          axis.text.x = element_text(angle = 45, hjust=1))
+  
+  plot
+  
+})
+  
+    output$bedPlot <-
     renderPlotly({
       ReportEnd <- ymd(input$utilizationDate) 
       ReportStart <- floor_date(ymd(ReportEnd), unit = "month") -
@@ -671,6 +947,18 @@ function(input, output, session) {
   
   output$unitNote <-
     renderUI(note_unit_utilization)
+  
+  output$covidText <- renderUI(
+    HTML("The Ohio Balance of State CoC is collecting COVID-19 data based on the 
+         <a href=\"https://www.cdc.gov/coronavirus/2019-ncov/symptoms-testing/symptoms.html\">CDC's guidelines</a>. 
+         We began collecting this data in April 2020. 
+         <p><br>While all Access Points into the Balance of State CoC
+         homeless system are required to screen every household for Covid-19, 
+         they are <strong>not</strong> required to enter that data into HMIS, so this data is
+         not representative of the entire Continuum of Care. 
+         <p>Please send inquiries to the COHHIO 
+         <a href = \"mailto:hmis@cohhio.org.\">HMIS team</a>.")
+  )
   
   output$bedNote <-
     renderUI(note_bed_utilization)

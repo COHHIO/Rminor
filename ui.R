@@ -20,8 +20,10 @@
         id = "sidebarmenuid",
         menuItem("Provider Dashboard",
                  tabName = "providerDashboardTab"),
-        menuItem("CoC Competition",
-                 tabName = "cocCompetitionTab"),
+        # menuItem("CoC Competition",
+        #          tabName = "cocCompetitionTab"),
+        menuItem("Covid-19 Analysis",
+                 tabName = "covid19Tab"),
         menuItem("Bed and Unit Utilization",
                       tabName = "utilizationTab"),
         menuItem(
@@ -80,6 +82,23 @@
                     uiOutput("CurrentlyAwaitingPH")
                   )
                 )), 
+        tabItem(
+          tabName = "covid19Tab",
+          fluidRow(box(htmlOutput("headerCovid19"), width = 12)),
+          fluidRow(box(
+            uiOutput("covidText"),
+            title = "Covid-19 Data Collection",
+            collapsible = TRUE,
+            collapsed = FALSE,
+            width = 12
+          )),
+          fluidRow(box(plotOutput("covidStatus"),
+                       title = "Covid-19 Status at Last Screening",
+                       width = 6),
+                   box(plotOutput("covidPrioritization"),
+                       title = "Prioritization Category at Coordinated Entry",
+                       width = 6))
+        ),
         tabItem(
           tabName = "utilizationTab",
           fluidRow(box(htmlOutput("headerUtilization"), width = 12)),
