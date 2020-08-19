@@ -52,7 +52,8 @@ function(input, output, session) {
       "7/21/2020", "COHHIO releases preliminary CoC project ranking (renewals only)",
       "7/31/2020", "Recipients submit appeals of project evaluation results and ranking to ohioboscoc@cohhio.org.",
       "8/7/2020", "Ohio BoSCoC Steering Committee will communicate decisions about all received appeals",
-      "8/12/2020", "Final CoC project ranking released"
+      "8/12/2020", "Final CoC project ranking released",
+      "9/30/2020", "Final Ranking posted on cohhio.org"
     ) %>%
       mutate(
         DueDate = mdy(DueDate),
