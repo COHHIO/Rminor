@@ -744,7 +744,8 @@ output$covidPrioritization <- renderPlot({
     labs(x = NULL, y = "Clients Assessed") +
     theme(legend.title=element_blank(),
           legend.position = "top",
-          axis.text.x = element_text(angle = 45, hjust=1))
+          legend.text = element_text(size = 11),
+          axis.text.x = element_text(angle = 45, hjust=1, size = 11))
 })  
 
 output$covidStatus <- renderPlot({
@@ -868,7 +869,8 @@ output$covidStatus <- renderPlot({
     labs(x = NULL, y = "Clients Assessed") +
     theme(legend.title=element_blank(),
           legend.position = "top",
-          axis.text.x = element_text(angle = 45, hjust=1))
+          legend.text = element_text(size = 11),
+          axis.text.x = element_text(angle = 45, hjust=1, size = 11))
   
   plot
   
