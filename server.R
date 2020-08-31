@@ -718,10 +718,12 @@ output$covidPrioritization <- renderPlot({
         how_many == 1 & June_yn == 1 ~ "June",
         how_many == 1 & July_yn == 1 ~ "July",
         how_many == 1 & August_yn == 1 ~ "August",
+        # how_many == 1 & Sept_yn == 1 ~ "September",
         April_yn + May_yn > 1 ~ "April-May",
         May_yn + June_yn > 1 ~ "May-June",
         June_yn + July_yn > 1 ~ "June-July",
         July_yn + August_yn > 1 ~ "July-August"
+        # ,August_yn + Sept_yn > 1 ~ "Aug-Sept"
       ),
       WeekName = paste(month_name, "Wk", Week),
       Week = as.numeric(Week)
