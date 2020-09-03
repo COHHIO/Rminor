@@ -711,19 +711,20 @@ output$covidPrioritization <- renderPlot({
       June_yn = if_else(is.na(June), 0, 1),
       July_yn = if_else(is.na(July), 0, 1),
       August_yn = if_else(is.na(August), 0, 1),
-      how_many = April_yn + May_yn + June_yn + July_yn + August_yn,
+      Sept_yn = if_else(is.na(September), 0, 1),
+      how_many = April_yn + May_yn + June_yn + July_yn + August_yn + Sept_yn,
       month_name = case_when(
         how_many == 1 & April_yn == 1 ~ "April",
         how_many == 1 & May_yn == 1 ~ "May",
         how_many == 1 & June_yn == 1 ~ "June",
         how_many == 1 & July_yn == 1 ~ "July",
         how_many == 1 & August_yn == 1 ~ "August",
-        # how_many == 1 & Sept_yn == 1 ~ "September",
+        how_many == 1 & Sept_yn == 1 ~ "September",
         April_yn + May_yn > 1 ~ "April-May",
         May_yn + June_yn > 1 ~ "May-June",
         June_yn + July_yn > 1 ~ "June-July",
-        July_yn + August_yn > 1 ~ "July-August"
-        # ,August_yn + Sept_yn > 1 ~ "Aug-Sept"
+        July_yn + August_yn > 1 ~ "July-August",
+        August_yn + Sept_yn > 1 ~ "Aug-Sept"
       ),
       WeekName = paste(month_name, "Wk", Week),
       Week = as.numeric(Week)
@@ -838,17 +839,20 @@ output$covidStatus <- renderPlot({
       June_yn = if_else(is.na(June), 0, 1),
       July_yn = if_else(is.na(July), 0, 1),
       August_yn = if_else(is.na(August), 0, 1),
-      how_many = April_yn + May_yn + June_yn + July_yn + August_yn,
+      Sept_yn = if_else(is.na(September), 0, 1),
+      how_many = April_yn + May_yn + June_yn + July_yn + August_yn + Sept_yn,
       month_name = case_when(
         how_many == 1 & April_yn == 1 ~ "April",
         how_many == 1 & May_yn == 1 ~ "May",
         how_many == 1 & June_yn == 1 ~ "June",
         how_many == 1 & July_yn == 1 ~ "July",
         how_many == 1 & August_yn == 1 ~ "August",
+        how_many == 1 & Sept_yn == 1 ~ "September",
         April_yn + May_yn > 1 ~ "April-May",
         May_yn + June_yn > 1 ~ "May-June",
         June_yn + July_yn > 1 ~ "June-July",
-        July_yn + August_yn > 1 ~ "July-August"
+        July_yn + August_yn > 1 ~ "July-August",
+        August_yn + Sept_yn > 1 ~ "Aug-Sept"
       ),
       WeekName = paste(month_name, "Wk", Week),
       Week = as.numeric(Week)
