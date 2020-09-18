@@ -22,21 +22,37 @@ library(plotly)
 library(zoo)
 library(DT)
 
-load("data/Utilization.RData")
+# CHANGED Iterative load on existing RData files
+e <- environment()
+sapply(c(
+  "Utilization"
+  , "QPR_SPDATs"
+  , "QPR_EEs"
+  , "Veterans"
+  , "Data_Quality"
+  , "SPM_data"
+  , "ProjectEvaluation"
+  ), rlang::as_function(~{
+    .x <- grep(., list.files("data", "\\.R[Dd]ata$", full.names = TRUE), ignore.case = TRUE, value = TRUE)
+    load(.x, envir = e)
+  }))
 
-# filebeginningdate <- update_date - years(2)
-
-load("data/QPR_SPDATs.RData")
-
-load("data/QPR_EEs.RData")
-
-load("data/Veterans.RData")
-
-load("data/Data_Quality.RData")
-
-load("data/SPM_data.RData")
-
-load("data/ProjectEvaluation.RData")
+# 
+# load("data/Utilization.RData")
+# 
+# # filebeginningdate <- update_date - years(2)
+# 
+# load("data/QPR_SPDATs.RData")
+# 
+# load("data/QPR_EEs.RData")
+# 
+# load("data/Veterans.RData")
+# 
+# load("data/Data_Quality.RData")
+# 
+# load("data/SPM_data.RData")
+# 
+# load("data/ProjectEvaluation.RData")
 
 choices_month <-
   format(seq.Date(
