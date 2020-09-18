@@ -24,7 +24,18 @@ library(DT)
 
 # CHANGED Iterative load on existing RData files
 e <- environment()
-sapply(list.files("data", pattern = "\\.RData$", full.names = TRUE), load, envir = e)
+sapply(c(
+  "Utilization"
+  , "QPR_SPDATs"
+  , "QPR_EEs"
+  , "Veterans"
+  , "Data_Quality"
+  , "SPM_data"
+  , "ProjectEvaluation"
+  ), rlang::as_function(~{
+    .x <- grep(., list.files("data", "\\.R[Dd]ata$", full.names = TRUE), ignore.case = TRUE, value = TRUE)
+    load(.x, envir = e)
+  }))
 
 # 
 # load("data/Utilization.RData")
