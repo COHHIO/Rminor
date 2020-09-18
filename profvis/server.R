@@ -88,7 +88,9 @@ function(input, output, session) {
       ptc <- summary_pe_final_scoring %>%
         filter(AltProjectName == input$pe_provider) %>%
         pull(ProjectType)
-utils::Rprof("profvis/server/91-111.Rprof", interval = 0.01,  line.profiling = TRUE, gc.profiling = TRUE,  memory.profiling = TRUE) #<p
+#<p
+      #REVIEW No inputs - BG Script
+      #TODO Simplify using select helpers and mutate_at as in COHHIODemo.R#163
       summary_pe_final_scoring <- summary_pe_final_scoring %>%
         mutate(
           ExitsToPHMath = str_replace(ExitsToPHMath, "/", "÷"),
@@ -108,8 +110,9 @@ utils::Rprof("profvis/server/91-111.Rprof", interval = 0.01,  line.profiling = T
           OnTrackSpendingMath = str_replace(OnTrackSpendingMath, "/", "÷"),
           UnspentFundsMath = str_replace(UnspentFundsMath, "/", "÷")
         )
-utils::Rprof(NULL) #>p
-utils::Rprof("profvis/server/112-137.Rprof", interval = 0.01,  line.profiling = TRUE, gc.profiling = TRUE,  memory.profiling = TRUE) #<p
+#>p
+#<p
+      #REVIEW 115-211 Can be simplified using the code provided in COHHIODemo.R#195-243. Perform the rename & pivot in background/loading script and keep only the filter that uses the input here. 
       a <- summary_pe_final_scoring %>%
         filter(AltProjectName == input$pe_provider) %>%
         select(
@@ -134,8 +137,8 @@ utils::Rprof("profvis/server/112-137.Rprof", interval = 0.01,  line.profiling = 
         pivot_longer(cols = everything(),
                      names_to = "Measure",
                      values_to = "Estimated Score")
-utils::Rprof(NULL) #>p
-utils::Rprof("profvis/server/138-158.Rprof", interval = 0.01,  line.profiling = TRUE, gc.profiling = TRUE,  memory.profiling = TRUE) #<p
+#>p
+#<p
       b <- summary_pe_final_scoring %>%
         filter(AltProjectName == input$pe_provider) %>%
         select(
@@ -155,8 +158,8 @@ utils::Rprof("profvis/server/138-158.Rprof", interval = 0.01,  line.profiling = 
         pivot_longer(cols = everything(),
                      names_to = "Measure",
                      values_to = "DQflag")
-utils::Rprof(NULL) #>p
-utils::Rprof("profvis/server/159-184.Rprof", interval = 0.01,  line.profiling = TRUE, gc.profiling = TRUE,  memory.profiling = TRUE) #<p
+#>p
+#<p
       c <- summary_pe_final_scoring %>%
         filter(AltProjectName == input$pe_provider) %>%
         select(
@@ -181,8 +184,8 @@ utils::Rprof("profvis/server/159-184.Rprof", interval = 0.01,  line.profiling = 
         pivot_longer(cols = everything(),
                      names_to = "Measure",
                      values_to = "Possible Score")
-utils::Rprof(NULL) #>p
-utils::Rprof("profvis/server/185-210.Rprof", interval = 0.01,  line.profiling = TRUE, gc.profiling = TRUE,  memory.profiling = TRUE) #<p
+#>p
+#<p
       d <- summary_pe_final_scoring %>%
         filter(AltProjectName == input$pe_provider) %>%
         select(
@@ -207,8 +210,8 @@ utils::Rprof("profvis/server/185-210.Rprof", interval = 0.01,  line.profiling = 
         pivot_longer(cols = everything(),
                      names_to = "Measure",
                      values_to = "Calculation")
-utils::Rprof(NULL) #>p
-utils::Rprof("profvis/server/211-231.Rprof", interval = 0.01,  line.profiling = TRUE, gc.profiling = TRUE,  memory.profiling = TRUE) #<p
+#>p
+#<p
       psh <- a %>% left_join(b, by = "Measure") %>%
         ungroup() %>%
         left_join(c, by = "Measure") %>%
@@ -228,8 +231,8 @@ utils::Rprof("profvis/server/211-231.Rprof", interval = 0.01,  line.profiling = 
                                "Average Length of Stay"),
                Calculation != "NOT SCORED in 2020 due to COVID-19.") %>%
         select(1, Calculation, 2, "Possible Score" = 4, "Data Quality" = DQ)
-utils::Rprof(NULL) #>p
-utils::Rprof("profvis/server/232-253.Rprof", interval = 0.01,  line.profiling = TRUE, gc.profiling = TRUE,  memory.profiling = TRUE) #<p
+#>p
+#<p
       rrh <- a %>% left_join(b, by = "Measure") %>%
         ungroup() %>%
         left_join(c, by = "Measure") %>%
@@ -250,8 +253,8 @@ utils::Rprof("profvis/server/232-253.Rprof", interval = 0.01,  line.profiling = 
                    "Prioritization of Chronic"),
                Calculation != "NOT SCORED in 2020 due to COVID-19.") %>%
         select(1, Calculation, 2, "Possible Score" = 4, "Data Quality" = DQ)
-utils::Rprof(NULL)       #>p
-utils::Rprof("profvis/server/254-276.Rprof", interval = 0.01,  line.profiling = TRUE, gc.profiling = TRUE,  memory.profiling = TRUE)       #<p
+      #>p
+      #<p
       th <- a %>% left_join(b, by = "Measure") %>%
         ungroup() %>%
         left_join(c, by = "Measure") %>%
@@ -273,8 +276,8 @@ utils::Rprof("profvis/server/254-276.Rprof", interval = 0.01,  line.profiling = 
         ),
         Calculation != "NOT SCORED in 2020 due to COVID-19.") %>%
         select(1, Calculation, 2, "Possible Score" = 4, "Data Quality" = DQ)
-utils::Rprof(NULL)       #>p
-utils::Rprof("profvis/server/277-300.Rprof", interval = 0.01,  line.profiling = TRUE, gc.profiling = TRUE,  memory.profiling = TRUE)       #<p
+      #>p
+      #<p
       sh <- a %>% left_join(b, by = "Measure") %>%
         ungroup() %>%
         left_join(c, by = "Measure") %>%
@@ -297,7 +300,7 @@ utils::Rprof("profvis/server/277-300.Rprof", interval = 0.01,  line.profiling = 
         ),
         Calculation != "NOT SCORED in 2020 due to COVID-19.") %>%
         select(1, Calculation, 2, "Possible Score" = 4, "Data Quality" = DQ)
-utils::Rprof(NULL)       #>p
+      #>p
       datatable(
         if (ptc == 3) {
           psh
@@ -313,44 +316,45 @@ utils::Rprof(NULL)       #>p
                        pageLength = 100)
       )
     })
-
-  # TODO eventReactive would be more appropriate here since the result is not a side-affect
-  observeEvent(c(input$providerList), {
-utils::Rprof("profvis/server/319-622.Rprof", interval = 0.01,  line.profiling = TRUE, gc.profiling = TRUE,  memory.profiling = TRUE) #<p
-    output$currentUnitUtilization <-
-# TODO perform filter for providerList once then use filtered data in if and subsequent infoboxes (currently performing filter operation for each output item) 
-      if (nrow(utilization %>%
-               filter(
-                 ProjectName == input$providerList &
-                 ProjectType %in% c(1, 2, 3, 8, 9)
-               )) > 0)
-      {
-# TODO renderInfoBox as result of eventReactive - extract infobox widget creation to result of reactive fn
-        renderInfoBox({
-          infoBox(
-            title = "Current Unit Utilization",
-            subtitle = paste(
-              utilization %>%
-                filter(ProjectName == input$providerList) %>%
-                select(Households),
-              "Households in",
-              utilization %>%
-                filter(ProjectName == input$providerList) %>%
-                select(UnitCount),
-              "Units"
-            ),
-            color = "aqua",
-            icon = icon("building"),
-            value = utilization %>%
-              filter(ProjectName == input$providerList) %>%
-              select(UnitUtilization)
-          )
-        })
-      }
-    else{
+  utilization_r <- eventReactive(input$providerList, {
+    utilization <- utilization %>% filter(ProjectName == input$providerList)
+  })
+  reactive({
+    
+  })
+  output$currentUnitUtilization <- renderInfoBox({
+    if (nrow(utilization_r() %>% filter(
+      ProjectType %in% c(1, 2, 3, 8, 9)
+    )) > 0)
+    {
+      # TODO renderInfoBox as result of eventReactive - extract infobox widget creation to result of reactive fn
+      
+        .out <- infoBox(
+          title = "Current Unit Utilization",
+          subtitle = paste(
+            utilization_r() %>%
+              select(Households),
+            "Households in",
+            utilization_r() %>%
+              select(UnitCount),
+            "Units"
+          ),
+          color = "aqua",
+          icon = icon("building"),
+          value = utilization_r() %>%
+            select(UnitUtilization)
+        )
+      
+    } else{
       
     }
-    #TODO #317
+    .out
+  })
+  # TODO eventReactive would be more appropriate here since the result is not a side-affect
+  observeEvent(c(input$providerList), {
+#<p
+    
+    #TODO #324
     output$currentBedUtilization <-
       if (nrow(utilization %>%
                filter(
@@ -379,7 +383,7 @@ utils::Rprof("profvis/server/319-622.Rprof", interval = 0.01,  line.profiling = 
         })
       }
     else{
-      
+      # TODO Fill with meaningful message      
     }
     
     output$headerSPMs <- renderUI({
@@ -417,7 +421,7 @@ utils::Rprof("profvis/server/319-622.Rprof", interval = 0.01,  line.profiling = 
           ReportEnd)
       )
     })
-    #TODO #317
+    #TODO #324
     output$veteranEngagement <-
       if (nrow(
         veteran_current_in_project %>%
@@ -439,9 +443,9 @@ utils::Rprof("profvis/server/319-622.Rprof", interval = 0.01,  line.profiling = 
         })
       }
     else {
-      
+      # TODO Fill with meaningful message      
     }
-    #TODO #317
+    #TODO #324
     output$TAYEngagement <-
       if (nrow(
         current_tay_hohs %>%
@@ -461,9 +465,9 @@ utils::Rprof("profvis/server/319-622.Rprof", interval = 0.01,  line.profiling = 
         })
       }
     else {
-      
+      # TODO Fill with meaningful message      
     }
-    #TODO #317
+    #TODO #324
     output$CurrentlyAwaitingPH <-
       if (nrow(validation %>%
                filter(ProjectType %in% c(3, 9, 13) &
@@ -498,9 +502,9 @@ utils::Rprof("profvis/server/319-622.Rprof", interval = 0.01,  line.profiling = 
         })
       }
     else{
-      
+      # TODO Fill with meaningful message      
     }
-    #TODO #317
+    #TODO #324
     output$CurrentClientCount <-
       if (nrow(validation %>%
                filter(
@@ -543,9 +547,9 @@ utils::Rprof("profvis/server/319-622.Rprof", interval = 0.01,  line.profiling = 
         })
       }
     else{
-      
+      # TODO Fill with meaningful message      
     }
-    #TODO #317  
+    #TODO #324  
     output$CurrentHHCount <-
       if (nrow(validation %>%
                filter(
@@ -588,9 +592,9 @@ utils::Rprof("profvis/server/319-622.Rprof", interval = 0.01,  line.profiling = 
         })
       }
     else{
-      
+      # TODO Fill with meaningful message      
     }
-  #TODO #317  
+  #TODO #324  
     output$ShelterExitsToRRH <-
       if (nrow(validation %>%
                filter(ProjectType == 1 &
@@ -617,13 +621,18 @@ utils::Rprof("profvis/server/319-622.Rprof", interval = 0.01,  line.profiling = 
         })
       }
     else{
-      
+      # TODO Fill with meaningful message      
     }
-utils::Rprof(NULL) #>p
+#>p
   })
+
+# CHANGED
+  
   
 output$covidPrioritization <- renderPlot({
-  # TODO 627-630 are reused at #770. Make a reactive that provides this filter function instead of duplicating filter
+  # REVIEW I can't find that this actually uses any user inputs - Move it's construction to a background script (global.R) and just render the constructed plot in the app. 
+  # TODO 627-630 are reused at #770. Make a reactive that provides this filter function instead of duplicating filter. 
+  #<p
   get_res_prior <- validation %>%
     select(PersonalID, EntryDate, ExitDate, LivingSituation) %>%
     group_by(PersonalID) %>%
@@ -677,6 +686,10 @@ output$covidPrioritization <- renderPlot({
           ) |
           # if the client has any symptoms at all
           (
+            # TODO Suggestion for simplification
+            # CHANGED Simplify with sum and select helpers
+            # sum(starts_with(Symptom), na.rm = TRUE) > 0 ~ "Needs Isolation/Quarantine"
+            # CHANGED END
             Symptom1BreathingDifficult +
               Symptom1Cough +
               Symptom2Chills +
@@ -692,6 +705,7 @@ output$covidPrioritization <- renderPlot({
           ) > 0 ~ "Needs Isolation/Quarantine",
         # if the client has any risks at all
         (
+          # TODO See 689
           HealthRiskHistoryOfRespiratoryIllness +
             HealthRiskChronicIllness +
             HealthRiskOver65 +
@@ -719,7 +733,7 @@ output$covidPrioritization <- renderPlot({
     pivot_wider(names_from = MonthName,
                 values_from = Clients) %>%
     ungroup() %>%
-    #QUESTION Intended outcome here? Could likely be accomplished via iteration or made simpler
+    #TODO Use floor_date
     mutate(
       April_yn = if_else(is.na(April), 0, 1),
       May_yn = if_else(is.na(May), 0, 1),
@@ -752,8 +766,8 @@ output$covidPrioritization <- renderPlot({
     summarise(Clients = n()) %>%
     left_join(week_names, by = "Week") %>%
     arrange(Week)
-  
-  priority_plot %>%
+  #>p
+  priority_plot <- priority_plot %>%
     ggplot(aes(x = reorder(WeekName, Week), y = Clients,
                fill = Priority, label = Clients)) +
     scale_fill_brewer(palette = "GnBu", direction = -1) +
@@ -764,11 +778,11 @@ output$covidPrioritization <- renderPlot({
           legend.position = "top",
           legend.text = element_text(size = 11),
           axis.text.x = element_text(angle = 45, hjust=1, size = 11))
-})  
-# QUESTION These are running automatically (I believe on app load) since they aren't linked to an event, is this intended behavior
+})
+
+#TODO Move all graph rendering to COHHIO_HMIS
 output$covidStatus <- renderPlot({
-utils::Rprof("profvis/server/770-899.Rprof", interval = 0.01,  line.profiling = TRUE, gc.profiling = TRUE,  memory.profiling = TRUE)   #<p
-  # TODO #627 Use reactive here instead of refiltering 
+  
   get_res_prior <- validation %>%
     select(PersonalID, EntryDate, ExitDate, LivingSituation) %>%
     group_by(PersonalID) %>%
@@ -776,7 +790,7 @@ utils::Rprof("profvis/server/770-899.Rprof", interval = 0.01,  line.profiling = 
     slice(1L)
   
   current_week <- week(today())
-  # REVIEW Very similar operation performed at #632, how much of this can be made identical to the above and turned into reactive?
+  
   covid19_status <- covid19 %>%
     left_join(get_res_prior, by = "PersonalID") %>%
     filter(ymd(COVID19AssessmentDate) >= mdy("04012020") &
@@ -896,7 +910,7 @@ utils::Rprof("profvis/server/770-899.Rprof", interval = 0.01,  line.profiling = 
           axis.text.x = element_text(angle = 45, hjust=1, size = 11))
   
   plot
-utils::Rprof(NULL)  #>p 
+ 
 })
   
     output$bedPlot <-
@@ -913,8 +927,7 @@ utils::Rprof(NULL)  #>p
       Provider <- input$providerListUtilization
       # TODO Perhaps we can just use a reactive to filter by input$providerListUtilization here and then use the reactive in these subsequent calls
       # REVIEW See COHHIO_HMIS/01_Bed_Unit_Utilization.R#351 for list suggestion such that iteration can be used to reduce verbosity here
-      utilization <- list(bed = utlilization_bed,
-                          )
+      
       bedPlot <- utilization_bed %>% 
         gather("Month",
                "Utilization",
@@ -1137,7 +1150,7 @@ utils::Rprof(NULL)  #>p
         substr(input$spdatSlider, 1, 4),
         "-01-01"
       )), "%m-%d-%Y")
-      #QUESTION Simplify with lubridate::quarter()?
+      
       ReportEnd <- format.Date(mdy(paste0(
         case_when(
           substr(input$spdatSlider, 7, 7) == 1 ~ "03-31-",
@@ -1148,7 +1161,7 @@ utils::Rprof(NULL)  #>p
         substr(input$spdatSlider, 1, 4)
       )), "%m-%d-%Y")
       # counting all hhs who were scored AND SERVED between the report dates
-      #TODO Rearrange 1154 to 1153 and move 1150 to 1153 to reactive to reduce duplication
+      
       CountyAverageScores <- qpr_spdats_county %>%
         filter(served_between(., ReportStart, ReportEnd)) %>%
         select(CountyServed, PersonalID, Score) %>%
@@ -1211,13 +1224,15 @@ utils::Rprof(NULL)  #>p
   
   output$NoteToUsers <-
     renderText(note_qpr_dq_community_need)
+
+  
   
   output$headerLengthOfStay <- renderUI({
     ReportStart <- format.Date(ymd(paste0(
       substr(input$LoSSlider, 1, 4),
       "-01-01"
     )), "%m-%d-%Y")
-    #TODO lubridate::quarter()?
+    
     ReportEnd <- format.Date(mdy(paste0(
       case_when(
         substr(input$LoSSlider, 7, 7) == 1 ~ "03-31-",
@@ -1240,8 +1255,8 @@ utils::Rprof(NULL)  #>p
   output$QPRLoSPlot <-
     
     renderPlotly({
-    #REVIEW What if we performed this duplicated date formatting on the input side?
-      #TODO The changing of input dates to quarter integers seems to be repeated for multiple inputs. Let's do this iteratively and save in a global reactiveValues object.
+    
+
       ReportStart <- format.Date(ymd(paste0(substr(
         input$LoSSlider, 1, 4
       ),
@@ -1424,7 +1439,7 @@ utils::Rprof(NULL)  #>p
   #   {
       output$ExitsToPH <- renderPlotly({
         #TODO #1242
-utils::Rprof("profvis/server/1427-1583.Rprof", interval = 0.01,  line.profiling = TRUE, gc.profiling = TRUE,  memory.profiling = TRUE)         #<p
+        #<p
         ReportStart <- format.Date(ymd(paste0(
           substr(input$ExitsToPHSlider, 1, 4),
           "-01-01"
@@ -1580,7 +1595,7 @@ utils::Rprof("profvis/server/1427-1583.Rprof", interval = 0.01,  line.profiling 
         else{
           #QUESTION Informative error message?
         }
-utils::Rprof(NULL)         #>p
+        #>p
       })
       
       output$ExitsToPHOutreach <- renderPlotly({
