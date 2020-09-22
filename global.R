@@ -24,6 +24,8 @@ library(DT)
 
 env <- environment()
 
+# loading the image files from the data/ folder
+
 sapply(c(
   "Utilization"
   , "QPR_SPDATs"
@@ -31,7 +33,7 @@ sapply(c(
   , "Veterans"
   , "Data_Quality"
   , "SPM_data"
-  , "ProjectEvaluation"
+  # , "ProjectEvaluation"
 ), rlang::as_function( ~ {
   .x <- grep(
     .,
@@ -41,6 +43,8 @@ sapply(c(
   )
   load(.x, envir = env)
 }))
+
+# creating various lists needed in the app
 
 choices_month <-
   format(seq.Date(
