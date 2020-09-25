@@ -25,25 +25,8 @@ library(DT)
 env <- environment()
 
 # loading the image files from the data/ folder
-
-sapply(c(
-  "Utilization"
-  , "QPR_SPDATs"
-  , "QPR_EEs"
-  , "Veterans"
-  , "Data_Quality"
-  , "SPM_data"
-  # , "ProjectEvaluation"
-), rlang::as_function( ~ {
-  .x <- grep(
-    .,
-    list.files("data", "\\.R[Dd]ata$", full.names = TRUE),
-    ignore.case = TRUE,
-    value = TRUE
-  )
-  load(.x, envir = env)
-}))
-
+load("data/Rminor.RData", envir = env)
+message("Data Loaded")
 # creating various lists needed in the app
 
 choices_month <-
@@ -76,12 +59,16 @@ provider_dash_selected <- providers %>%
   unique() %>%
   arrange(ProjectName)
 
-choices_project_type <- c(
-  "Emergency Shelter", 
-  "Transitional Housing", 
-  "Permanent Supportive Housing",
-  "Street Outreach", 
-  "Safe Haven", 
-  "Homelessness Prevention", 
-  "Rapid Rehousing"
+# CHANGED Add names (which will be visible to users) and numeric values (for filtering data). Eliminates the need for mutating the data to human readable names
+# NOTE entries have been alphabetized.
+choices_project_type <- list(
+  `Coordinated Entry` = 14,
+  `Emergency Shelters` = 1, 
+  `Homelessness Prevention` = 12, 
+  `Permanent Supportive Housing` = c(3, 9),
+  `Rapid Rehousing` = 13,
+  `Safe Haven` = 8, 
+  `Services Only` = 6,
+  `Street Outreach` = 4, 
+  `Transitional Housing` = 2
 )
