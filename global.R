@@ -22,8 +22,10 @@ library(plotly)
 library(zoo)
 library(DT)
 
-# CHANGED Iterative load on existing RData files
-e <- environment()
+env <- environment()
+
+# loading the image files from the data/ folder
+
 sapply(c(
   "Utilization"
   , "QPR_SPDATs"
@@ -31,28 +33,18 @@ sapply(c(
   , "Veterans"
   , "Data_Quality"
   , "SPM_data"
-  , "ProjectEvaluation"
-  ), rlang::as_function(~{
-    .x <- grep(., list.files("data", "\\.R[Dd]ata$", full.names = TRUE), ignore.case = TRUE, value = TRUE)
-    load(.x, envir = e)
-  }))
+  # , "ProjectEvaluation"
+), rlang::as_function( ~ {
+  .x <- grep(
+    .,
+    list.files("data", "\\.R[Dd]ata$", full.names = TRUE),
+    ignore.case = TRUE,
+    value = TRUE
+  )
+  load(.x, envir = env)
+}))
 
-# 
-# load("data/Utilization.RData")
-# 
-# # filebeginningdate <- update_date - years(2)
-# 
-# load("data/QPR_SPDATs.RData")
-# 
-# load("data/QPR_EEs.RData")
-# 
-# load("data/Veterans.RData")
-# 
-# load("data/Data_Quality.RData")
-# 
-# load("data/SPM_data.RData")
-# 
-# load("data/ProjectEvaluation.RData")
+# creating various lists needed in the app
 
 choices_month <-
   format(seq.Date(
@@ -68,9 +60,11 @@ providers <- validation %>%
   unique() %>%
   filter(str_detect(ProjectName, "zz", negate = TRUE) == TRUE &
            ProjectType %in% c(1, 2, 3, 8, 12, 13))
+
 # the sample() function was pulling in a zz'd provider in the Provider Dashboard
 # so I'm filtering out the zz'd providers because why would they ever need to
 # check their Provider Dashboard? they wouldn't. Also we don't want to see APs.
+
 provider_dash_choices <- 
   sort(providers$ProjectName) %>% 
   unique() 
