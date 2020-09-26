@@ -592,6 +592,76 @@ function(input, output, session) {
     }
     
   })
+  
+  
+output$AP_list_county <- renderDataTable({
+  AP_list <- APs %>%
+    filter(ProjectCountyServed %in% c(input$ap_by_county)) %>%
+    select(ProjectID) %>% unique()
+  
+  AP_final <- APs %>%
+    right_join(AP_list, by = "ProjectID") %>%
+    group_by(OrganizationName,
+             ProjectHours,
+             ProjectWebsite,
+             ProjectTelNo) %>%
+    summarise(Counties = paste(unique(ProjectCountyServed), collapse = ", "),
+              Regions = paste(unique(ProjectAreaServed), collapse = "\n")) %>%
+    ungroup() %>%
+    unique()
+  
+  datatable(AP_final,
+            rownames = FALSE,
+            options = list(dom = 'ltpi'),
+            escape = FALSE)
+  
+})
+  
+output$AP_list_region <- renderDataTable({
+  AP_list <- APs %>%
+    filter(ProjectAreaServed %in% c(input$ap_by_region)) %>%
+    select(ProjectID) %>% unique()
+  
+  AP_final <- APs %>%
+    right_join(AP_list, by = "ProjectID") %>%
+    group_by(OrganizationName,
+             ProjectHours,
+             ProjectWebsite,
+             ProjectTelNo) %>%
+    summarise(Counties = paste(unique(ProjectCountyServed), collapse = ", "),
+              Regions = paste(unique(ProjectAreaServed), collapse = ", ")) %>%
+    ungroup() %>%
+    unique()
+  
+  datatable(AP_final,
+            rownames = FALSE,
+            options = list(dom = 'ltpi'),
+            escape = FALSE)
+  
+})
+
+output$AP_list_org <- renderDataTable({
+  AP_list <- APs %>%
+    filter(OrganizationName %in% c(input$ap_by_org)) %>%    
+    select(ProjectID) %>% unique()
+  
+  AP_final <- APs %>%
+    right_join(AP_list, by = "ProjectID") %>%
+    group_by(OrganizationName,
+             ProjectHours,
+             ProjectWebsite,
+             ProjectTelNo) %>%
+    summarise(Counties = paste(unique(ProjectCountyServed), collapse = ", "),
+              Regions = paste(unique(ProjectAreaServed), collapse = ", ")) %>%
+    ungroup() %>%
+    unique()
+  
+  datatable(AP_list,
+            rownames = FALSE,
+            options = list(dom = 'ltpi'),
+            escape = FALSE)
+  
+})   
 output$covidPrioritization <- renderPlot({
   get_res_prior <- validation %>%
     select(PersonalID, EntryDate, ExitDate, LivingSituation) %>%

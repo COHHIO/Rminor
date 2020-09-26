@@ -22,6 +22,8 @@
                  tabName = "providerDashboardTab"),
         # menuItem("CoC Competition",
         #          tabName = "cocCompetitionTab"),
+        menuItem("Coordinated Entry Access Points",
+                 tabName = "ceAPs"),
         menuItem("Covid-19 Analysis",
                  tabName = "covid19Tab"),
         menuItem("Bed and Unit Utilization",
@@ -80,6 +82,38 @@
                     uiOutput("CurrentlyAwaitingPH")
                   )
                 )), 
+        tabItem(
+          tabName = "ceAPs",
+          tabsetPanel(
+            type = "tabs",
+            tabPanel("By County", 
+                     pickerInput(
+                       inputId = "ap_by_county",
+                       label = "Select County/-ies",
+                       choices = bos_counties,
+                       multiple = TRUE
+                     ),
+                     dataTableOutput("AP_list_county")),
+            tabPanel("By Homeless Planning Region", 
+                     pickerInput(
+                       inputId = "ap_by_region",
+                       label = "Select Homeless Planning Region(s)",
+                       choices = choices_regions,
+                       multiple = TRUE
+                     ),
+                     dataTableOutput("AP_list_region")),
+            tabPanel("By Organization", 
+                     pickerInput(
+                       inputId = "ap_by_org",
+                       label = "Select Organization",
+                       choices = APs %>% 
+                         arrange(OrganizationName) %>%
+                         pull(OrganizationName) %>% 
+                         unique()
+                     ),
+                     dataTableOutput("AP_list_org"))
+          )
+        ),
         tabItem(
           tabName = "covid19Tab",
           fluidRow(box(htmlOutput("headerCovid19"), width = 12)),
