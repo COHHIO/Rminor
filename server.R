@@ -616,7 +616,7 @@ output$AP_list_county <- renderDataTable({
       Address,
       "Hours" = ProjectHours,
       "Phone" = ProjectTelNo,
-      "Homeless Planning Region(s) Served" = Regions
+      "Service Area(s)" = Regions
     )
   
   datatable(AP_final,
@@ -682,7 +682,7 @@ output$AP_list_org <- renderDataTable({
       "Hours" = ProjectHours,
       "Phone" = ProjectTelNo,
       "County/-ies Served" = Counties,
-      "Homeless Planning Region(s) Served" = Regions
+      "Service Area(s)" = Regions
     )
   
   datatable(AP_final,
