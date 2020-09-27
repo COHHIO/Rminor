@@ -601,14 +601,23 @@ output$AP_list_county <- renderDataTable({
   
   AP_final <- APs %>%
     right_join(AP_list, by = "ProjectID") %>%
-    group_by(OrganizationName,
+    mutate(Address = if_else(!is.na(CoCCode),
+                             paste(Addresses, City, sep = '<br>'),
+                             "Please call- address not available.")) %>%    
+    group_by(OrgLink,
+             Address,
              ProjectHours,
-             ProjectWebsite,
              ProjectTelNo) %>%
-    summarise(Counties = paste(unique(ProjectCountyServed), collapse = ", "),
-              Regions = paste(unique(ProjectAreaServed), collapse = "\n")) %>%
+    summarise(Regions = paste(unique(ProjectAreaServed), collapse = ",<br>")) %>%
     ungroup() %>%
-    unique()
+    unique() %>%
+    select(
+      "Organization" = OrgLink,
+      Address,
+      "Hours" = ProjectHours,
+      "Phone" = ProjectTelNo,
+      "Homeless Planning Region(s) Served" = Regions
+    )
   
   datatable(AP_final,
             rownames = FALSE,
@@ -624,14 +633,23 @@ output$AP_list_region <- renderDataTable({
   
   AP_final <- APs %>%
     right_join(AP_list, by = "ProjectID") %>%
-    group_by(OrganizationName,
+    mutate(Address = if_else(!is.na(CoCCode),
+                             paste(Addresses, City, sep = '</br>'),
+                             "Please call- address not available.")) %>%
+    group_by(OrgLink,
+             Address,
              ProjectHours,
-             ProjectWebsite,
              ProjectTelNo) %>%
-    summarise(Counties = paste(unique(ProjectCountyServed), collapse = ", "),
-              Regions = paste(unique(ProjectAreaServed), collapse = ", ")) %>%
+    summarise(Counties = paste(unique(ProjectCountyServed), collapse = ", ")) %>%
     ungroup() %>%
-    unique()
+    unique() %>%
+    select(
+      "Organization" = OrgLink,
+      Address,
+      "Hours" = ProjectHours,
+      "Phone" = ProjectTelNo,
+      "County/-ies Served" = Counties
+    )
   
   datatable(AP_final,
             rownames = FALSE,
@@ -647,16 +665,27 @@ output$AP_list_org <- renderDataTable({
   
   AP_final <- APs %>%
     right_join(AP_list, by = "ProjectID") %>%
-    group_by(OrganizationName,
+    mutate(Address = if_else(!is.na(CoCCode),
+                             paste(Addresses, City, sep = '</br>'),
+                             "Please call- address not available.")) %>%
+    group_by(OrgLink,
+             Address,
              ProjectHours,
-             ProjectWebsite,
              ProjectTelNo) %>%
     summarise(Counties = paste(unique(ProjectCountyServed), collapse = ", "),
-              Regions = paste(unique(ProjectAreaServed), collapse = ", ")) %>%
+              Regions = paste(unique(ProjectAreaServed), collapse = ",</br>")) %>%
     ungroup() %>%
-    unique()
+    unique() %>%
+    select(
+      "Organization" = OrgLink,
+      Address,
+      "Hours" = ProjectHours,
+      "Phone" = ProjectTelNo,
+      "County/-ies Served" = Counties,
+      "Homeless Planning Region(s) Served" = Regions
+    )
   
-  datatable(AP_list,
+  datatable(AP_final,
             rownames = FALSE,
             options = list(dom = 'ltpi'),
             escape = FALSE)
