@@ -1,19 +1,19 @@
 #' QPR_tabItem UI Function
-#'
-#' @description A shiny Module.
-#'
+#' @title 
+#' @description A shiny Module to generate the QPR tabitems.
 #' @param id,input,output,session Internal parameters for {shiny}.
-#'
-#' @noRd 
-#'
+#' @param program_choices \code{(named list)} of choices of program types for the radio picker. Default does not show the UI item - choices must be provided for the picker to show.
+#' @param region_choices \code{(named list)} of choices of regions for the region drop-down selector. Default does not show the UI item - choices must be provided for the picker to show options
+#QUESTION Should there be defaults for options?
+#' @param radio_mean \code{(logical)} whether to show the Mean/Median based average radio UI
 #' @importFrom shiny NS tagList 
-#'
+#TODO sinew::makeImport
 tab_choices <- list(LoS = c("Emergency Shelters", "Transitional Housing","Safe Haven", "Rapid Rehousing"),
      PH = c("Emergency Shelters", "Transitional Housing", "Safe Haven", "Prevention", "Rapid Rehousing", "Permanent Supportive Housing", "Street Outreach"),
      NCB = c("Emergency Shelters", "Transitional Housing", "Safe Haven", "Prevention", "Rapid Rehousing", "Permanent Supportive Housing", "Street Outreach"),
      HI = c("Emergency Shelters", "Transitional Housing", "Safe Haven", "Prevention", "Rapid Rehousing","Permanent Supportive Housing", "Street Outreach")
 )
-mod_QPR_tabItem_ui <- function(id, program_choices, region_choices, radio_mean = FALSE){
+mod_QPR_tabItem_ui <- function(id, project_choices, region_choices, radio_mean = FALSE){
   ns <- NS(id)
   # Create labeled Quarter List
   # .quarter_labels <- rev(unique(zoo::Sys.yearqtr() - 6 / 4:zoo::Sys.yearqtr() + 1 / 4))
@@ -27,23 +27,22 @@ mod_QPR_tabItem_ui <- function(id, program_choices, region_choices, radio_mean =
       shinyWidgets::setSliderColor("#56B4E9", 1),
       shinyWidgets::sliderTextInput(ns("slider"),
                                     "",
-                                    c(
-                                      unique(zoo::Sys.yearqtr() - 6 / 4:zoo::Sys.yearqtr() + 1 / 4)
-                                    ),
+                                     unique(zoo::Sys.yearqtr() - 6 / 4:zoo::Sys.yearqtr() + 1 / 4)
+                                    ,
                                     selected = zoo::Sys.yearqtr() - 1 / 4),
-      if (!missing(program_choices)) {
+      if (!missing(project_choices)) {
         shinyWidgets::prettyRadioButtons(
-        inputId = ns("program_radio"),
+        inputId = ns("ProjectType"),
         label = "Program Type",
         thick = TRUE,
         animation = "pulse",
         status = "info",
-        choices = program_choices,
+        choices = project_choices,
         selected = NULL
       )},
       if (!missing(region_choices)) {
         shinyWidgets::pickerInput(
-        inputId = ns("region_select"),
+        inputId = ns("Region"),
         "Select Region(s)",
         choices = region_choices,
         options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
@@ -65,14 +64,149 @@ mod_QPR_tabItem_ui <- function(id, program_choices, region_choices, radio_mean =
       plotly::plotlyOutput(ns("plot"))
     ) 
 }
-    
-#' QPR_tabItem Server Functions
-#'
-#' @noRd 
-mod_QPR_header_server <- function(id){
+
+#' QPR Server Functions
+
+mod_QPR_server <- function(id, header){
+  if (missing(header)) {rlang::abort("Must provide header for mod_QPR_header_server(",id,")")}
   moduleServer( id, function(input, output, session){
     ns <- session$ns
-   
+    # Process Slider Inputs
+    Report <- eventReactive(input$slider, {
+      list(
+      Start = qstart_date(input$slider),
+      End = qend_date(input$slider)
+      )
+    })
+    # Header
+    output$header <- shiny::renderUI({
+      message(paste0(as.character(Report()$Start), " \ ", as.character(Report()$End)))
+      list(shiny::h2("Quarterly Performance Report"),
+           shiny::h3(paste(input$radio_mean, header)),
+           shiny::h4(Report()$Start, "-", Report()$End))
+    })
+    # Gather Objects
+    
+    # Process Data
+    # data_env <- reactive({
+    #  rlang::eval_bare(expressions[[id]]) 
+    # })
+    output$plot <- plotly::renderPlotly({
+      ReportStart <- Report()$Start
+      ReportEnd <- Report()$End
+      
+      LoSGoals <- goals %>%
+        dplyr::select(-Measure) %>%
+        dplyr::filter(SummaryMeasure == "Length of Stay" &
+                        ProjectType %in% c(input$ProjectType)) %>%
+        unique()
+      
+      LoSDetail <- qpr_leavers %>%
+        dplyr::filter(((
+          !is.na(MoveInDateAdjust) &
+            ProjectType == 13
+        ) |
+          (
+            ProjectType %in% c(1, 2, 8) &
+              !is.na(ExitDate)
+          )) &
+          exited_between(., ReportStart, ReportEnd)) %>%
+        dplyr::filter(
+          ProjectRegion %in% c(input$Region) &
+            ProjectType %in% c(input$ProjectType)
+        ) # this filter needs
+      # to be here so the selection text matches the mutated data
+      TotalLeavers <- LoSDetail %>%
+        dplyr::group_by(FriendlyProjectName) %>%
+        dplyr::summarise(Leavers = dplyr::n())
+      
+      title <-
+        paste0(
+          "Length of Stay (",
+          input$radio_mean,
+          ")\n",
+          names(choices_project_type)[choices_project_type %in% input$ProjectType],
+          "\n",
+          ReportStart,
+          " to ",
+          ReportEnd
+        )
+      
+      LoSSummary <- LoSDetail %>%
+        dplyr::group_by(FriendlyProjectName,
+                        ProjectRegion,
+                        ProjectCounty,
+                        ProjectType) %>%
+        dplyr::summarise(
+          Days = dplyr::case_when(
+            input$radio_mean == "Average Days" ~
+              as.numeric(mean(DaysinProject)),
+            input$radio_mean == "Median Days" ~
+              as.numeric(stats::median(DaysinProject))
+          )
+        ) %>%
+        dplyr::left_join(LoSGoals, by = "ProjectType") %>%
+        dplyr::left_join(TotalLeavers, by = ("FriendlyProjectName")) %>%
+        dplyr::mutate(
+          hover = paste0(
+            FriendlyProjectName,
+            "\nTotal Leavers: ",
+            Leavers,
+            "\nDays: ",
+            Days,
+            sep = "\n"
+          )
+        )
+      message(paste0("LosSummary:", nrow(LoSSummary)))
+      if (nrow(LoSDetail) > 0) {
+        plotly::plot_ly(
+          data = LoSSummary,
+          x = ~ FriendlyProjectName,
+          y = ~ Days,
+          text = ~ hover,
+          hoverinfo = 'text'
+        ) %>%
+          plotly::add_trace(type = "bar") %>%
+          plotly::layout(
+            shapes = list(
+              type = "rect",
+              name = "CoC Goal",
+              fillcolor = "#008000",
+              line = list(color = "white"),
+              layer = "below",
+              xref = "paper",
+              yref = "y",
+              x0 = 0,
+              x1 = 1,
+              y0 = 0,
+              y1 = ~ Goal[1],
+              opacity = .2
+            ),
+            title = list(text = title,
+                         font = list(size = 15)),
+            margin = list(
+              l = 50,
+              r = 50,
+              b = 100,
+              t = 100,
+              pad = 4
+            ),
+            yaxis = list(
+              title = "Days",
+              rangemode = "tozero",
+              showgrid = TRUE
+            ),
+            xaxis = list(
+              title = "",
+              showgrid = TRUE,
+              rangemode = "tozero"
+            )
+          )
+      }
+      else {
+        
+      }
+    })
   })
 }
-    
+

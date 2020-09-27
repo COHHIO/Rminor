@@ -239,9 +239,12 @@ app_ui <- function(request) {
               width = 12
             ))
           ),
-          mod_QPR_tabItem_ui("LoS", program_choices = choices_project_type[tab_choices$LoS], region_choices = choices_regions)
+          mod_QPR_tabItem_ui("LoS"
+                             , project_choices = choices_project_type[tab_choices$LoS]
+                             , region_choices = choices_regions
+                             , radio_mean = TRUE)
           ,
-          shinydashboard::tabItem(tabName = "PHTab",
+          shinydashboard::tabItem(tabName = "PH-Tab",
                                   shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerQPRExitsToPH"), width = 12)),
                                   shinyWidgets::chooseSliderSkin("Round"),
                                   shinyWidgets::setSliderColor("#56B4E9", 1),
@@ -276,7 +279,7 @@ app_ui <- function(request) {
                                   htmltools::br(),
                                   plotly::plotlyOutput("ExitsToPHOutreach")
           ),
-          shinydashboard::tabItem(tabName = "NCBTab",
+          shinydashboard::tabItem(tabName = "NCB-Tab",
                                   shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerQPRNCBs"), width = 12)),
                                   shinyWidgets::chooseSliderSkin("Round"),
                                   shinyWidgets::setSliderColor("#56B4E9", 1),
@@ -309,7 +312,7 @@ app_ui <- function(request) {
                                   plotly::plotlyOutput("QPRNCBs"),
                                   htmltools::br()
           ),
-          shinydashboard::tabItem(tabName = "HITab",
+          shinydashboard::tabItem(tabName = "HI-Tab",
                                   shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerQPRHI"), width = 12)),
                                   shinyWidgets::chooseSliderSkin("Round"),
                                   shinyWidgets::setSliderColor("#56B4E9", 1),
@@ -341,7 +344,7 @@ app_ui <- function(request) {
                                   ),
                                   plotly::plotlyOutput("QPRHIs"),
                                   htmltools::br()),
-          shinydashboard::tabItem(tabName = "incomeTab",
+          shinydashboard::tabItem(tabName = "income-Tab",
                                   shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerQPRIncome"), width = 12)),
                                   shinyWidgets::chooseSliderSkin("Round"),
                                   shinyWidgets::setSliderColor("#56B4E9", 1),
@@ -373,7 +376,7 @@ app_ui <- function(request) {
                                   ),
                                   plotly::plotlyOutput("QPRIncome"),
                                   htmltools::br()),
-          shinydashboard::tabItem(tabName = "rapidTab",
+          shinydashboard::tabItem(tabName = "rapid-Tab",
                                   shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerRRHRapidPlacement"), width = 12)),
                                   shinyWidgets::chooseSliderSkin("Round"),
                                   shinyWidgets::setSliderColor("#56B4E9", 1),
@@ -393,7 +396,7 @@ app_ui <- function(request) {
                                     selected = sample(choices_regions, 1)
                                   ),
                                   plotly::plotlyOutput("DaysToHouse")),
-          shinydashboard::tabItem(tabName = "spendingTab",
+          shinydashboard::tabItem(tabName = "spending-Tab",
                                   shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerRRHSpending"), width = 12)),
                                   shinyWidgets::chooseSliderSkin("Round"),
                                   shinyWidgets::setSliderColor("#56B4E9", 1),

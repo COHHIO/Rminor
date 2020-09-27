@@ -1204,182 +1204,12 @@ app_server <- function( input, output, session ) {
   output$NoteToUsers <-
     shiny::renderText(note_qpr_dq_community_need)
   
-  output$headerLengthOfStay <- shiny::renderUI({
-    ReportStart <- format.Date(lubridate::ymd(paste0(
-      substr(input$LoSSlider, 1, 4),
-      "-01-01"
-    )), "%m-%d-%Y")
-    ReportEnd <- format.Date(lubridate::mdy(paste0(
-      dplyr::case_when(
-        substr(input$LoSSlider, 7, 7) == 1 ~ "03-31-",
-        substr(input$LoSSlider, 7, 7) == 2 ~ "06-30-",
-        substr(input$LoSSlider, 7, 7) == 3 ~ "09-30-",
-        substr(input$LoSSlider, 7, 7) == 4 ~ "12-31-"
-      ),
-      substr(input$LoSSlider, 1, 4)
-    )), "%m-%d-%Y")
-    
-    list(shiny::h2("Quarterly Performance Report"),
-         shiny::h3(paste(input$radioAvgMeanLoS, "Length of Stay")),
-         shiny::h4(ReportStart, "-", ReportEnd))
-  })  
+  #  QPR Length of Stay ----
+  # Sun Sep 27 08:54:44 2020
+  mod_QPR_server("LoS", "Length of Stay")
   
   
-  # QPR Length of Stay
-  # observeEvent(c(input$LoSRegionSelect, input$LoSSlider, input$radioLoSPTC),
-  #              {
-  output$QPRLoSPlot <-
-    plotly::renderPlotly({
-      ReportStart <- format.Date(lubridate::ymd(paste0(substr(
-        input$LoSSlider, 1, 4
-      ),
-      "-01-01")), "%m-%d-%Y")
-      ReportEnd <- format.Date(lubridate::mdy(paste0(
-        dplyr::case_when(
-          substr(input$LoSSlider, 7, 7) == 1 ~ "03-31-",
-          substr(input$LoSSlider, 7, 7) == 2 ~ "06-30-",
-          substr(input$LoSSlider, 7, 7) == 3 ~ "09-30-",
-          substr(input$LoSSlider, 7, 7) == 4 ~ "12-31-"
-        ),
-        substr(input$LoSSlider, 1, 4)
-      )), "%m-%d-%Y")
-      
-      LoSGoals <- goals %>%
-        dplyr::select(-Measure) %>%
-        dplyr::mutate(
-          ProjectType = dplyr::case_when(
-            ProjectType == 1 ~ "Emergency Shelters",
-            ProjectType == 2 ~ "Transitional Housing",
-            ProjectType %in% c(3, 9) ~ "Permanent Supportive Housing",
-            ProjectType == 4 ~ "Street Outreach",
-            ProjectType == 8 ~ "Safe Haven",
-            ProjectType == 12 ~ "Homelessness Prevention",
-            ProjectType == 13 ~ "Rapid Rehousing"
-          )
-        )  %>%
-        dplyr::filter(SummaryMeasure == "Length of Stay" &
-                        ProjectType %in% c(input$radioLoSPTC)) %>%
-        unique()
-      
-      LoSDetail <- qpr_leavers %>%
-        dplyr::filter(((
-          !is.na(MoveInDateAdjust) &
-            ProjectType == 13
-        ) |
-          (
-            ProjectType %in% c(1, 2, 8) &
-              !is.na(ExitDate)
-          )) &
-          exited_between(., ReportStart, ReportEnd)) %>%
-        dplyr::mutate(
-          ProjectType = dplyr::case_when(
-            ProjectType == 1 ~ "Emergency Shelters",
-            ProjectType == 2 ~ "Transitional Housing",
-            ProjectType %in% c(3, 9) ~ "Permanent Supportive Housing",
-            ProjectType == 4 ~ "Street Outreach",
-            ProjectType == 8 ~ "Safe Haven",
-            ProjectType == 12 ~ "Homelessness Prevention",
-            ProjectType == 13 ~ "Rapid Rehousing"
-          )
-        ) %>%
-        dplyr::filter(
-          ProjectRegion %in% c(input$LoSRegionSelect) &
-            ProjectType %in% c(input$radioLoSPTC)
-        ) # this filter needs
-      # to be here so the selection text matches the mutated data
-      TotalLeavers <- LoSDetail %>%
-        dplyr::group_by(FriendlyProjectName) %>%
-        dplyr::summarise(Leavers = dplyr::n())
-      
-      title <-
-        paste0(
-          "Length of Stay (",
-          input$radioAvgMeanLoS,
-          ")\n",
-          input$radioLoSPTC,
-          "\n",
-          ReportStart,
-          " to ",
-          ReportEnd
-        )
-      
-      LoSSummary <- LoSDetail %>%
-        dplyr::group_by(FriendlyProjectName,
-                        ProjectRegion,
-                        ProjectCounty,
-                        ProjectType) %>%
-        dplyr::summarise(
-          Days = dplyr::case_when(
-            input$radioAvgMeanLoS == "Average Days" ~
-              as.numeric(mean(DaysinProject)),
-            input$radioAvgMeanLoS == "Median Days" ~
-              as.numeric(stats::median(DaysinProject))
-          )
-        ) %>%
-        dplyr::left_join(LoSGoals, by = "ProjectType") %>%
-        dplyr::left_join(TotalLeavers, by = ("FriendlyProjectName")) %>%
-        dplyr::mutate(
-          hover = paste0(
-            FriendlyProjectName,
-            "\nTotal Leavers: ",
-            Leavers,
-            "\nDays: ",
-            Days,
-            sep = "\n"
-          )
-        )
-      
-      if (nrow(LoSDetail) > 0) {
-        plotly::plot_ly(
-          data = LoSSummary,
-          x = ~ FriendlyProjectName,
-          y = ~ Days,
-          text = ~ hover,
-          hoverinfo = 'text'
-        ) %>%
-          plotly::add_trace(type = "bar") %>%
-          plotly::layout(
-            shapes = list(
-              type = "rect",
-              name = "CoC Goal",
-              fillcolor = "#008000",
-              line = list(color = "white"),
-              layer = "below",
-              xref = "paper",
-              yref = "y",
-              x0 = 0,
-              x1 = 1,
-              y0 = 0,
-              y1 = ~ Goal[1],
-              opacity = .2
-            ),
-            title = list(text = title,
-                         font = list(size = 15)),
-            margin = list(
-              l = 50,
-              r = 50,
-              b = 100,
-              t = 100,
-              pad = 4
-            ),
-            yaxis = list(
-              title = "Days",
-              rangemode = "tozero",
-              showgrid = TRUE
-            ),
-            xaxis = list(
-              title = "",
-              showgrid = TRUE,
-              rangemode = "tozero"
-            )
-          )
-      }
-      else {
-        
-      }
-    })
-  # })
-  
+
   # QPR Exits to PH 
   
   output$headerQPRExitsToPH <- shiny::renderUI({
@@ -1396,7 +1226,7 @@ app_server <- function( input, output, session ) {
       ),
       substr(input$ExitsToPHSlider, 1, 4)
     )), "%m-%d-%Y")
-    
+    message(paste0(ReportStart, " / ", ReportEnd))
     list(
       shiny::h2("Quarterly Performance Report"),
       shiny::h3("Exits to Permanent Housing"),
