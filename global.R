@@ -55,6 +55,8 @@ choices_month <-
 
 choices_regions <- unique(regions$RegionName[regions$County != "Mahoning"])
 
+choices_service_areas <- sort(unique(APs$ProjectAreaServed)) 
+
 providers <- validation %>%
   select(ProjectName, ProjectType) %>%
   unique() %>%
