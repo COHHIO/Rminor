@@ -458,9 +458,9 @@ app_ui <- function(request) {
           ), #tabItem SPDAT tab
           shinydashboard::tabItem(tabName = "about-Tab",
                                   shiny::fluidRow(
-                                    shinydashboard::box(
-                                      shiny::actionButton("tictoc", "Save tictoc log")
-                                    ),
+                                    # shinydashboard::box(
+                                    #   shiny::actionButton("tictoc", "Save tictoc log")
+                                    # ),
                                     shinydashboard::box(
                                       title = "Ohio Balance of State CoC Homeless Planning Regions",
                                       htmltools::HTML("The solid-colored counties are all part of the Ohio
@@ -474,7 +474,7 @@ app_ui <- function(request) {
                        are unsure what Region your county is in."),
                                       htmltools::img(
                                         src =
-                                          "Homeless-Region-Map-for-COHHIO-2017.png",
+                                          "www/Homeless-Region-Map-for-COHHIO-2017.png",
                                         height = '100%',
                                         width = '100%'
                                       ),

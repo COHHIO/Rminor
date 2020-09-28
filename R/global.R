@@ -25,7 +25,8 @@ library(DT)
 env <- environment()
 
 # loading the image files from the data/ folder
-#load("data/Rminor.RData", envir = env)
+load("data/Rminor.RData", envir = env)
+
 message("Data Loaded")
 # creating various lists needed in the app
 
