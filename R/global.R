@@ -29,35 +29,35 @@ env <- environment()
 message("Data Loaded")
 # creating various lists needed in the app
 
-# choices_month <-
-#   format(seq.Date(
-#     from = as.Date(floor_date(today(), unit = "month") - years(2)),
-#     by = "month",
-#     length.out = 24
-#   ), "%b %Y")
-# 
-# choices_regions <- unique(regions$RegionName[regions$County != "Mahoning"])
-# 
-# providers <- validation %>%
-#   select(ProjectName, ProjectType) %>%
-#   unique() %>%
-#   filter(str_detect(ProjectName, "zz", negate = TRUE) == TRUE &
-#            ProjectType %in% c(1, 2, 3, 8, 12, 13))
-# 
-# # the sample() function was pulling in a zz'd provider in the Provider Dashboard
-# # so I'm filtering out the zz'd providers because why would they ever need to
-# # check their Provider Dashboard? they wouldn't. Also we don't want to see APs.
-# 
-# provider_dash_choices <-
-#   sort(providers$ProjectName) %>%
-#   unique()
-# 
-# provider_dash_selected <- providers %>%
-#   left_join(validation, by = c("ProjectName", "ProjectType")) %>%
-#   filter(is.na(ExitDate)) %>%
-#   select(ProjectName) %>%
-#   unique() %>%
-#   arrange(ProjectName)
+choices_month <-
+  format(seq.Date(
+    from = as.Date(floor_date(today(), unit = "month") - years(2)),
+    by = "month",
+    length.out = 24
+  ), "%b %Y")
+
+choices_regions <- unique(regions$RegionName[regions$County != "Mahoning"])
+
+providers <- validation %>%
+  select(ProjectName, ProjectType) %>%
+  unique() %>%
+  filter(str_detect(ProjectName, "zz", negate = TRUE) == TRUE &
+           ProjectType %in% c(1, 2, 3, 8, 12, 13))
+
+# the sample() function was pulling in a zz'd provider in the Provider Dashboard
+# so I'm filtering out the zz'd providers because why would they ever need to
+# check their Provider Dashboard? they wouldn't. Also we don't want to see APs.
+
+provider_dash_choices <-
+  sort(providers$ProjectName) %>%
+  unique()
+
+provider_dash_selected <- providers %>%
+  left_join(validation, by = c("ProjectName", "ProjectType")) %>%
+  filter(is.na(ExitDate)) %>%
+  select(ProjectName) %>%
+  unique() %>%
+  arrange(ProjectName)
 
 # CHANGED Add names (which will be visible to users) and numeric values (for filtering data). Eliminates the need for mutating the data to human readable names
 # NOTE entries have been alphabetized.
