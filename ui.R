@@ -116,18 +116,20 @@
                        dataTableOutput("AP_list_region"))
                      )),
             tabPanel("By Organization", 
-                     fluidRow(box(pickerInput(
-                       inputId = "ap_by_org",
-                       label = "Select Organization",
-                       selected = NULL,
-                       options = pickerOptions(dropupAuto = FALSE,
-                                               actionsBox = TRUE),
-                       multiple = TRUE,
-                       choices = APs %>% 
-                         arrange(OrganizationName) %>%
-                         pull(OrganizationName) %>% 
-                         unique()
-                     ))),
+                     fluidRow(box(
+                       pickerInput(
+                         inputId = "ap_by_org",
+                         label = "Select Organization",
+                         selected = NULL,
+                         options = pickerOptions(dropupAuto = FALSE,
+                                                 actionsBox = TRUE),
+                         multiple = TRUE,
+                         choices = APs %>%
+                           arrange(ProjectAKA) %>%
+                           pull(ProjectAKA) %>%
+                           unique()
+                       )
+                     )), 
                      fluidRow(box(
                        title = "Coordinated Entry Access Points",
                        width = 12,

@@ -660,7 +660,7 @@ output$AP_list_region <- renderDataTable({
 
 output$AP_list_org <- renderDataTable({
   AP_list <- APs %>%
-    filter(OrganizationName %in% c(input$ap_by_org)) %>%    
+    filter(ProjectAKA %in% c(input$ap_by_org)) %>%    
     select(ProjectID) %>% unique()
   
   AP_final <- APs %>%
