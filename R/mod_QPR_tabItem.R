@@ -68,7 +68,7 @@ mod_QPR_tabItem_ui <- function(id, project_choices, region_choices, radio_mean =
 #' QPR Server Functions
 
 mod_QPR_server <- function(id, header){
-  if (missing(header)) {rlang::abort("Must provide header for mod_QPR_header_server(",id,")")}
+  if (missing(header)) {rlang::abort("Must provide header for mod_QPR_server(",id,")")}
   moduleServer( id, function(input, output, session){
     ns <- session$ns
     # Process Slider Inputs

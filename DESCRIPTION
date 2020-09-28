@@ -6,6 +6,7 @@ Description: An open-source HMIS custom reporting Shiny app
 License: AGPL-3
 Imports: 
     config,
+    cli,
     golem,
     shiny,
     processx,

@@ -456,7 +456,7 @@ app_ui <- function(request) {
               collapsed = TRUE
             ))
           ), #tabItem SPDAT tab
-          shinydashboard::tabItem(tabName = "aboutTab",
+          shinydashboard::tabItem(tabName = "about-Tab",
                                   shiny::fluidRow(
                                     shinydashboard::box(
                                       shiny::actionButton("tictoc", "Save tictoc log")
