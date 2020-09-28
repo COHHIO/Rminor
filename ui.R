@@ -22,14 +22,13 @@
                  tabName = "providerDashboardTab"),
         # menuItem("CoC Competition",
         #          tabName = "cocCompetitionTab"),
-        menuItem("Coordinated Entry Access Points",
-                 tabName = "ceAPs"),
+        # menuItem("Coordinated Entry Access Points",
+        #          tabName = "ceAPs"),
         menuItem("Covid-19 Analysis",
                  tabName = "covid19Tab"),
         menuItem("Bed and Unit Utilization",
-                      tabName = "utilizationTab"),
-        menuItem(
-          "Quarterly Performance Report",
+                 tabName = "utilizationTab"),
+        menuItem("Quarterly Performance Report",
           menuSubItem("System Performance Measures",
                       tabName = "SPMs"),
           menuSubItem("Community Need (by County)",
@@ -101,7 +100,7 @@
                        dataTableOutput("AP_list_county")
                        ))
                      ),
-            tabPanel("By Homeless Planning Region", 
+            tabPanel("By Service Area", 
                      fluidRow(box(pickerInput(
                        inputId = "ap_by_region",
                        label = "Select Service Area",
