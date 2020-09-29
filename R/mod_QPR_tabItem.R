@@ -8,11 +8,46 @@
 #' @param radio_mean \code{(logical)} whether to show the Mean/Median based average radio UI
 #' @importFrom shiny NS tagList 
 #TODO sinew::makeImport
-tab_choices <- list(LoS = c("Emergency Shelters", "Transitional Housing","Safe Haven", "Rapid Rehousing"),
-     PH = c("Emergency Shelters", "Transitional Housing", "Safe Haven", "Prevention", "Rapid Rehousing", "Permanent Supportive Housing", "Street Outreach"),
-     NCB = c("Emergency Shelters", "Transitional Housing", "Safe Haven", "Prevention", "Rapid Rehousing", "Permanent Supportive Housing", "Street Outreach"),
-     HI = c("Emergency Shelters", "Transitional Housing", "Safe Haven", "Prevention", "Rapid Rehousing","Permanent Supportive Housing", "Street Outreach")
-)
+
+#QUESTION could we use choices_project_type for PH, NCB, and HI? Like HI <- choices_project_type, etc.?
+
+tab_choices <-
+  list(
+    LoS = c(
+      "Emergency Shelters",
+      "Transitional Housing",
+      "Safe Haven",
+      "Rapid Rehousing"
+    ),
+    PH = c(
+      "Emergency Shelters",
+      "Transitional Housing",
+      "Safe Haven",
+      "Prevention",
+      "Rapid Rehousing",
+      "Permanent Supportive Housing",
+      "Street Outreach"
+    ),
+    NCB = c(
+      "Emergency Shelters",
+      "Transitional Housing",
+      "Safe Haven",
+      "Prevention",
+      "Rapid Rehousing",
+      "Permanent Supportive Housing",
+      "Street Outreach"
+    ),
+    HI = c(
+      "Emergency Shelters",
+      "Transitional Housing",
+      "Safe Haven",
+      "Prevention",
+      "Rapid Rehousing",
+      "Permanent Supportive Housing",
+      "Street Outreach"
+    )
+  )
+
 mod_QPR_tabItem_ui <- function(id, project_choices, region_choices, radio_mean = FALSE){
   ns <- NS(id)
   # Create labeled Quarter List
