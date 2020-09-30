@@ -458,9 +458,8 @@ app_ui <- function(request) {
           ), #tabItem SPDAT tab
           shinydashboard::tabItem(tabName = "about-Tab",
                                   shiny::fluidRow(
-                                    # shinydashboard::box(
-                                    #   shiny::actionButton("tictoc", "Save tictoc log")
-                                    # ),
+                                    actionButton("browser", "browser"),
+                                    tags$script("$('#browser').hide();"),
                                     shinydashboard::box(
                                       title = "Ohio Balance of State CoC Homeless Planning Regions",
                                       htmltools::HTML("The solid-colored counties are all part of the Ohio

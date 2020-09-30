@@ -36,6 +36,9 @@ app_server <- function( input, output, session ) {
   #  input$utilizationDate
   # cat("Length of Stay", input$LoSRegionSelect)
   # })
+  observeEvent(input$browser,{
+    browser()
+  })
   output$headerUtilization <- shiny::renderUI({
     ReportEnd <- 
       lubridate::ceiling_date(lubridate::ymd(input$utilizationDate), unit = "month") - lubridate::days(1)
