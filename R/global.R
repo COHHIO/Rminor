@@ -25,7 +25,8 @@ library(DT)
 env <- environment()
 
 # loading the image files from the data/ folder
-#load("data/Rminor.RData", envir = env)
+load("data/Rminor.RData", envir = env)
+
 message("Data Loaded")
 # creating various lists needed in the app
 
@@ -37,6 +38,8 @@ choices_month <-
   ), "%b %Y")
 
 choices_regions <- unique(regions$RegionName[regions$County != "Mahoning"])
+
+choices_service_areas <- sort(unique(APs$ProjectAreaServed)) 
 
 providers <- validation %>%
   select(ProjectName, ProjectType) %>%
