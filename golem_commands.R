@@ -35,3 +35,9 @@ fs::file_copy(fs::path("..", .pkg, "global", ext = ".R"), "R/global.R")
 fs::dir_copy(fs::path("..", .pkg, "www"), "inst/app/")
 golem::add_resource_path("www", "inst/app/www")
 golem::add_utils("helpers")
+#https://github.com/ThinkR-open/golem/issues/395
+# There is currently an issue with the CRAN version of golem that prevents add_resource_path from working. 
+# Golem must be 0.2.1.9020 or above
+remotes::install_github("thinkr-open/golem", ref = "dev")
+
+
