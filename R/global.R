@@ -12,56 +12,48 @@
 # GNU Affero General Public License for more details at
 # <https://www.gnu.org/licenses/>. 
 
-library(tidyverse)
-library(shinydashboard)
-library(shiny)
-library(shinyWidgets)
-library(lubridate)
-library(scales)
-library(plotly)
-library(zoo)
-library(DT)
-
-env <- environment()
-
-# loading the image files from the data/ folder
-load("data/Rminor.RData", envir = env)
-
-message("Data Loaded")
-# creating various lists needed in the app
-
-choices_month <-
-  format(seq.Date(
-    from = as.Date(floor_date(today(), unit = "month") - years(2)),
-    by = "month",
-    length.out = 24
-  ), "%b %Y")
-
-choices_regions <- unique(regions$RegionName[regions$County != "Mahoning"])
-
-choices_service_areas <- sort(unique(APs$ProjectAreaServed)) 
-
-providers <- validation %>%
-  select(ProjectName, ProjectType) %>%
-  unique() %>%
-  filter(str_detect(ProjectName, "zz", negate = TRUE) == TRUE &
-           ProjectType %in% c(1, 2, 3, 8, 12, 13))
-
-# the sample() function was pulling in a zz'd provider in the Provider Dashboard
-# so I'm filtering out the zz'd providers because why would they ever need to
-# check their Provider Dashboard? they wouldn't. Also we don't want to see APs.
-
-provider_dash_choices <-
-  sort(providers$ProjectName) %>%
-  unique()
-
-provider_dash_selected <- providers %>%
-  left_join(validation, by = c("ProjectName", "ProjectType")) %>%
-  filter(is.na(ExitDate)) %>%
-  select(ProjectName) %>%
-  unique() %>%
-  arrange(ProjectName)
-
+#CHANGED Removed library calls - unnecessary as they are loaded by the package load process in run_dev.
+if (golem::app_dev()) {
+  # Run only if in production mode
+  env <- environment()
+  
+  # loading the image files from the data/ folder
+  load("data/Rminor.RData", envir = env)
+  message("Data Loaded")
+  # creating various lists needed in the app
+  
+  choices_month <-
+    format(seq.Date(
+      from = as.Date(lubridate::floor_date(lubridate::today(), unit = "month") - lubridate::years(2)),
+      by = "month",
+      length.out = 24
+    ), "%b %Y")
+  
+  choices_service_areas <- sort(unique(APs$ProjectAreaServed)) 
+  
+  choices_regions <- unique(regions$RegionName[regions$County != "Mahoning"])
+  
+  providers <- validation %>%
+    dplyr::select(ProjectName, ProjectType) %>%
+    unique() %>%
+    dplyr::filter(stringr::str_detect(ProjectName, "zz", negate = TRUE) == TRUE &
+             ProjectType %in% c(1, 2, 3, 8, 12, 13))
+  
+  # the sample() function was pulling in a zz'd provider in the Provider Dashboard
+  # so I'm filtering out the zz'd providers because why would they ever need to
+  # check their Provider Dashboard? they wouldn't. Also we don't want to see APs.
+  
+  provider_dash_choices <-
+    sort(providers$ProjectName) %>%
+    unique()
+  
+  provider_dash_selected <- providers %>%
+    dplyr::left_join(validation, by = c("ProjectName", "ProjectType")) %>%
+    dplyr::filter(is.na(ExitDate)) %>%
+    dplyr::select(ProjectName) %>%
+    unique() %>%
+    dplyr::arrange(ProjectName)
+}
 # CHANGED Add names (which will be visible to users) and numeric values (for filtering data). Eliminates the need for mutating the data to human readable names
 # NOTE entries have been alphabetized.
 choices_project_type <- list(
