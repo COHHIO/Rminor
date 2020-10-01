@@ -1212,7 +1212,7 @@ app_server <- function( input, output, session ) {
   mod_QPR_server("LoS", "Length of Stay")
   
   
-
+  
   # QPR Exits to PH 
   
   output$headerQPRExitsToPH <- shiny::renderUI({
