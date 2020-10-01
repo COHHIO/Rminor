@@ -13,11 +13,18 @@
 # <https://www.gnu.org/licenses/>.
 
 function(input, output, session) {
+  observeEvent(input$tictoc, {saveRDS(dplyr::arrange(purrr::map_dfr(tictoc::tic.log(format = FALSE), ~{
+    tibble::tibble(
+      Duration = lubridate::as.duration(.x$toc - .x$tic),
+      Message = as.character(.x$msg))
+  }), dplyr::desc(Duration))
+  , "profvis/tictoc.rds")}, ignoreInit = TRUE)
   # output$res <- renderPrint({
   #  input$utilizationDate
   # cat("Length of Stay", input$LoSRegionSelect)
   # })
   output$headerUtilization <- renderUI({
+
     ReportEnd <- 
       ceiling_date(ymd(input$utilizationDate), unit = "month") - days(1)
     ReportStart <- 
@@ -26,26 +33,31 @@ function(input, output, session) {
     ReportStart <- format.Date(ymd(ReportStart), "%B %d, %Y")
     ReportEnd <- format.Date(ymd(ReportEnd), "%B %d, %Y")
     
-    list(
+    .out <- list(
       h2("Bed and Unit Utilization"),
       h4(input$providerListUtilization),
       h4(ReportStart, "-", ReportEnd)
     )
-  })
 
+    .out
+  })
+  
   
   output$headerCovid19 <- renderUI({
 
     ReportStart <- format.Date(mdy("04012020"), "%B %d, %Y")
     ReportEnd <- format.Date(ymd_hms(update_date), "%B %d, %Y")
     
-    list(
+    .out <- list(
       h2("Ohio Balance of State CoC Covid-19 Data Analysis"),
       h4(ReportStart, "-", ReportEnd)
     )
-  })
 
+    .out
+  })
+  
   output$headerCoCCompetitionProjectLevel <- renderUI({
+
     next_thing_due <- tribble(
       ~ DueDate, ~ Event,
       "7/20/2020", "All HMIS data corrections must be complete by 11:59pm",
@@ -64,8 +76,8 @@ function(input, output, session) {
       ) %>%
       filter(today() %within% DateRange) %>%
       select(Event, DueDate)
-
-    list(
+    
+    .out <- list(
       h2("2020 CoC Competition: Project Evaluation"),
       h4("Fixed Date Range: January 1, 2019 - December 31, 2019"),
       h4(strong("THE DATA ON THIS TAB DOES NOT SHOW CHANGES MADE ON OR AFTER
@@ -81,13 +93,17 @@ function(input, output, session) {
           href = "https://cohhio.org/boscoc/coc-program/"),
         "for complete specifications and timeline.")
     )
-  })
 
+    .out
+  })
+  
   output$pe_ProjectSummary <-
     DT::renderDataTable({
+
       ptc <- summary_pe_final_scoring %>%
         filter(AltProjectName == input$pe_provider) %>%
         pull(ProjectType)
+
 
       summary_pe_final_scoring <- summary_pe_final_scoring %>%
         mutate(
@@ -108,6 +124,7 @@ function(input, output, session) {
           OnTrackSpendingMath = str_replace(OnTrackSpendingMath, "/", "÷"),
           UnspentFundsMath = str_replace(UnspentFundsMath, "/", "÷")
         )
+
 
       a <- summary_pe_final_scoring %>%
         filter(AltProjectName == input$pe_provider) %>%
@@ -134,6 +151,7 @@ function(input, output, session) {
                      names_to = "Measure",
                      values_to = "Estimated Score")
 
+
       b <- summary_pe_final_scoring %>%
         filter(AltProjectName == input$pe_provider) %>%
         select(
@@ -153,6 +171,7 @@ function(input, output, session) {
         pivot_longer(cols = everything(),
                      names_to = "Measure",
                      values_to = "DQflag")
+
 
       c <- summary_pe_final_scoring %>%
         filter(AltProjectName == input$pe_provider) %>%
@@ -179,6 +198,7 @@ function(input, output, session) {
                      names_to = "Measure",
                      values_to = "Possible Score")
 
+
       d <- summary_pe_final_scoring %>%
         filter(AltProjectName == input$pe_provider) %>%
         select(
@@ -204,6 +224,7 @@ function(input, output, session) {
                      names_to = "Measure",
                      values_to = "Calculation")
 
+
       psh <- a %>% left_join(b, by = "Measure") %>%
         ungroup() %>%
         left_join(c, by = "Measure") %>%
@@ -223,6 +244,7 @@ function(input, output, session) {
                                "Average Length of Stay"),
                Calculation != "NOT SCORED in 2020 due to COVID-19.") %>%
         select(1, Calculation, 2, "Possible Score" = 4, "Data Quality" = DQ)
+
 
       rrh <- a %>% left_join(b, by = "Measure") %>%
         ungroup() %>%
@@ -245,6 +267,7 @@ function(input, output, session) {
                Calculation != "NOT SCORED in 2020 due to COVID-19.") %>%
         select(1, Calculation, 2, "Possible Score" = 4, "Data Quality" = DQ)
 
+
       th <- a %>% left_join(b, by = "Measure") %>%
         ungroup() %>%
         left_join(c, by = "Measure") %>%
@@ -266,6 +289,7 @@ function(input, output, session) {
         ),
         Calculation != "NOT SCORED in 2020 due to COVID-19.") %>%
         select(1, Calculation, 2, "Possible Score" = 4, "Data Quality" = DQ)
+
 
       sh <- a %>% left_join(b, by = "Measure") %>%
         ungroup() %>%
@@ -290,7 +314,8 @@ function(input, output, session) {
         Calculation != "NOT SCORED in 2020 due to COVID-19.") %>%
         select(1, Calculation, 2, "Possible Score" = 4, "Data Quality" = DQ)
 
-      datatable(
+
+      .out <- datatable(
         if (ptc == 3) {
           psh
         } else if (ptc == 13) {
@@ -304,9 +329,12 @@ function(input, output, session) {
         options = list(dom = 't',
                        pageLength = 100)
       )
+
+      .out
     })
   
   observeEvent(c(input$providerList), {
+
     output$currentUnitUtilization <-
       if (nrow(utilization %>%
                filter(
@@ -338,7 +366,8 @@ function(input, output, session) {
     else{
       
     }
-    
+
+
     output$currentBedUtilization <-
       if (nrow(utilization %>%
                filter(
@@ -369,7 +398,8 @@ function(input, output, session) {
     else{
       
     }
-    
+
+
     output$headerSPMs <- renderUI({
       ReportStart <- spm_current_start_date
       ReportEnd <- spm_current_end_date - days(1)
@@ -405,7 +435,8 @@ function(input, output, session) {
           ReportEnd)
       )
     })
-    
+
+
     output$veteranEngagement <-
       if (nrow(
         veteran_current_in_project %>%
@@ -429,7 +460,8 @@ function(input, output, session) {
     else {
       
     }
-    
+
+
     output$TAYEngagement <-
       if (nrow(
         current_tay_hohs %>%
@@ -451,7 +483,8 @@ function(input, output, session) {
     else {
       
     }
-    
+
+
     output$CurrentlyAwaitingPH <-
       if (nrow(validation %>%
                filter(ProjectType %in% c(3, 9, 13) &
@@ -488,7 +521,8 @@ function(input, output, session) {
     else{
       
     }
-    
+
+
     output$CurrentClientCount <-
       if (nrow(validation %>%
                filter(
@@ -533,7 +567,8 @@ function(input, output, session) {
     else{
       
     }
-    
+
+
     output$CurrentHHCount <-
       if (nrow(validation %>%
                filter(
@@ -578,7 +613,8 @@ function(input, output, session) {
     else{
       
     }
-    
+
+
     output$ShelterExitsToRRH <-
       if (nrow(validation %>%
                filter(ProjectType == 1 &
@@ -607,36 +643,172 @@ function(input, output, session) {
     else{
       
     }
-    
+
   })
-output$covidPrioritization <- renderPlot({
-  get_res_prior <- validation %>%
-    select(PersonalID, EntryDate, ExitDate, LivingSituation) %>%
-    group_by(PersonalID) %>%
-    arrange(desc(EntryDate)) %>%
-    slice(1L)
+  output$covidPrioritization <- renderPlot({
+    
+    get_res_prior <- validation %>%
+      select(PersonalID, EntryDate, ExitDate, LivingSituation) %>%
+      group_by(PersonalID) %>%
+      arrange(desc(EntryDate)) %>%
+      slice(1L)
+    
+    current_week <- week(today())
+    
+    priority <- covid19 %>%
+      left_join(get_res_prior, by = "PersonalID") %>%
+      filter(ymd(COVID19AssessmentDate) >= mdy("04012020") &
+               ymd(COVID19AssessmentDate) <= today()) %>%
+      mutate(
+        Priority = case_when(
+          # if tested positive
+          (
+            Tested == 1 &
+              TestResults == "Positive" &
+              ymd(TestDate) > ymd(COVID19AssessmentDate) - days(14) &
+              !is.na(TestDate)
+          ) |
+            # if under investigation
+            (
+              UnderInvestigation == 1 &
+                ymd(DateUnderInvestigation) > ymd(COVID19AssessmentDate) - days(14)
+            ) |
+            # contact with COVID-19
+            (
+              ContactWithConfirmedCOVID19Patient == 1 &
+                (
+                  ymd(ContactWithConfirmedDate) >
+                    ymd(COVID19AssessmentDate) - days(14) |
+                    is.na(ContactWithConfirmedDate)
+                )
+              # compares contact date to the assessment date too since we want to
+              # see severity at the time of assessment
+            ) |
+            (
+              ContactWithUnderCOVID19Investigation == 1 &
+                (
+                  ymd(ContactWithUnderInvestigationDate) >
+                    ymd(COVID19AssessmentDate) - days(14) |
+                    is.na(ContactWithUnderInvestigationDate)
+                )
+            ) |
+            # if the client came from jail or nursing home
+            (
+              LivingSituation %in% c(7, 25) &
+                EntryDate > ymd(COVID19AssessmentDate) - days(14) &
+                EntryDate <= ymd(COVID19AssessmentDate)
+            ) |
+            # if the client has any symptoms at all
+            (
+              Symptom1BreathingDifficult +
+                Symptom1Cough +
+                Symptom2Chills +
+                Symptom2SoreThroat +
+                Symptom2Fever +
+                Symptom2Headache +
+                Symptom2LostTasteSmell +
+                Symptom2MusclePain +
+                Symptom2Congestion +
+                Symptom2Nausea +
+                Symptom2Diarrhea +
+                Symptom2Weak
+            ) > 0 ~ "Needs Isolation/Quarantine",
+          # if the client has any risks at all
+          (
+            HealthRiskHistoryOfRespiratoryIllness +
+              HealthRiskChronicIllness +
+              HealthRiskOver65 +
+              HealthRiskKidneyDisease +
+              HealthRiskImmunocompromised +
+              HealthRiskSmoke > 0
+          )  ~ "Has Health Risk(s)",
+          TRUE ~ "No Known Risks or Exposure"
+          # everyone else lands here ^
+          # in the report, there will be a third level: "Not Assessed Recently"
+        ),
+        Priority = factor(Priority, levels = c("Needs Isolation/Quarantine", 
+                                               "Has Health Risk(s)", 
+                                               "No Known Risks or Exposure")),
+        Week = format.Date(COVID19AssessmentDate, "%U"),
+        Week = as.numeric(Week),
+        Month = format.Date(COVID19AssessmentDate, "%m"),
+        MonthName = format.Date(COVID19AssessmentDate, "%B")
+      ) %>% 
+      filter(Week != current_week)
+    
+    week_names <- priority %>%
+      group_by(Week, MonthName) %>%
+      summarise(Clients = n()) %>%
+      pivot_wider(names_from = MonthName,
+                  values_from = Clients) %>%
+      ungroup() %>%
+      mutate(
+        April_yn = if_else(is.na(April), 0, 1),
+        May_yn = if_else(is.na(May), 0, 1),
+        June_yn = if_else(is.na(June), 0, 1),
+        July_yn = if_else(is.na(July), 0, 1),
+        August_yn = if_else(is.na(August), 0, 1),
+        Sept_yn = if_else(is.na(September), 0, 1),
+        how_many = April_yn + May_yn + June_yn + July_yn + August_yn + Sept_yn,
+        month_name = case_when(
+          how_many == 1 & April_yn == 1 ~ "April",
+          how_many == 1 & May_yn == 1 ~ "May",
+          how_many == 1 & June_yn == 1 ~ "June",
+          how_many == 1 & July_yn == 1 ~ "July",
+          how_many == 1 & August_yn == 1 ~ "August",
+          how_many == 1 & Sept_yn == 1 ~ "September",
+          April_yn + May_yn > 1 ~ "April-May",
+          May_yn + June_yn > 1 ~ "May-June",
+          June_yn + July_yn > 1 ~ "June-July",
+          July_yn + August_yn > 1 ~ "July-August",
+          August_yn + Sept_yn > 1 ~ "Aug-Sept"
+        ),
+        WeekName = paste(month_name, "Wk", Week),
+        Week = as.numeric(Week)
+      ) %>%
+      select(Week, WeekName)
+    
+    priority_plot <- priority %>%
+      dplyr::select(PersonalID, Week, Priority) %>%
+      group_by(Week, Priority) %>%
+      summarise(Clients = n()) %>%
+      left_join(week_names, by = "Week") %>%
+      arrange(Week)
+    
+    priority_plot %>%
+      ggplot(aes(x = reorder(WeekName, Week), y = Clients,
+                 fill = Priority, label = Clients)) +
+      scale_fill_brewer(palette = "GnBu", direction = -1) +
+      geom_bar(stat = "identity") +
+      theme_minimal() +
+      labs(x = NULL, y = "Clients Assessed") +
+      theme(legend.title=element_blank(),
+            legend.position = "top",
+            legend.text = element_text(size = 11),
+            axis.text.x = element_text(angle = 45, hjust=1, size = 11))
+  })  
   
-  current_week <- week(today())
-  
-  priority <- covid19 %>%
-    left_join(get_res_prior, by = "PersonalID") %>%
-    filter(ymd(COVID19AssessmentDate) >= mdy("04012020") &
-             ymd(COVID19AssessmentDate) <= today()) %>%
-    mutate(
-      Priority = case_when(
-        # if tested positive
-        (
+  output$covidStatus <- renderPlot({
+    get_res_prior <- validation %>%
+      select(PersonalID, EntryDate, ExitDate, LivingSituation) %>%
+      group_by(PersonalID) %>%
+      arrange(desc(EntryDate)) %>%
+      slice(1L)
+    
+    current_week <- week(today())
+    
+    covid19_status <- covid19 %>%
+      left_join(get_res_prior, by = "PersonalID") %>%
+      filter(ymd(COVID19AssessmentDate) >= mdy("04012020") &
+               ymd(COVID19AssessmentDate) <= today()) %>%
+      mutate(
+        COVID19Status = case_when(
           Tested == 1 &
             TestResults == "Positive" &
             ymd(TestDate) > ymd(COVID19AssessmentDate) - days(14) &
-            !is.na(TestDate)
-        ) |
-          # if under investigation
-          (
-            UnderInvestigation == 1 &
-              ymd(DateUnderInvestigation) > ymd(COVID19AssessmentDate) - days(14)
-          ) |
-          # contact with COVID-19
+            !is.na(TestDate) ~ "Positive",
+          # testing positive in the 14 days prior to assessment is the only way to
+          # land in this bucket
           (
             ContactWithConfirmedCOVID19Patient == 1 &
               (
@@ -644,246 +816,112 @@ output$covidPrioritization <- renderPlot({
                   ymd(COVID19AssessmentDate) - days(14) |
                   is.na(ContactWithConfirmedDate)
               )
-            # compares contact date to the assessment date too since we want to
-            # see severity at the time of assessment
+            # compares contact date to date of the assessment
           ) |
-          (
-            ContactWithUnderCOVID19Investigation == 1 &
-              (
-                ymd(ContactWithUnderInvestigationDate) >
-                  ymd(COVID19AssessmentDate) - days(14) |
-                  is.na(ContactWithUnderInvestigationDate)
-              )
-          ) |
-          # if the client came from jail or nursing home
-          (
-            LivingSituation %in% c(7, 25) &
-              EntryDate > ymd(COVID19AssessmentDate) - days(14) &
-              EntryDate <= ymd(COVID19AssessmentDate)
-          ) |
-          # if the client has any symptoms at all
-          (
-            Symptom1BreathingDifficult +
-              Symptom1Cough +
-              Symptom2Chills +
-              Symptom2SoreThroat +
-              Symptom2Fever +
-              Symptom2Headache +
-              Symptom2LostTasteSmell +
-              Symptom2MusclePain +
-              Symptom2Congestion +
-              Symptom2Nausea +
-              Symptom2Diarrhea +
-              Symptom2Weak
-          ) > 0 ~ "Needs Isolation/Quarantine",
-        # if the client has any risks at all
-        (
-          HealthRiskHistoryOfRespiratoryIllness +
-            HealthRiskChronicIllness +
-            HealthRiskOver65 +
-            HealthRiskKidneyDisease +
-            HealthRiskImmunocompromised +
-            HealthRiskSmoke > 0
-        )  ~ "Has Health Risk(s)",
-        TRUE ~ "No Known Risks or Exposure"
-        # everyone else lands here ^
-        # in the report, there will be a third level: "Not Assessed Recently"
-      ),
-      Priority = factor(Priority, levels = c("Needs Isolation/Quarantine", 
-                                             "Has Health Risk(s)", 
-                                             "No Known Risks or Exposure")),
-      Week = format.Date(COVID19AssessmentDate, "%U"),
-      Week = as.numeric(Week),
-      Month = format.Date(COVID19AssessmentDate, "%m"),
-      MonthName = format.Date(COVID19AssessmentDate, "%B")
-    ) %>% 
-    filter(Week != current_week)
-  
-  week_names <- priority %>%
-    group_by(Week, MonthName) %>%
-    summarise(Clients = n()) %>%
-    pivot_wider(names_from = MonthName,
-                values_from = Clients) %>%
-    ungroup() %>%
-    mutate(
-      April_yn = if_else(is.na(April), 0, 1),
-      May_yn = if_else(is.na(May), 0, 1),
-      June_yn = if_else(is.na(June), 0, 1),
-      July_yn = if_else(is.na(July), 0, 1),
-      August_yn = if_else(is.na(August), 0, 1),
-      Sept_yn = if_else(is.na(September), 0, 1),
-      how_many = April_yn + May_yn + June_yn + July_yn + August_yn + Sept_yn,
-      month_name = case_when(
-        how_many == 1 & April_yn == 1 ~ "April",
-        how_many == 1 & May_yn == 1 ~ "May",
-        how_many == 1 & June_yn == 1 ~ "June",
-        how_many == 1 & July_yn == 1 ~ "July",
-        how_many == 1 & August_yn == 1 ~ "August",
-        how_many == 1 & Sept_yn == 1 ~ "September",
-        April_yn + May_yn > 1 ~ "April-May",
-        May_yn + June_yn > 1 ~ "May-June",
-        June_yn + July_yn > 1 ~ "June-July",
-        July_yn + August_yn > 1 ~ "July-August",
-        August_yn + Sept_yn > 1 ~ "Aug-Sept"
-      ),
-      WeekName = paste(month_name, "Wk", Week),
-      Week = as.numeric(Week)
-    ) %>%
-    select(Week, WeekName)
-  
-  priority_plot <- priority %>%
-    dplyr::select(PersonalID, Week, Priority) %>%
-    group_by(Week, Priority) %>%
-    summarise(Clients = n()) %>%
-    left_join(week_names, by = "Week") %>%
-    arrange(Week)
-  
-  priority_plot %>%
-    ggplot(aes(x = reorder(WeekName, Week), y = Clients,
-               fill = Priority, label = Clients)) +
-    scale_fill_brewer(palette = "GnBu", direction = -1) +
-    geom_bar(stat = "identity") +
-    theme_minimal() +
-    labs(x = NULL, y = "Clients Assessed") +
-    theme(legend.title=element_blank(),
-          legend.position = "top",
-          legend.text = element_text(size = 11),
-          axis.text.x = element_text(angle = 45, hjust=1, size = 11))
-})  
-
-output$covidStatus <- renderPlot({
-  get_res_prior <- validation %>%
-    select(PersonalID, EntryDate, ExitDate, LivingSituation) %>%
-    group_by(PersonalID) %>%
-    arrange(desc(EntryDate)) %>%
-    slice(1L)
-  
-  current_week <- week(today())
-  
-  covid19_status <- covid19 %>%
-    left_join(get_res_prior, by = "PersonalID") %>%
-    filter(ymd(COVID19AssessmentDate) >= mdy("04012020") &
-             ymd(COVID19AssessmentDate) <= today()) %>%
-    mutate(
-      COVID19Status = case_when(
-        Tested == 1 &
-          TestResults == "Positive" &
-          ymd(TestDate) > ymd(COVID19AssessmentDate) - days(14) &
-          !is.na(TestDate) ~ "Positive",
-        # testing positive in the 14 days prior to assessment is the only way to
-        # land in this bucket
-        (
-          ContactWithConfirmedCOVID19Patient == 1 &
             (
-              ymd(ContactWithConfirmedDate) >
-                ymd(COVID19AssessmentDate) - days(14) |
-                is.na(ContactWithConfirmedDate)
-            )
-          # compares contact date to date of the assessment
-        ) |
-          (
-            ContactWithUnderCOVID19Investigation == 1 &
-              (
-                ymd(ContactWithUnderInvestigationDate) >
-                  ymd(COVID19AssessmentDate) - days(14) |
-                  is.na(ContactWithUnderInvestigationDate)
-              )
-          ) |
-          (
-            Symptom1BreathingDifficult +
-              Symptom1Cough +
-              Symptom2Chills +
-              Symptom2SoreThroat +
-              Symptom2Fever +
-              Symptom2Headache +
-              Symptom2LostTasteSmell +
-              Symptom2MusclePain +
-              Symptom2Congestion +
-              Symptom2Nausea +
-              Symptom2Diarrhea +
-              Symptom2Weak
-          ) > 0
-        |
-          (
-            UnderInvestigation == 1 &
-              ymd(DateUnderInvestigation) > ymd(COVID19AssessmentDate) - days(14)
-          ) ~
-          "May Have COVID-19",
-        # being Under Investigation (past 14 days), any Symptom, or any Contact
-        # in the 14 days prior to the assessment date will land you here ^
-        TRUE ~ "No Current Indications"
-        # everyone else lands here ^
-      ),
-      COVID19Status = factor(
-        COVID19Status,
-        levels = c("No Current Indications",
-                   "May Have COVID-19",
-                   "Positive")
-      ),
-      Week = format.Date(COVID19AssessmentDate, "%U"),
-      Week = as.numeric(Week),
-      Month = format.Date(COVID19AssessmentDate, "%m"),
-      MonthName = format.Date(COVID19AssessmentDate, "%B")
-    ) %>% 
-    filter(Week != current_week)
+              ContactWithUnderCOVID19Investigation == 1 &
+                (
+                  ymd(ContactWithUnderInvestigationDate) >
+                    ymd(COVID19AssessmentDate) - days(14) |
+                    is.na(ContactWithUnderInvestigationDate)
+                )
+            ) |
+            (
+              Symptom1BreathingDifficult +
+                Symptom1Cough +
+                Symptom2Chills +
+                Symptom2SoreThroat +
+                Symptom2Fever +
+                Symptom2Headache +
+                Symptom2LostTasteSmell +
+                Symptom2MusclePain +
+                Symptom2Congestion +
+                Symptom2Nausea +
+                Symptom2Diarrhea +
+                Symptom2Weak
+            ) > 0
+          |
+            (
+              UnderInvestigation == 1 &
+                ymd(DateUnderInvestigation) > ymd(COVID19AssessmentDate) - days(14)
+            ) ~
+            "May Have COVID-19",
+          # being Under Investigation (past 14 days), any Symptom, or any Contact
+          # in the 14 days prior to the assessment date will land you here ^
+          TRUE ~ "No Current Indications"
+          # everyone else lands here ^
+        ),
+        COVID19Status = factor(
+          COVID19Status,
+          levels = c("No Current Indications",
+                     "May Have COVID-19",
+                     "Positive")
+        ),
+        Week = format.Date(COVID19AssessmentDate, "%U"),
+        Week = as.numeric(Week),
+        Month = format.Date(COVID19AssessmentDate, "%m"),
+        MonthName = format.Date(COVID19AssessmentDate, "%B")
+      ) %>% 
+      filter(Week != current_week)
+    
+    week_names <- covid19_status %>%
+      group_by(Week, MonthName) %>%
+      summarise(Clients = n()) %>%
+      pivot_wider(names_from = MonthName,
+                  values_from = Clients) %>%
+      ungroup() %>%
+      mutate(
+        April_yn = if_else(is.na(April), 0, 1),
+        May_yn = if_else(is.na(May), 0, 1),
+        June_yn = if_else(is.na(June), 0, 1),
+        July_yn = if_else(is.na(July), 0, 1),
+        August_yn = if_else(is.na(August), 0, 1),
+        Sept_yn = if_else(is.na(September), 0, 1),
+        how_many = April_yn + May_yn + June_yn + July_yn + August_yn + Sept_yn,
+        month_name = case_when(
+          how_many == 1 & April_yn == 1 ~ "April",
+          how_many == 1 & May_yn == 1 ~ "May",
+          how_many == 1 & June_yn == 1 ~ "June",
+          how_many == 1 & July_yn == 1 ~ "July",
+          how_many == 1 & August_yn == 1 ~ "August",
+          how_many == 1 & Sept_yn == 1 ~ "September",
+          April_yn + May_yn > 1 ~ "April-May",
+          May_yn + June_yn > 1 ~ "May-June",
+          June_yn + July_yn > 1 ~ "June-July",
+          July_yn + August_yn > 1 ~ "July-August",
+          August_yn + Sept_yn > 1 ~ "Aug-Sept"
+        ),
+        WeekName = paste(month_name, "Wk", Week),
+        Week = as.numeric(Week)
+      ) %>%
+      select(Week, WeekName)
+    
+    
+    plot <- covid19_status %>%
+      select(PersonalID, Week, COVID19Status) %>%
+      group_by(Week, COVID19Status) %>%
+      summarise(Clients = n()) %>%
+      left_join(week_names, by = "Week") %>%
+      arrange(Week) %>%
+      ggplot(aes(x = reorder(WeekName, Week), y = Clients,
+                 fill = COVID19Status)) +
+      geom_bar(stat = "identity", 
+               position = position_stack(reverse = TRUE)) +  
+      scale_fill_manual(values = c("#e0ecf4", "#9ebcda", "#8856a7")) +
+      theme_minimal() +
+      labs(x = NULL, y = "Clients Assessed") +
+      theme(legend.title=element_blank(),
+            legend.position = "top",
+            legend.text = element_text(size = 11),
+            axis.text.x = element_text(angle = 45, hjust=1, size = 11))
+    
+    plot
+    
+  })
   
-  week_names <- covid19_status %>%
-    group_by(Week, MonthName) %>%
-    summarise(Clients = n()) %>%
-    pivot_wider(names_from = MonthName,
-                values_from = Clients) %>%
-    ungroup() %>%
-    mutate(
-      April_yn = if_else(is.na(April), 0, 1),
-      May_yn = if_else(is.na(May), 0, 1),
-      June_yn = if_else(is.na(June), 0, 1),
-      July_yn = if_else(is.na(July), 0, 1),
-      August_yn = if_else(is.na(August), 0, 1),
-      Sept_yn = if_else(is.na(September), 0, 1),
-      how_many = April_yn + May_yn + June_yn + July_yn + August_yn + Sept_yn,
-      month_name = case_when(
-        how_many == 1 & April_yn == 1 ~ "April",
-        how_many == 1 & May_yn == 1 ~ "May",
-        how_many == 1 & June_yn == 1 ~ "June",
-        how_many == 1 & July_yn == 1 ~ "July",
-        how_many == 1 & August_yn == 1 ~ "August",
-        how_many == 1 & Sept_yn == 1 ~ "September",
-        April_yn + May_yn > 1 ~ "April-May",
-        May_yn + June_yn > 1 ~ "May-June",
-        June_yn + July_yn > 1 ~ "June-July",
-        July_yn + August_yn > 1 ~ "July-August",
-        August_yn + Sept_yn > 1 ~ "Aug-Sept"
-      ),
-      WeekName = paste(month_name, "Wk", Week),
-      Week = as.numeric(Week)
-    ) %>%
-    select(Week, WeekName)
-  
-  
-  plot <- covid19_status %>%
-    select(PersonalID, Week, COVID19Status) %>%
-    group_by(Week, COVID19Status) %>%
-    summarise(Clients = n()) %>%
-    left_join(week_names, by = "Week") %>%
-    arrange(Week) %>%
-    ggplot(aes(x = reorder(WeekName, Week), y = Clients,
-               fill = COVID19Status)) +
-    geom_bar(stat = "identity", 
-             position = position_stack(reverse = TRUE)) +  
-    scale_fill_manual(values = c("#e0ecf4", "#9ebcda", "#8856a7")) +
-    theme_minimal() +
-    labs(x = NULL, y = "Clients Assessed") +
-    theme(legend.title=element_blank(),
-          legend.position = "top",
-          legend.text = element_text(size = 11),
-          axis.text.x = element_text(angle = 45, hjust=1, size = 11))
-  
-  plot
-  
-})
-  
-    output$bedPlot <-
+  output$bedPlot <-
     renderPlotly({
+
       ReportEnd <- ymd(input$utilizationDate) 
       ReportStart <- floor_date(ymd(ReportEnd), unit = "month") -
         years(1) +
@@ -923,8 +961,9 @@ output$covidStatus <- renderPlot({
       utilizationPlot <- unitPlot %>%
         full_join(bedPlot,
                   by = c("ProjectID", "ProjectName", "ProjectType", "Month")) 
-      
-      plot_ly(utilizationPlot, 
+
+
+      .p <- plot_ly(utilizationPlot, 
               x = ~Month) %>%
         add_trace(y = ~ Unit,
                   name = "Unit Utilization",
@@ -951,7 +990,8 @@ output$covidStatus <- renderPlot({
                       format(ymd(ReportStart), "%B %Y"), 
                       "to", 
                       format(ymd(ReportEnd), "%B %Y")))
-      
+
+      .p
     })  
   
   output$unitNote <-
@@ -975,8 +1015,9 @@ output$covidStatus <- renderPlot({
   output$utilizationNote <-
     renderUI(HTML(note_calculation_utilization))
   
-  output$spmLoTH <- DT::renderDataTable({
     
+  output$spmLoTH <- DT::renderDataTable({
+
     a <- spm_1b_loth_self_report %>%
       filter(Metric1b == "Persons in ES, SH, TH, and PH") %>%
       mutate(AvgLoT = paste(as.integer(AvgLoT), "days"),
@@ -989,16 +1030,16 @@ output$covidStatus <- renderPlot({
         "Prior Year<br>Median" = Prior_MedLoT,
         "Current Year<br>Median" = MedLoT
       )
-    
+
     datatable(a,
               rownames = FALSE,
               options = list(dom = 't'),
               escape = FALSE)
-    
   })
+    
   
   output$spmRecurrence <- DT::renderDataTable({
-    
+
     a <- spm_2_recurrence %>%
       filter(ProjectType == "TOTAL Returns to Homelessness") %>%
       mutate_at(vars(-ProjectType), as.integer) %>%
@@ -1023,15 +1064,16 @@ output$covidStatus <- renderPlot({
         "Current Year<br>Recurred up to 2 Years After Permanent Exit" = Percent2yrCurrent
       )
     
-    datatable(a,
+    .out <- datatable(a,
               rownames = FALSE,
               options = list(dom = 't'),
               escape = FALSE)
-    
+
+    .out
   })
   
   output$spmExitsToPH <- DT::renderDataTable({
-    
+
     a <- spm_7b1_exits_lh %>%
       filter(Metric7b1 == "% Successful exits") %>%
       mutate(Metric7b1 = "ES, TH, SH, RRH: Successful Exits") %>%
@@ -1039,7 +1081,8 @@ output$covidStatus <- renderPlot({
         "Metric" = Metric7b1,
         "Prior Year" = PriorYear,
         "Current Year" = CurrentYear)
-    
+
+
     b <- spm_7b2_exits_ph %>%
       filter(Metric7b2 == "% Successful exits/retention") %>%
       mutate(Metric7b2 = "PSH: Successful Exits/Retention of Housing in PSH") %>%
@@ -1048,7 +1091,7 @@ output$covidStatus <- renderPlot({
         "Prior Year" = PriorYear,
         "Current Year" = CurrentYear
       )
-    
+
     c <- rbind(a, b)
     
     datatable(c,
@@ -1058,7 +1101,7 @@ output$covidStatus <- renderPlot({
   })
   
   output$spmPIT <- DT::renderDataTable({
-    
+
     a <- tribble(
       ~Population, ~January2019Count, ~January2020Count,
       "Total", 3479, 3577,
@@ -1078,7 +1121,7 @@ output$covidStatus <- renderPlot({
              "January 2019 Count" = January2019Count,
              "January 2020 Count" = January2020Count,
              Difference)
-    
+
     datatable(a,
               rownames = FALSE,
               options = list(dom = 't'))
@@ -1086,6 +1129,7 @@ output$covidStatus <- renderPlot({
   })
   
   output$headerQPRCommunityNeed <- renderUI({
+
     ReportStart <- format.Date(ymd(paste0(
       substr(input$spdatSlider, 1, 4),
       "-01-01"
@@ -1100,14 +1144,17 @@ output$covidStatus <- renderPlot({
       substr(input$spdatSlider, 1, 4)
     )), "%m-%d-%Y")
     
-    list(h2("Quarterly Performance Report"),
+    .out <- list(h2("Quarterly Performance Report"),
          h3("Community Need"),
          h4(input$regionList),
          h4(ReportStart, "-", ReportEnd))
+
+    .out
   })  
   
   output$SPDATScoresByCounty <-
     renderPlot({
+      
       ReportStart <- format.Date(ymd(paste0(
         substr(input$spdatSlider, 1, 4),
         "-01-01"
@@ -1121,6 +1168,7 @@ output$covidStatus <- renderPlot({
         ),
         substr(input$spdatSlider, 1, 4)
       )), "%m-%d-%Y")
+
       # counting all hhs who were scored AND SERVED between the report dates
       CountyAverageScores <- qpr_spdats_county %>%
         filter(served_between(., ReportStart, ReportEnd)) %>%
@@ -1129,12 +1177,16 @@ output$covidStatus <- renderPlot({
         group_by(CountyServed) %>%
         summarise(AverageScore = round(mean(Score), 1),
                   HHsLHinCounty = n())
+
+
       # counting all hhs who ENTERED either RRH or PSH between the report dates
       CountyHousedAverageScores <- qpr_spdats_project %>%
         filter(entered_between(., ReportStart, ReportEnd)) %>%
         group_by(CountyServed) %>%
         summarise(HousedAverageScore = round(mean(ScoreAdjusted), 1),
                   HHsHousedInCounty = n())
+
+
       # pulling in both averages for each county plus adding Region for grouping
       Compare <-
         full_join(CountyAverageScores,
@@ -1143,8 +1195,10 @@ output$covidStatus <- renderPlot({
         arrange(CountyServed) %>%
         left_join(., regions, by = c("CountyServed" = "County")) %>%
         filter(RegionName == input$regionList)
+
       # the plot
-      ggplot(Compare, aes(x = CountyServed, y = AverageScore)) +
+
+      .g <- ggplot(Compare, aes(x = CountyServed, y = AverageScore)) +
         geom_point(size = 12, shape = 95) +
         scale_y_continuous(limits = c(0, 17)) +
         geom_point(
@@ -1174,6 +1228,8 @@ output$covidStatus <- renderPlot({
           the Ohio Balance of State CoC HMIS. Detail may be found at R minor
           elevated."
         )
+
+      .g
     })
   
   output$CountyScoresText <-
@@ -1224,7 +1280,7 @@ output$covidStatus <- renderPlot({
         ),
         substr(input$LoSSlider, 1, 4)
       )), "%m-%d-%Y")
-      
+
       LoSGoals <- goals %>%
         select(-Measure) %>%
         mutate(
@@ -1241,7 +1297,8 @@ output$covidStatus <- renderPlot({
         filter(SummaryMeasure == "Length of Stay" &
                  ProjectType %in% c(input$radioLoSPTC)) %>%
         unique()
-      
+
+utils::Rprof("profvis/server_rprof/1301-1327.Rprof", interval = 0.02,  memory.profiling = TRUE)       #<p
       LoSDetail <- qpr_leavers %>%
         filter(((
           !is.na(MoveInDateAdjust) &
@@ -1267,11 +1324,13 @@ output$covidStatus <- renderPlot({
           ProjectRegion %in% c(input$LoSRegionSelect) &
             ProjectType %in% c(input$radioLoSPTC)
         ) # this filter needs
+Rprof(NULL)       #>p
+
       # to be here so the selection text matches the mutated data
       TotalLeavers <- LoSDetail %>%
         group_by(FriendlyProjectName) %>%
         summarise(Leavers = n())
-      
+
       title <-
         paste0(
           "Length of Stay (",
@@ -1283,7 +1342,7 @@ output$covidStatus <- renderPlot({
           " to ",
           ReportEnd
         )
-      
+
       LoSSummary <- LoSDetail %>%
         group_by(FriendlyProjectName,
                  ProjectRegion,
@@ -1309,9 +1368,10 @@ output$covidStatus <- renderPlot({
             sep = "\n"
           )
         )
-      
+
+
       if (nrow(LoSDetail) > 0) {
-        plot_ly(
+        .p <- plot_ly(
           data = LoSSummary,
           x = ~ FriendlyProjectName,
           y = ~ Days,
@@ -1356,11 +1416,13 @@ output$covidStatus <- renderPlot({
           )
       }
       else {
-        
+        .p <- NULL
       }
+
+      .p
     })
-               # })
- 
+  # })
+  
   # QPR Exits to PH 
   
   output$headerQPRExitsToPH <- renderUI({
@@ -1388,120 +1450,254 @@ output$covidStatus <- renderPlot({
   # observeEvent(
   #   c(input$ExitsToPHRegionSelect, input$ExitsToPHSlider),
   #   {
-      output$ExitsToPH <- renderPlotly({
-        ReportStart <- format.Date(ymd(paste0(
-          substr(input$ExitsToPHSlider, 1, 4),
-          "-01-01"
-        )), "%m-%d-%Y")
-        ReportEnd <- format.Date(mdy(paste0(
-          case_when(
-            substr(input$ExitsToPHSlider, 7, 7) == 1 ~ "03-31-",
-            substr(input$ExitsToPHSlider, 7, 7) == 2 ~ "06-30-",
-            substr(input$ExitsToPHSlider, 7, 7) == 3 ~ "09-30-",
-            substr(input$ExitsToPHSlider, 7, 7) == 4 ~ "12-31-"
-          ),
-          substr(input$ExitsToPHSlider, 1, 4)
-        )), "%m-%d-%Y")
-        # title changes if you pick PSH since it's looking at Stayers as well
-        yAxisTitle <- if_else(
-          input$radioExitsToPHPTC !=
-            "Permanent Supportive Housing",
-          "Exited to Permanent Housing",
-          "Remained in or Exited to PH"
+  output$ExitsToPH <- renderPlotly({
+    ReportStart <- format.Date(ymd(paste0(
+      substr(input$ExitsToPHSlider, 1, 4),
+      "-01-01"
+    )), "%m-%d-%Y")
+    ReportEnd <- format.Date(mdy(paste0(
+      case_when(
+        substr(input$ExitsToPHSlider, 7, 7) == 1 ~ "03-31-",
+        substr(input$ExitsToPHSlider, 7, 7) == 2 ~ "06-30-",
+        substr(input$ExitsToPHSlider, 7, 7) == 3 ~ "09-30-",
+        substr(input$ExitsToPHSlider, 7, 7) == 4 ~ "12-31-"
+      ),
+      substr(input$ExitsToPHSlider, 1, 4)
+    )), "%m-%d-%Y")
+
+    # title changes if you pick PSH since it's looking at Stayers as well
+    yAxisTitle <- if_else(
+      input$radioExitsToPHPTC !=
+        "Permanent Supportive Housing",
+      "Exited to Permanent Housing",
+      "Remained in or Exited to PH"
+    )
+
+utils::Rprof("profvis/server_rprof/1476-1502.Rprof", interval = 0.02,  memory.profiling = TRUE) #<p
+    # hhs that achieved the goal
+    SuccessfullyPlaced <- qpr_leavers %>%
+      filter(((
+        ProjectType %in% c(3, 9, 13) &
+          !is.na(MoveInDateAdjust)
+      ) |
+        ProjectType %in% c(1, 2, 4, 8, 12)) &
+        # excluding non-mover-inners
+        (((DestinationGroup == "Permanent" |
+             #exited to ph or still in PSH/HP
+             is.na(ExitDate)) &
+            ProjectType %in% c(3, 9, 12) &
+            served_between(., ReportStart, ReportEnd)# PSH & HP
+        ) |
+          (
+            DestinationGroup == "Permanent" & # exited to ph
+              ProjectType %in% c(1, 2, 4, 8, 13) &
+              exited_between(., ReportStart, ReportEnd)
+          )
+        )) %>% # ES, TH, SH, RRH, OUT) %>%
+      group_by(FriendlyProjectName, 
+               ProjectType, 
+               ProjectCounty, 
+               ProjectRegion) %>%
+      summarise(SuccessfullyPlacedHHs = n())
+Rprof(NULL)     #>p
+utils::Rprof("profvis/server_rprof/1503-1520.Rprof", interval = 0.02,  memory.profiling = TRUE)     #<p
+    # calculating the total households to compare successful placements to
+    TotalHHsSuccessfulPlacement <- qpr_leavers %>%
+      filter((
+        served_between(., ReportStart, ReportEnd) &
+          ProjectType %in% c(3, 9, 12) # PSH & HP
+      ) |
+        (
+          exited_between(., ReportStart, ReportEnd) &
+            ProjectType %in% c(1, 2, 4, 8, 13) # ES, TH, SH, OUT, RRH
+        )) %>%
+      group_by(FriendlyProjectName, 
+               ProjectType, 
+               ProjectCounty, 
+               ProjectRegion) %>%
+      summarise(TotalHHs = n()) # For PSH & HP, it's total hhs served;
+    # otherwise, it's total hhs *exited* during the reporting period
+Rprof(NULL)     #>p
+
+    SuccessfulPlacement <- TotalHHsSuccessfulPlacement %>%
+      left_join(
+        SuccessfullyPlaced,
+        by = c("FriendlyProjectName", 
+               "ProjectType", 
+               "ProjectCounty", 
+               "ProjectRegion")
+      ) %>%
+      mutate(Percent = SuccessfullyPlacedHHs / TotalHHs)
+
+    SuccessfulPlacement[is.na(SuccessfulPlacement)] <- 0
+
+    PlacementGoal <-
+      goals %>%
+      filter(
+        SummaryMeasure == "Obtaining and Maintaining Permanent Housing" &
+          Measure != "Exits to Temporary or Permanent Housing"
+      )
+    title <- paste0("Exits to Permanent Housing\n", 
+                    input$radioExitsToPHPTC, "\n",
+                    ReportStart, " to ", ReportEnd)
+
+    
+    region <- input$ExitsToPHRegionSelect
+    # translating the project type from radiobutton to numeric
+    # since PSH is both 3 and 9, we have to account for that
+    x <- c(1, 2, 3, 4, 8, 9, 12, 13)
+    y <- c("Emergency Shelters", "Transitional Housing", 
+           "Permanent Supportive Housing", "Street Outreach", "Safe Haven",
+           "Permanent Supportive Housing", "Prevention",  "Rapid Rehousing")
+    PTC <- as.data.frame(cbind(x, y))
+    ptc <- PTC %>% filter(y == input$radioExitsToPHPTC) %>% select(x)
+    ptc <- as_vector(ptc)
+
+    stagingExitsToPH <- SuccessfulPlacement %>%
+      left_join(PlacementGoal, by = "ProjectType") %>%
+      filter(ProjectType %in% ptc, ProjectRegion %in% region) %>%
+      mutate(
+        hover = paste0(
+          FriendlyProjectName, 
+          "\nExited to PH: ", SuccessfullyPlacedHHs, 
+          "\nTotal Households: ", TotalHHs, 
+          "\n", as.integer(Percent * 100), "%",
+          sep = "\n"
         )
-        # hhs that achieved the goal
-        SuccessfullyPlaced <- qpr_leavers %>%
-          filter(((
-            ProjectType %in% c(3, 9, 13) &
-              !is.na(MoveInDateAdjust)
-          ) |
-            ProjectType %in% c(1, 2, 4, 8, 12)) &
-            # excluding non-mover-inners
-            (((DestinationGroup == "Permanent" |
-                 #exited to ph or still in PSH/HP
-                 is.na(ExitDate)) &
-                ProjectType %in% c(3, 9, 12) &
-                served_between(., ReportStart, ReportEnd)# PSH & HP
-            ) |
-              (
-                DestinationGroup == "Permanent" & # exited to ph
-                  ProjectType %in% c(1, 2, 4, 8, 13) &
-                  exited_between(., ReportStart, ReportEnd)
-              )
-            )) %>% # ES, TH, SH, RRH, OUT) %>%
-          group_by(FriendlyProjectName, 
-                   ProjectType, 
-                   ProjectCounty, 
-                   ProjectRegion) %>%
-          summarise(SuccessfullyPlacedHHs = n())
-        
-        # calculating the total households to compare successful placements to
-        TotalHHsSuccessfulPlacement <- qpr_leavers %>%
-          filter((
-            served_between(., ReportStart, ReportEnd) &
-              ProjectType %in% c(3, 9, 12) # PSH & HP
-          ) |
-            (
-              exited_between(., ReportStart, ReportEnd) &
-                ProjectType %in% c(1, 2, 4, 8, 13) # ES, TH, SH, OUT, RRH
-            )) %>%
-          group_by(FriendlyProjectName, 
-                   ProjectType, 
-                   ProjectCounty, 
-                   ProjectRegion) %>%
-          summarise(TotalHHs = n()) # For PSH & HP, it's total hhs served;
-        # otherwise, it's total hhs *exited* during the reporting period
-        
-        SuccessfulPlacement <- TotalHHsSuccessfulPlacement %>%
-          left_join(
-            SuccessfullyPlaced,
-            by = c("FriendlyProjectName", 
-                   "ProjectType", 
-                   "ProjectCounty", 
-                   "ProjectRegion")
-          ) %>%
-          mutate(Percent = SuccessfullyPlacedHHs / TotalHHs)
-        
-        SuccessfulPlacement[is.na(SuccessfulPlacement)] <- 0
-        
-        PlacementGoal <-
-          goals %>%
-          filter(
-            SummaryMeasure == "Obtaining and Maintaining Permanent Housing" &
-              Measure != "Exits to Temporary or Permanent Housing"
+      )
+
+
+    if(nrow(stagingExitsToPH) > 0) {
+      .p <- plot_ly(
+        stagingExitsToPH,
+        x = ~ FriendlyProjectName,
+        y = ~ Percent,
+        text = ~ hover,
+        hoverinfo = 'text',
+        type = "bar"
+      ) %>%
+        layout(
+          xaxis = list(title = ""),
+          yaxis = list(title = yAxisTitle,
+                       tickformat = "%"),
+          title = list(
+            text = title,
+            font = list(
+              size = 15
+            )),
+          margin = list(
+            l = 50,
+            r = 50,
+            b = 100,
+            t = 100,
+            pad = 4
+          ),
+          shapes = list(
+            type = "rect",
+            name = "CoC Goal",
+            fillcolor = "#008000",
+            line = list(color = "white", width = .01),
+            layer = "below",
+            xref = "paper",
+            yref = "y",
+            x0 = 0,
+            x1 = 1,
+            y0 = ~ Goal[1],
+            y1 = 1,
+            opacity = .2
+          ),
+          title = "Obtaining and Maintaining Permanent Housing"
+        )}
+    else{
+      .p <- NULL
+    }
+
+    .p
+  })
+  
+  output$ExitsToPHOutreach <- renderPlotly({
+    if (input$radioExitsToPHPTC == "Street Outreach") {
+      ReportStart <- format.Date(ymd(paste0(
+        substr(input$ExitsToPHSlider, 1, 4),
+        "-01-01"
+      )), "%m-%d-%Y")
+      ReportEnd <- format.Date(mdy(paste0(
+        case_when(
+          substr(input$ExitsToPHSlider, 7, 7) == 1 ~ "03-31-",
+          substr(input$ExitsToPHSlider, 7, 7) == 2 ~ "06-30-",
+          substr(input$ExitsToPHSlider, 7, 7) == 3 ~ "09-30-",
+          substr(input$ExitsToPHSlider, 7, 7) == 4 ~ "12-31-"
+        ),
+        substr(input$ExitsToPHSlider, 1, 4)
+      )), "%m-%d-%Y")
+
+      totalServed <- qpr_leavers %>%
+        filter(exited_between(., ReportStart, ReportEnd) &
+                 ProjectType == 4) %>%
+        group_by(FriendlyProjectName,
+                 ProjectType,
+                 ProjectCounty,
+                 ProjectRegion) %>%
+        summarise(TotalHHs = n())
+
+utils::Rprof("profvis/server_rprof/1643-1656.Rprof", interval = 0.02,  memory.profiling = TRUE)       #<p
+      notUnsheltered <- qpr_leavers %>%
+        filter(
+          ProjectType == 4 &
+            Destination != 16 &
+            DestinationGroup %in% c("Temporary", "Permanent") &
+            exited_between(., ReportStart, ReportEnd)
+        ) %>%
+        group_by(FriendlyProjectName,
+                 ProjectType,
+                 ProjectCounty,
+                 ProjectRegion) %>%
+        summarise(NotUnsheltered = n())
+Rprof(NULL)       #>p
+
+      goalOutreach <- goals %>%
+        filter(Measure == "Exits to Temporary or Permanent Housing") %>%
+        select(Goal, ProjectType)
+      
+      notUnsheltered <- notUnsheltered %>%
+        left_join(goalOutreach, by = "ProjectType") %>%
+        left_join(
+          totalServed,
+          by = c(
+            "FriendlyProjectName",
+            "ProjectType",
+            "ProjectCounty",
+            "ProjectRegion"
           )
-        
-        title <- paste0("Exits to Permanent Housing\n", 
-                        input$radioExitsToPHPTC, "\n",
-                        ReportStart, " to ", ReportEnd)
-        
-        region <- input$ExitsToPHRegionSelect
-        # translating the project type from radiobutton to numeric
-        # since PSH is both 3 and 9, we have to account for that
-        x <- c(1, 2, 3, 4, 8, 9, 12, 13)
-        y <- c("Emergency Shelters", "Transitional Housing", 
-               "Permanent Supportive Housing", "Street Outreach", "Safe Haven",
-               "Permanent Supportive Housing", "Prevention",  "Rapid Rehousing")
-        PTC <- as.data.frame(cbind(x, y))
-        ptc <- PTC %>% filter(y == input$radioExitsToPHPTC) %>% select(x)
-        ptc <- as_vector(ptc)
-        
-        stagingExitsToPH <- SuccessfulPlacement %>%
-          left_join(PlacementGoal, by = "ProjectType") %>%
-          filter(ProjectType %in% ptc, ProjectRegion %in% region) %>%
-          mutate(
-            hover = paste0(
-              FriendlyProjectName, 
-              "\nExited to PH: ", SuccessfullyPlacedHHs, 
-              "\nTotal Households: ", TotalHHs, 
-              "\n", as.integer(Percent * 100), "%",
-              sep = "\n"
-            )
+        ) %>%
+        mutate(
+          Percent = NotUnsheltered / TotalHHs,
+          hover = paste0(
+            FriendlyProjectName,
+            "\nExited to Temp or PH: ",
+            NotUnsheltered,
+            "\nTotal Households: ",
+            TotalHHs,
+            "\n",
+            as.integer(Percent * 100),
+            "%",
+            sep = "\n"
           )
-        
-        if(nrow(stagingExitsToPH) > 0) {
-        plot_ly(
-          stagingExitsToPH,
+        ) %>%
+        filter(ProjectRegion %in% c(input$ExitsToPHRegionSelect))
+      title <-
+        paste0(
+          "Exits to Temporary or Permanent Housing\n",
+          "Street Outreach\n",
+          ReportStart,
+          " to ",
+          ReportEnd
+        )
+
+
+      if (nrow(notUnsheltered) > 0) {
+        .p <- plot_ly(
+          notUnsheltered,
           x = ~ FriendlyProjectName,
           y = ~ Percent,
           text = ~ hover,
@@ -1510,13 +1706,10 @@ output$covidStatus <- renderPlot({
         ) %>%
           layout(
             xaxis = list(title = ""),
-            yaxis = list(title = yAxisTitle,
+            yaxis = list(title = "Exited to Temporary or Permanent Housing",
                          tickformat = "%"),
-            title = list(
-              text = title,
-              font = list(
-                size = 15
-              )),
+            title = list(text = title,
+                         font = list(size = 15)),
             margin = list(
               l = 50,
               r = 50,
@@ -1539,135 +1732,19 @@ output$covidStatus <- renderPlot({
               opacity = .2
             ),
             title = "Obtaining and Maintaining Permanent Housing"
-          )}
-        else{
-          
-        }
-      })
-      
-      output$ExitsToPHOutreach <- renderPlotly({
-        if (input$radioExitsToPHPTC == "Street Outreach") {
-          ReportStart <- format.Date(ymd(paste0(
-            substr(input$ExitsToPHSlider, 1, 4),
-            "-01-01"
-          )), "%m-%d-%Y")
-          ReportEnd <- format.Date(mdy(paste0(
-            case_when(
-              substr(input$ExitsToPHSlider, 7, 7) == 1 ~ "03-31-",
-              substr(input$ExitsToPHSlider, 7, 7) == 2 ~ "06-30-",
-              substr(input$ExitsToPHSlider, 7, 7) == 3 ~ "09-30-",
-              substr(input$ExitsToPHSlider, 7, 7) == 4 ~ "12-31-"
-            ),
-            substr(input$ExitsToPHSlider, 1, 4)
-          )), "%m-%d-%Y")
-          
-          totalServed <- qpr_leavers %>%
-            filter(exited_between(., ReportStart, ReportEnd) &
-                     ProjectType == 4) %>%
-            group_by(FriendlyProjectName,
-                     ProjectType,
-                     ProjectCounty,
-                     ProjectRegion) %>%
-            summarise(TotalHHs = n())
-          
-          notUnsheltered <- qpr_leavers %>%
-            filter(
-              ProjectType == 4 &
-                Destination != 16 &
-                DestinationGroup %in% c("Temporary", "Permanent") &
-                exited_between(., ReportStart, ReportEnd)
-            ) %>%
-            group_by(FriendlyProjectName,
-                     ProjectType,
-                     ProjectCounty,
-                     ProjectRegion) %>%
-            summarise(NotUnsheltered = n())
-          
-          goalOutreach <- goals %>%
-            filter(Measure == "Exits to Temporary or Permanent Housing") %>%
-            select(Goal, ProjectType)
-          
-          notUnsheltered <- notUnsheltered %>%
-            left_join(goalOutreach, by = "ProjectType") %>%
-            left_join(
-              totalServed,
-              by = c(
-                "FriendlyProjectName",
-                "ProjectType",
-                "ProjectCounty",
-                "ProjectRegion"
-              )
-            ) %>%
-            mutate(
-              Percent = NotUnsheltered / TotalHHs,
-              hover = paste0(
-                FriendlyProjectName,
-                "\nExited to Temp or PH: ",
-                NotUnsheltered,
-                "\nTotal Households: ",
-                TotalHHs,
-                "\n",
-                as.integer(Percent * 100),
-                "%",
-                sep = "\n"
-              )
-            ) %>%
-            filter(ProjectRegion %in% c(input$ExitsToPHRegionSelect))
-          
-          title <-
-            paste0(
-              "Exits to Temporary or Permanent Housing\n",
-              "Street Outreach\n",
-              ReportStart,
-              " to ",
-              ReportEnd
-            )
-          if (nrow(notUnsheltered) > 0) {
-            plot_ly(
-              notUnsheltered,
-              x = ~ FriendlyProjectName,
-              y = ~ Percent,
-              text = ~ hover,
-              hoverinfo = 'text',
-              type = "bar"
-            ) %>%
-              layout(
-                xaxis = list(title = ""),
-                yaxis = list(title = "Exited to Temporary or Permanent Housing",
-                             tickformat = "%"),
-                title = list(text = title,
-                             font = list(size = 15)),
-                margin = list(
-                  l = 50,
-                  r = 50,
-                  b = 100,
-                  t = 100,
-                  pad = 4
-                ),
-                shapes = list(
-                  type = "rect",
-                  name = "CoC Goal",
-                  fillcolor = "#008000",
-                  line = list(color = "white", width = .01),
-                  layer = "below",
-                  xref = "paper",
-                  yref = "y",
-                  x0 = 0,
-                  x1 = 1,
-                  y0 = ~ Goal[1],
-                  y1 = 1,
-                  opacity = .2
-                ),
-                title = "Obtaining and Maintaining Permanent Housing"
-              )
-            
-          }
-          else{
-            NULL
-          }
-        }
-      })
+          )
         
+      }
+      else{
+        .p <- NULL
+      }
+    } else {
+      .p <- NULL
+    }
+
+    .p
+  })
+  
   # })
   
   # QPR NonCash Benefits
@@ -1706,7 +1783,7 @@ output$covidStatus <- renderPlot({
       ),
       substr(input$QPRNCBDateSlider, 1, 4)
     )), "%m-%d-%Y")
-    
+utils::Rprof("profvis/server_rprof/1786-1799.Rprof", interval = 0.02,  memory.profiling = TRUE)     #<p
     meeting_objective <- qpr_benefits %>%
       filter(
         ProjectRegion %in% input$QPRNCBRegionSelect &
@@ -1719,7 +1796,8 @@ output$covidStatus <- renderPlot({
                ProjectCounty, 
                ProjectRegion) %>%
       summarise(BenefitsAtExit = n())
-    
+Rprof(NULL)     #>p
+utils::Rprof("profvis/server_rprof/1800-1811.Rprof", interval = 0.02,  memory.profiling = TRUE)     #<p
     # calculating the total households for comparison
     all_hhs <- qpr_benefits %>%
       filter(ProjectRegion %in% c(input$QPRNCBRegionSelect) &
@@ -1730,7 +1808,8 @@ output$covidStatus <- renderPlot({
                ProjectCounty, 
                ProjectRegion) %>%
       summarise(TotalHHs = n()) 
-    
+Rprof(NULL)     #>p
+
     NCBsAtExit <- all_hhs %>%
       left_join(
         meeting_objective,
@@ -1739,12 +1818,12 @@ output$covidStatus <- renderPlot({
                "ProjectCounty", 
                "ProjectRegion")
       )
-    
     NCBsAtExit[is.na(NCBsAtExit)] <- 0
     
     NCBsAtExit <- NCBsAtExit %>%
       mutate(Percent = BenefitsAtExit / TotalHHs)
-    
+
+
     NCBGoal <-
       goals %>%
       filter(Measure == "Non-cash Benefits") %>%
@@ -1762,9 +1841,9 @@ output$covidStatus <- renderPlot({
     title <- paste0("Non-Cash Benefits at Exit\n", 
                     input$radioQPR_NCB_PTC, "\n",
                     ReportStart, " to ", ReportEnd)
-    
+
     region <- c(input$QPRNCBRegionSelect)
-    
+
     stagingNCBs <- NCBsAtExit %>%
       left_join(NCBGoal, by = "ProjectType") %>%
       filter(ProjectType == input$radioQPR_NCB_PTC & 
@@ -1778,9 +1857,10 @@ output$covidStatus <- renderPlot({
           sep = "\n"
         )
       )
-    
+
+
     if(nrow(stagingNCBs) > 0) {
-      plot_ly(
+      .p <- plot_ly(
         stagingNCBs,
         x = ~ FriendlyProjectName,
         y = ~ Percent,
@@ -1821,8 +1901,10 @@ output$covidStatus <- renderPlot({
           title = "Accessing Mainstream Benefits: Non-Cash Benefits at Exit"
         )}
     else{
-      
+      .p <- NULL
     }
+
+    .p
   })
   
   # QPR Health Insurance
@@ -1861,7 +1943,7 @@ output$covidStatus <- renderPlot({
       ),
       substr(input$QPRHIDateSlider, 1, 4)
     )), "%m-%d-%Y")
-    
+utils::Rprof("profvis/server_rprof/1946-1959.Rprof", interval = 0.02,  memory.profiling = TRUE)     #<p
     meeting_objective <- qpr_benefits %>%
       filter(
         ProjectRegion %in% input$QPRHIRegionSelect &
@@ -1874,7 +1956,8 @@ output$covidStatus <- renderPlot({
                ProjectCounty,
                ProjectRegion) %>%
       summarise(InsuranceAtExit = n())
-    
+Rprof(NULL)     #>p
+utils::Rprof("profvis/server_rprof/1960-1971.Rprof", interval = 0.02,  memory.profiling = TRUE)     #<p
     # calculating the total households for comparison
     all_hhs <- qpr_benefits %>%
       filter(ProjectRegion %in% input$QPRHIRegionSelect &
@@ -1885,7 +1968,8 @@ output$covidStatus <- renderPlot({
                ProjectCounty,
                ProjectRegion) %>%
       summarise(TotalHHs = n()) 
-    
+Rprof(NULL)     #>p
+
     HIAtExit <- all_hhs %>%
       left_join(
         meeting_objective,
@@ -1899,7 +1983,8 @@ output$covidStatus <- renderPlot({
     
     HIAtExit <- HIAtExit %>%
       mutate(Percent = InsuranceAtExit / TotalHHs)
-    
+
+
     HIGoal <-
       goals %>%
       filter(Measure == "Health Insurance at Exit") %>%
@@ -1917,9 +2002,9 @@ output$covidStatus <- renderPlot({
     title <- paste0("Health Insurance at Exit\n", 
                     input$radioQPR_NCB_PTC, "\n",
                     ReportStart, " to ", ReportEnd)
-    
+
     region <- c(input$QPRHIRegionSelect)
-    
+
     stagingHI <- HIAtExit %>%
       left_join(HIGoal, by = "ProjectType") %>%
       filter(ProjectType == input$radioQPR_HI_PTC & 
@@ -1933,9 +2018,10 @@ output$covidStatus <- renderPlot({
           sep = "\n"
         )
       )
-    
+
+
     if(nrow(stagingHI) > 0) {
-      plot_ly(
+      .p <- plot_ly(
         stagingHI,
         x = ~ FriendlyProjectName,
         y = ~ Percent,
@@ -1976,8 +2062,10 @@ output$covidStatus <- renderPlot({
           title = "Accessing Mainstream Benefits: Health Insurance at Exit"
         )}
     else{
-      
+      .p <- NULL
     }
+
+    .p
   })
   
   # QPR Increase Income
@@ -2016,7 +2104,7 @@ output$covidStatus <- renderPlot({
       ),
       substr(input$QPRIncomeDateSlider, 1, 4)
     )), "%m-%d-%Y")
-    
+utils::Rprof("profvis/server_rprof/2107-2120.Rprof", interval = 0.02,  memory.profiling = TRUE)     #<p
     meeting_objective <- qpr_income %>%
       filter(
         ProjectRegion %in% input$QPRIncomeRegionSelect &
@@ -2029,7 +2117,8 @@ output$covidStatus <- renderPlot({
                ProjectCounty,
                ProjectRegion) %>%
       summarise(Increased = n())
-    
+Rprof(NULL)     #>p
+utils::Rprof("profvis/server_rprof/2121-2145.Rprof", interval = 0.02,  memory.profiling = TRUE)     #<p
     # calculating the total households for comparison
     all_hhs <- qpr_income %>%
       filter(ProjectRegion %in% input$QPRIncomeRegionSelect &
@@ -2049,12 +2138,12 @@ output$covidStatus <- renderPlot({
                "ProjectCounty",
                "ProjectRegion")
       )
-    
     IncreasedIncome[is.na(IncreasedIncome)] <- 0
     
     IncreasedIncome <- IncreasedIncome %>%
       mutate(Percent = Increased / TotalHHs)
-    
+Rprof(NULL)     #>p
+
     IncomeGoal <-
       goals %>%
       filter(Measure == "Gain or Increase Income") %>%
@@ -2068,13 +2157,13 @@ output$covidStatus <- renderPlot({
         ProjectType == 12 ~ "Prevention",  
         ProjectType == 13 ~ "Rapid Rehousing"
       )) %>% unique()
-    
     title <- paste0("Increased Income\n", 
                     input$radioQPR_Income_PTC, "\n",
                     ReportStart, " to ", ReportEnd)
     
+
     region <- c(input$QPRIncomeRegionSelect)
-    
+
     stagingIncome <- IncreasedIncome %>%
       left_join(IncomeGoal, by = "ProjectType") %>%
       filter(ProjectType == input$radioQPR_Income_PTC &
@@ -2088,9 +2177,10 @@ output$covidStatus <- renderPlot({
           sep = "\n"
         )
       )
-    
+
+
     if(nrow(stagingIncome) > 0) {
-      plot_ly(
+      .p <- plot_ly(
         stagingIncome,
         x = ~ FriendlyProjectName,
         y = ~ Percent,
@@ -2131,8 +2221,10 @@ output$covidStatus <- renderPlot({
           title = "Accessing Mainstream Benefits: Health Insurance at Exit"
         )}
     else{
-      
+      .p <- NULL
     }
+
+    .p
   })
   
   output$headerRRHRapidPlacement <- renderUI({
@@ -2174,18 +2266,20 @@ output$covidStatus <- renderPlot({
         ),
         substr(input$RapidRRHDateSlider, 1, 4)
       )), "%m-%d-%Y")
-      
+
       daysToHouse <- qpr_rrh_enterers %>%
         filter(
-            !is.na(MoveInDateAdjust) &
+          !is.na(MoveInDateAdjust) &
             ProjectRegion %in% c(input$RapidRRHRegion) &
             entered_between(., ReportStart, ReportEnd)
         )
-      
+
+
       RRHgoal <- goals %>%
         filter(SummaryMeasure == "Rapid Placement") %>%
         select(ProjectType, Goal)
-      
+
+
       summaryDays <- daysToHouse %>%
         group_by(FriendlyProjectName,
                  ProjectCounty,
@@ -2205,8 +2299,9 @@ output$covidStatus <- renderPlot({
       
       title <- paste0("Average Days to House\nRapid Rehousing\n",
                       ReportStart, " to ", ReportEnd)
-      
-      plot_ly(
+
+
+      .p <- plot_ly(
         summaryDays,
         x = ~ FriendlyProjectName,
         y = ~ AvgDays,
@@ -2245,6 +2340,8 @@ output$covidStatus <- renderPlot({
           ),
           title = "Days to House"
         )
+
+      .p
     })
   
   output$headerRRHSpending <- renderUI({
@@ -2252,7 +2349,7 @@ output$covidStatus <- renderPlot({
       substr(input$RRHSpendingDateSlider, 1, 4),
       "-01-01"
     )), "%m-%d-%Y")
-
+    
     ReportEnd <- format.Date(mdy(paste0(
       case_when(
         substr(input$RRHSpendingDateSlider, 7, 7) == 1 ~ "03-31-",
@@ -2262,20 +2359,20 @@ output$covidStatus <- renderPlot({
       ),
       substr(input$RRHSpendingDateSlider, 1, 4)
     )), "%m-%d-%Y")
-
+    
     list(h2("Quarterly Performance Report"),
          h3("Rapid Rehousing Spending Goals"),
          h4(ReportStart, "-", ReportEnd))
   })
-
-#  QPR HP vs RRH Spending
+  
+  #  QPR HP vs RRH Spending
   output$RRHSpending <-
     renderPlotly({
       ReportStart <- format.Date(ymd(paste0(
         substr(input$RRHSpendingDateSlider, 1, 4),
         "-01-01"
       )), "%m-%d-%Y")
-
+      
       ReportEnd <- format.Date(mdy(paste0(
         case_when(
           substr(input$RRHSpendingDateSlider, 7, 7) == 1 ~ "03-31-",
@@ -2296,7 +2393,8 @@ output$covidStatus <- renderPlot({
                                      "HP",
                                      "RRH"),
                ProjectType = factor(ProjectType, levels = c("HP", "RRH")))
-      
+
+
       x <- qpr_spending %>%
         filter(
           !is.na(OrganizationName) &
@@ -2312,7 +2410,8 @@ output$covidStatus <- renderPlot({
       y <- data.frame(ProjectType = c("HP", "RRH"))
       
       z <- cbind(x, y)
-      
+
+
       rrhSpending <- rrhSpending %>% right_join(z, by = c("OrganizationName",
                                                           "ProjectRegion",
                                                           "ProjectType")) %>%
@@ -2326,8 +2425,8 @@ output$covidStatus <- renderPlot({
                ExitDate = if_else(PersonalID == 4216,
                                   mdy(ReportEnd),
                                   ymd(EntryDate)))
-      
-      
+
+
       rrhSpending <- rrhSpending  %>%
         group_by(OrganizationName, ProjectRegion, ProjectType) %>%
         summarise(Amount = sum(Amount),
@@ -2361,8 +2460,9 @@ output$covidStatus <- renderPlot({
       
       title <- paste0("Percent Spent on Rapid Rehousing\n",
                       ReportStart, " to ", ReportEnd)
-      
-      plot_ly(
+
+
+      .p <- plot_ly(
         rrhSpending,
         x = ~ OrganizationName,
         y = ~ PercentRRH,
@@ -2401,6 +2501,7 @@ output$covidStatus <- renderPlot({
             opacity = .2
           )
         )
-  })
-  
+
+      .p
+    })
 }
