@@ -86,7 +86,6 @@ check_dates <- function(start, end) {
 #' @return \code{data.frame} after filtering the appropriate columns
 #' @importFrom rlang abort sym `!!`
 #' @importFrom stringr str_detect
-#' @importFrom dplyr filter between
 
 #TODO Test with additional qpr_*, test with operating_* and beds_available_* instances
 between_df <- function(., status, start = ReportStart, end = ReportEnd) {
