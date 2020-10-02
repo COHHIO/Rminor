@@ -55,11 +55,11 @@ check_dates <- function(start, end) {
       } else if (inherits(.x, "character")) {
         # try these formats
         .out <- lubridate::parse_date_time(.x, c("Ymd", "mdY", "dmY"))
-        if (!inherits(.out, c("Date"))) {
-          # if none of those formats worked throw error and inform user which argument was not able to be parsed
-          rlang::abort(paste0(.y, " could not be parsed to a Datetime, please check argument."))
-        }
       } 
+      if (!inherits(.out, c("Date"))) {
+        # if none of those formats worked throw error and inform user which argument was not able to be parsed
+        rlang::abort(paste0(.y, " could not be parsed to a Datetime, please check argument."))
+      }
       .out
     })
     # bind the coerced Date/Datetimes to the environment, overwriting the existing values
