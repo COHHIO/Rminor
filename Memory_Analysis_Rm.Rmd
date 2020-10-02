@@ -75,6 +75,11 @@ The image necessary for `r basename(getwd())` to run is:
 ```{r 'Image call' }
 .current_dir <- basename(getwd())
 .call <- unique(unlist(purrr::map(objects_tables, ~{.x$objects[.x$keep]}), use.names = FALSE))
+if (stringr::str_detect(getwd(), "Rminor$")) {
+  # Remove between functions if Rminor
+ .call <- stringr::str_subset(.call, "\\_between$", negate = TRUE) 
+}
+
 .call <- paste0(stringr::str_subset(sort(.call), "^\\.", negate = T), collapse = ", ")
 suppressWarnings(.call$file <-  fs::path("..", .current_dir, "data", .current_dir, ext = "RData"))
 htmltools::tags$code(paste0("save(", .call[[1]],", compress = FALSE, file = '", .call$file,"')"))
