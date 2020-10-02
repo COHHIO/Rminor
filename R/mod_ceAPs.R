@@ -4,110 +4,111 @@
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @noRd 
+#' @noRd
 #'
-#' @importFrom shiny NS tagList 
+#' @importFrom shiny NS tagList
 
 
-
-mod_ceAPs_ui <- function(id, search_by){
+mod_ceAPs_ui <- function(id) {
   ns <- NS(id)
-  tagList(
-    tabItem(
-      tabName = "ceAPs",
-      tabsetPanel(
-        type = "tabs",
-        tabPanel("By County", 
-                 fluidRow(box(pickerInput(
-                   inputId = "ap_by_county",
-                   label = "Select County/-ies",
-                   options = pickerOptions(dropupAuto = FALSE,
-                                           actionsBox = TRUE),
-                   choices = bos_counties,
-                   multiple = TRUE
-                 ))),
-                 fluidRow(box(
-                   title = "Coordinated Entry Access Points",
-                   width = 12,
-                   dataTableOutput("AP_list_county")
-                 ))
+  shinydashboard::tabItem(
+    tabName = ns("Tab"),
+    shiny::fluidRow(shinydashboard::box(
+      shinyWidgets::prettyRadioButtons(
+        inputId = ns("radio_search"),
+        label = "Search by:",
+        choices = c(
+          "County" = "ProjectCountyServed",
+          "Service Area" = "ProjectAreaServed",
+          "Organization" = "ProjectAKA"
         ),
-        tabPanel("By Service Area", 
-                 fluidRow(box(pickerInput(
-                   inputId = "ap_by_region",
-                   label = "Select Service Area",
-                   options = pickerOptions(dropupAuto = FALSE,
-                                           actionsBox = TRUE),
-                   choices = choices_service_areas,
-                   multiple = TRUE)
-                 )),
-                 fluidRow(box(
-                   title = "Coordinated Entry Access Points",
-                   width = 12,
-                   dataTableOutput("AP_list_region"))
-                 )),
-        tabPanel("By Organization", 
-                 fluidRow(box(
-                   pickerInput(
-                     inputId = "ap_by_org",
-                     label = "Select Organization",
-                     selected = NULL,
-                     options = pickerOptions(dropupAuto = FALSE,
-                                             actionsBox = TRUE),
-                     multiple = TRUE,
-                     choices = APs %>%
-                       arrange(ProjectAKA) %>%
-                       pull(ProjectAKA) %>%
-                       unique()
-                   )
-                 )), 
-                 fluidRow(box(
-                   title = "Coordinated Entry Access Points",
-                   width = 12,
-                   dataTableOutput("AP_list_org")))
-        )
-      ),
-      fluidRow(box(
+        selected = "ProjectCountyServed"
+      )
+    )),
+    shiny::fluidRow(shinydashboard::box(
+      shinyWidgets::pickerInput(
+        inputId = ns("AP"),
+        label = "Select County/-ies",
+        options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
+                                              actionsBox = TRUE),
+        choices = bos_counties,
+        multiple = TRUE
+      )
+    )),
+    shiny::fluidRow(
+      shinydashboard::box(
+        title = "Coordinated Entry Access Points",
+        width = 12,
+        DT::dataTableOutput(ns("AP_list"))
+      )
+    ),
+    shiny::fluidRow(
+      shinydashboard::box(
         title = "Ohio Balance of State CoC Homeless Planning Regions",
-        HTML("The solid-colored counties are all part of the Ohio
-                       Balance of State CoC. The Ohio Development Services 
+        htmltools::HTML(
+          "The solid-colored counties are all part of the Ohio
+                       Balance of State CoC. The Ohio Development Services
                        Agency (ODSA) further divided the counties in the Balance
                        of State into 17 Homeless Planning Regions to make
                        implementation of state-funded programs in the Balance of
-                       State more localized."),
-        img(
-          src =
-            "Homeless-Region-Map-for-COHHIO-2017.png",
-          height = '100%',
-          width = '100%'
+                       State more localized."
         ),
+        img(src =
+              "www/Homeless-Region-Map-for-COHHIO-2017.png",
+            style = 'max-width: 100%; height: auto'),
         width = 12
-      )),
-    ),
+      )
+    )
   )
 }
-    
+
 #' ceAPs Server Functions
 #'
-#' @noRd 
-mod_ceAPs_server <- function(id, search_by){
-  moduleServer( id, function(input, output, session){
+#' @noRd
+mod_ceAPs_server <- function(id) {
+  moduleServer(id, function(input, output, session) {
     ns <- session$ns
-    output$AP_list_county <- renderDataTable({
+    observeEvent(input$radio_search, {
+      shinyWidgets::updatePickerInput(
+        session = session,
+        inputId = "AP",
+        label = list(
+          "ProjectCountyServed" = "Select County/-ies",
+          "ProjectAreaServed" = "Select Service Area",
+          "ProjectAKA" = "Select Organization"
+        )[[input$radio_search]], 
+        choices = list(
+          "ProjectCountyServed" = bos_counties,
+          "ProjectAreaServed" = choices_service_areas,
+          "ProjectAKA" = APs %>%
+            arrange(ProjectAKA) %>%
+            pull(ProjectAKA) %>%
+            unique()
+        )[[input$radio_search]]
+      )
+    })
+    
+    output$AP_list <- renderDataTable({
+      SearchColumn <- rlang::sym(input$radio_search)
       AP_list <- APs %>%
-        filter(ProjectCountyServed %in% c(input$ap_by_county)) %>%
+        filter(!!SearchColumn %in% c(input$AP)) %>%
         select(ProjectID) %>% unique()
-      
+      message(paste0("AP_list", nrow(AP_list)))
       AP_final <- APs %>%
         right_join(AP_list, by = "ProjectID") %>%
-        mutate(Address = if_else(!is.na(CoCCode),
-                                 paste(Addresses, City, sep = '<br>'),
-                                 "Please call- address not available.")) %>%    
+        mutate(Address = if_else(
+          !is.na(CoCCode),
+          paste(Addresses, City, sep = '<br>'),
+          "Please call- address not available."
+        )) %>%
         group_by(OrgLink,
                  Address,
                  ProjectHours,
                  ProjectTelNo) %>%
-        summarise(Regions = paste(unique(ProjectAreaServed), collapse = ",<br>")) %>%
+        summarise(
+          Regions = paste(unique(ProjectAreaServed), collapse = ",<br>"),
+          Counties = paste(unique(ProjectCountyServed), collapse = ", ")
+        ) %>%
         ungroup() %>%
         unique() %>%
         select(
@@ -115,86 +116,22 @@ mod_ceAPs_server <- function(id, search_by){
           Address,
           "Hours" = ProjectHours,
           "Phone" = ProjectTelNo,
+          "County/-ies" = Counties,
           "Service Area(s)" = Regions
         )
       
-      datatable(AP_final,
-                rownames = FALSE,
-                options = list(dom = 'ltpi'),
-                escape = FALSE)
-      
+      datatable(
+        AP_final,
+        rownames = FALSE,
+        options = list(dom = 'ltpi'),
+        escape = FALSE
+      )
     })
-    
-    output$AP_list_region <- renderDataTable({
-      AP_list <- APs %>%
-        filter(ProjectAreaServed %in% c(input$ap_by_region)) %>%
-        select(ProjectID) %>% unique()
-      
-      AP_final <- APs %>%
-        right_join(AP_list, by = "ProjectID") %>%
-        mutate(Address = if_else(!is.na(CoCCode),
-                                 paste(Addresses, City, sep = '</br>'),
-                                 "Please call- address not available.")) %>%
-        group_by(OrgLink,
-                 Address,
-                 ProjectHours,
-                 ProjectTelNo) %>%
-        summarise(Counties = paste(unique(ProjectCountyServed), collapse = ", ")) %>%
-        ungroup() %>%
-        unique() %>%
-        select(
-          "Organization" = OrgLink,
-          Address,
-          "Hours" = ProjectHours,
-          "Phone" = ProjectTelNo,
-          "County/-ies Served" = Counties
-        )
-      
-      datatable(AP_final,
-                rownames = FALSE,
-                options = list(dom = 'ltpi'),
-                escape = FALSE)
-      
-    })
-    
-    output$AP_list_org <- renderDataTable({
-      AP_list <- APs %>%
-        filter(ProjectAKA %in% c(input$ap_by_org)) %>%    
-        select(ProjectID) %>% unique()
-      
-      AP_final <- APs %>%
-        right_join(AP_list, by = "ProjectID") %>%
-        mutate(Address = if_else(!is.na(CoCCode),
-                                 paste(Addresses, City, sep = '</br>'),
-                                 "Please call- address not available.")) %>%
-        group_by(OrgLink,
-                 Address,
-                 ProjectHours,
-                 ProjectTelNo) %>%
-        summarise(Counties = paste(unique(ProjectCountyServed), collapse = ", "),
-                  Regions = paste(unique(ProjectAreaServed), collapse = ",</br>")) %>%
-        ungroup() %>%
-        unique() %>%
-        select(
-          "Organization" = OrgLink,
-          Address,
-          "Hours" = ProjectHours,
-          "Phone" = ProjectTelNo,
-          "County/-ies Served" = Counties,
-          "Service Area(s)" = Regions
-        )
-      
-      datatable(AP_final,
-                rownames = FALSE,
-                options = list(dom = 'ltpi'),
-                escape = FALSE)
-      
-    })   
   })
 }
-    
+
 ## To be copied in the UI
 # mod_ceAPs_ui("ceAPs_ui_1")
-    
+
 ## To be copied in the server
 # mod_ceAPs_server("ceAPs_ui_1")

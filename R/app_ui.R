@@ -43,6 +43,8 @@ app_ui <- function(request) {
                                    tabName = "providerDashboard-Tab"),
           # menuItem("CoC Competition",
           #          tabName = "cocCompetitionTab"),
+          shinydashboard::menuItem("Coordinated Entry Access Points",
+                                   tabName = "ceAPs-Tab"),
           shinydashboard::menuItem("Covid-19 Analysis",
                                    tabName = "covid19-Tab"),
           shinydashboard::menuItem("Bed and Unit Utilization",
@@ -102,6 +104,7 @@ app_ui <- function(request) {
                                       shiny::uiOutput("CurrentlyAwaitingPH")
                                     )
                                   )), 
+          mod_ceAPs_ui("ceAPs"),
           shinydashboard::tabItem(
             tabName = "covid19-Tab",
             shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerCovid19"), width = 12)),

@@ -770,6 +770,8 @@ app_server <- function( input, output, session ) {
                      axis.text.x = ggplot2::element_text(angle = 45, hjust=1, size = 11))
   })  
   
+  mod_ceAPs_server("ceAPs")
+  
   output$covidStatus <- shiny::renderPlot({
     get_res_prior <- validation %>%
       dplyr::select(PersonalID, EntryDate, ExitDate, LivingSituation) %>%
