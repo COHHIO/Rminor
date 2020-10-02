@@ -94,8 +94,10 @@ between_df <- function(., status, start = ReportStart, end = ReportEnd) {
   
   # if no status supplied, throw error
   if (missing(status)) {
-    rlang::abort("Please supply a status. See ?between_ for details.")
+    rlang::abort("Please supply a status. See ?between_df for details.")
   } 
+    # Check calling context - if inside of a filter call, return the logical
+    .lgl <- sum(purrr::map_lgl(sys.calls(), ~{any(grepl("filter", as.character(.x)))})[-1]) > 1
   # Convert that to a character for regex parsing
   .cn_chr <- tolower(substr(status, 0, 2))
   # If it's one of served of stayed
@@ -107,8 +109,13 @@ between_df <- function(., status, start = ReportStart, end = ReportEnd) {
       # if stayed used entryadjust
       .col <- rlang::sym("EntryAdjust")
     }
+    .cond <- rlang::expr(!!.col <= dates["end"] & (is.na(ExitDate) | ExitDate >= dates["start"]))
+    if (.lgl) {
+      .out <- rlang::eval_tidy(.cond, data = .)
+    } else {
     #filter the appropriate columns
-    .out <- dplyr::filter(., !!.col <= dates["end"] & (is.na(ExitDate) | ExitDate >= dates["start"]))
+      .out <- dplyr::filter(., !!.cond)
+    }
   } else if (stringr::str_detect(.cn_chr, "en|ex")) {
     # if its entered or exited
     if (stringr::str_detect(.cn_chr, "en")) {
@@ -118,8 +125,13 @@ between_df <- function(., status, start = ReportStart, end = ReportEnd) {
       #if exited use exit date
       .col <- rlang::sym("ExitDate")
     }
-    # Filter the appropriate column using between
-    .out <- dplyr::filter(., !!.col >= dates["start"] & !!.col <= dates["end"])
+    .cond <- rlang::expr(!!.col >= dates["start"] & !!.col <= dates["end"])
+    if (.lgl) {
+      .out <- rlang::eval_tidy(.cond, data = .)
+    } else {
+      #filter the appropriate columns
+      .out <- dplyr::filter(., !!.cond)
+    }
   } else if (stringr::str_detect(.cn_chr, "ba|be|op")) {
     if (stringr::str_detect(.cn_chr, "op")) {
       .prefix <- "Operating"
@@ -130,13 +142,14 @@ between_df <- function(., status, start = ReportStart, end = ReportEnd) {
     .cols <- paste0(.prefix, c("StartDate", "EndDate"))
     # Extract the appropriate columns
     .cols <- purrr::map(.cols, rlang::sym)
-    # Do the filtering
-    
-    .out <- dplyr::filter(., 
-                          !!.cols[[1]] <= dates["end"] &
-                          (is.na(!!.cols[[2]]) | !!.cols[[2]] >= dates["start"])
-                          )
-    
+    .cond <- rlang::expr(!!.cols[[1]] <= dates["end"] &
+                           (is.na(!!.cols[[2]]) | !!.cols[[2]] >= dates["start"]))
+    if (.lgl) {
+      .out <- rlang::eval_tidy(.cond, data = .)
+    } else {
+      #filter the appropriate columns
+      .out <- dplyr::filter(., !!.cond)
+    }
   }
   .out
 }
