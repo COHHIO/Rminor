@@ -13,7 +13,7 @@
 # <https://www.gnu.org/licenses/>. 
 
 #CHANGED Removed library calls - unnecessary as they are loaded by the package load process in run_dev.
-if (golem::app_dev()) {
+if (golem::app_prod()) {
   # Run only if in production mode
   env <- environment()
   
