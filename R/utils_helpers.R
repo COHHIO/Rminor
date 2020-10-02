@@ -39,56 +39,73 @@ qend_date <- function(input) {
 #' @noRd
 #' @keywords Internal
 #' @importFrom purrr map_lgl imap
-#' @importFrom vctrs vec_cast.Date
-#' @importFrom lubridate parse_date_time
+#' @importFrom lubridate parse_date_time as_date
 #' @importFrom rlang abort
 check_dates <- function(start, end) {
   # Add input dates to list
   .dates <- list(start = start, end = end)
   # Check if inputs are all Date or POSIXct
-  .test_date <- purrr::map_lgl(.dates, ~{inherits(.x, c("Date", "POSIXct"))})
+  .test_date <- purrr::map_lgl(.dates, ~{inherits(.x, c("Date"))})
   # If not
   if (!all(.test_date)) {
     # map over the one's that arent
-    .dates <- purrr::imap(.dates[!.test_date], ~{
-      # try these formats
-      .out <- lubridate::parse_date_time(.x, c("Ymd", "mdY", "dmY"))
-      if (!inherits(.out, c("POSIXct","Date"))) {
-        # if none of those formats worked throw error and inform user which argument was not able to be parsed
-        rlang::abort(paste0(.y, " could not be parsed to a Datetime, please check argument."))
-      }
+    .dates <- purrr::imap(.dates, ~{
+      if (inherits(.x, c("POSIXct", "POSIXlt", "numeric"))) {
+        .out <- lubridate::as_date(.x)  
+      } else if (inherits(.x, "character")) {
+        # try these formats
+        .out <- lubridate::parse_date_time(.x, c("Ymd", "mdY", "dmY"))
+        if (!inherits(.out, c("Date"))) {
+          # if none of those formats worked throw error and inform user which argument was not able to be parsed
+          rlang::abort(paste0(.y, " could not be parsed to a Datetime, please check argument."))
+        }
+      } 
       .out
     })
     # bind the coerced Date/Datetimes to the environment, overwriting the existing values
-  }
-  vctrs::vec_cast.Date(do.call(c,.dates))
+  } 
+  do.call(c,.dates)
 }
 
 
 
 #CHANGED New Between function
 #' @title between_df
+#' @family _between
 #' @keywords Internal
-#' @description Performs quick filtering of qpr_* data.frames with the input of the type of filtering
+#' @description Context sensitive quick filtering or output of logical based on `start` and `end` Dates. 
 #' @param . \code{(data.frame/tibble)} Input to be filtered. In a `magrittr` pipe this will always be the first object
 #' @param status \code{(character)} One of:
 #' \itemize{
-#'   \item{\code{"served"/"se"}}
-#'   \item{\code{"stayed"/"st"}}
-#'   \item{\code{"entered"/"en"}}
-#'   \item{\code{"exited"/"ex"}}
-#'   \item{\code{"operating"/"op"}}
-#'   \item{\code{"beds_available"/"be"/"ba`}}
+#'   \item{\code{"served"/"se"}}{ Equivalent of \code{served_between}}
+#'   \item{\code{"stayed"/"st"}}{ Equivalent of \code{stayed_between}}
+#'   \item{\code{"entered"/"en"}}{ Equivalent of \code{entered_between}}
+#'   \item{\code{"exited"/"ex"}}{ Equivalent of \code{exited_between}}
+#'   \item{\code{"operating"/"op"}}{ Equivalent of \code{operating_between}}
+#'   \item{\code{"beds_available"/"be"/"ba"}}{ Equivalent of \code{beds_available_between}}
 #' }
 #' that specifies the type of function to be performed
-#' @param start The ReportStart variable created from user input - will be automatically retrieved from parent environments if not specified. If start is named other than ReportStart, it must be specified.
-#' @param end The ReportEnd variable created from user input - will be automatically retrieved from parent environments if not specified. If end is named other than ReportEnd, it must be specified.
-#' @return \code{data.frame} after filtering the appropriate columns
-#' @importFrom rlang abort sym `!!`
+#' @param start \code{character/Date} of the end of the timeframe. Characters in format mdY, Ymd, dmY acceptable.  **Default `ReportStart`** will be automatically retrieved from parent environments if not specified. If end is named other than ReportStart, it must be specified. 
+#' @param end \code{character/Date} of the end of the timeframe. Characters in format mdY, Ymd, dmY acceptable.  **Default `ReportEnd`** will be automatically retrieved from parent environments if not specified. If end is named other than ReportEnd, it must be specified. 
+#' @param lgl \code{logical} Flag to force logical vector output. **Default `FALSE`**
+#' @details Context-sensitive: Automatically detects if nested inside of \link[dplyr]{filter} call, if so returns `logical` instead of `data.frame`
+#' @return \code{data.frame/logical} after filtering/applying conditional to the appropriate columns
+#' @examples 
+#' \dontrun{
+#' library(dplyr)
+#' ReportStart = Sys.Date() - lubridate::weeks(4)
+#' ReportEnd = Sys.Date()
+#' identical(
+#' served_between(qpr_leavers),
+#' qpr_leavers %>% filter(served_between(.))
+#' )
+#' }
+#' @importFrom rlang abort sym `!!` expr eval_tidy
 #' @importFrom stringr str_detect
+#' @importFrom purrr map_lgl
 
-#TODO Test with additional qpr_*, test with operating_* and beds_available_* instances
-between_df <- function(., status, start = ReportStart, end = ReportEnd) {
+
+between_df <- function(., status, start = ReportStart, end = ReportEnd, lgl = FALSE) {
   #Check date format and coerce if need be
   dates <- check_dates(start, end)
   
@@ -110,7 +127,7 @@ between_df <- function(., status, start = ReportStart, end = ReportEnd) {
       .col <- rlang::sym("EntryAdjust")
     }
     .cond <- rlang::expr(!!.col <= dates["end"] & (is.na(ExitDate) | ExitDate >= dates["start"]))
-    if (.lgl) {
+    if (.lgl || lgl) {
       .out <- rlang::eval_tidy(.cond, data = .)
     } else {
     #filter the appropriate columns
@@ -126,7 +143,7 @@ between_df <- function(., status, start = ReportStart, end = ReportEnd) {
       .col <- rlang::sym("ExitDate")
     }
     .cond <- rlang::expr(!!.col >= dates["start"] & !!.col <= dates["end"])
-    if (.lgl) {
+    if (.lgl || lgl) {
       .out <- rlang::eval_tidy(.cond, data = .)
     } else {
       #filter the appropriate columns
@@ -144,7 +161,7 @@ between_df <- function(., status, start = ReportStart, end = ReportEnd) {
     .cols <- purrr::map(.cols, rlang::sym)
     .cond <- rlang::expr(!!.cols[[1]] <= dates["end"] &
                            (is.na(!!.cols[[2]]) | !!.cols[[2]] >= dates["start"]))
-    if (.lgl) {
+    if (.lgl || lgl) {
       .out <- rlang::eval_tidy(.cond, data = .)
     } else {
       #filter the appropriate columns
@@ -159,52 +176,51 @@ between_df <- function(., status, start = ReportStart, end = ReportEnd) {
 
 # Client Entry Exits Between Date Range Functions -------------------------------------
 #' @title served_between
-#' @family *_between
-#' @description Filters a data.frame between the start and end dates specified
+#' @family _between
+#' @inherit between_df
 #' @inheritParams between_df
-#' @return \code{data.frame} after filtering the appropriate columns
 #' @export
-#' @examples 
-#' \dontrun{
-#' ReportStart = Sys.Date() - lubridate::weeks(4)
-#' ReportEnd = Sys.Date()
-#' qpr_leavers %>% served_between()
-#' }
-served_between <- function(., start = ReportStart, end = ReportEnd) {
-  between_df(., "served", start, end)
+
+served_between <- function(., start = ReportStart, end = ReportEnd, lgl = FALSE) {
+  between_df(., "served", start, end, lgl)
 }
 
 #' @title entered_between
-#' @family *_between
+#' @inherit between_df
+#' @family _between
 #' @export
-entered_between <- function(., start = ReportStart, end = ReportEnd) {
-  between_df(., "entered", start, end)
+entered_between <- function(., start = ReportStart, end = ReportEnd, lgl = FALSE) {
+  between_df(., "entered", start, end, lgl)
 }
 
 #' @title exited_between
-#' @family *_between
+#' @inherit between_df
+#' @family _between
 #' @export
-exited_between <- function(., start = ReportStart, end = ReportEnd){
-  between_df(., "exited", start, end)
+exited_between <- function(., start = ReportStart, end = ReportEnd, lgl = FALSE){
+  between_df(., "exited", start, end, lgl)
 }
 
 #' @title stayed_between
-#' @family *_between
+#' @inherit between_df
+#' @family _between
 #' @export
-stayed_between <- function(., start = ReportStart, end = ReportEnd){
-  between_df(., "stayed", start, end)
+stayed_between <- function(., start = ReportStart, end = ReportEnd, lgl = FALSE){
+  between_df(., "stayed", start, end, lgl)
 }
 
 #' @title operating_between
-#' @family *_between
+#' @inherit between_df
+#' @family _between
 #' @export
-operating_between <- function(., start = ReportStart, end = ReportEnd){
-  between_df(., "op", start, end)
+operating_between <- function(., start = ReportStart, end = ReportEnd, lgl = FALSE){
+  between_df(., "op", start, end, lgl)
 }
 
 #' @title beds_available_between
-#' @family *_between
+#' @inherit between_df
+#' @family _between
 #' @export
-beds_available_between <- function(., start = ReportStart, end = ReportEnd){
-  between_df(., "ba", start, end)
+beds_available_between <- function(., start = ReportStart, end = ReportEnd, lgl = FALSE){
+  between_df(., "ba", start, end, lgl)
 }

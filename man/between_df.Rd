@@ -4,28 +4,52 @@
 \alias{between_df}
 \title{between_df}
 \usage{
-between_df(., status, start = ReportStart, end = ReportEnd)
+between_df(., status, start = ReportStart, end = ReportEnd, lgl = FALSE)
 }
 \arguments{
 \item{.}{\code{(data.frame/tibble)} Input to be filtered. In a `magrittr` pipe this will always be the first object}
 
 \item{status}{\code{(character)} One of:
 \itemize{
-  \item{\code{"served"/"se"}}
-  \item{\code{"stayed"/"st"}}
-  \item{\code{"entered"/"en"}}
-  \item{\code{"exited"/"ex"}}
+  \item{\code{"served"/"se"}}{ Equivalent of \code{served_between}}
+  \item{\code{"stayed"/"st"}}{ Equivalent of \code{stayed_between}}
+  \item{\code{"entered"/"en"}}{ Equivalent of \code{entered_between}}
+  \item{\code{"exited"/"ex"}}{ Equivalent of \code{exited_between}}
+  \item{\code{"operating"/"op"}}{ Equivalent of \code{operating_between}}
+  \item{\code{"beds_available"/"be"/"ba"}}{ Equivalent of \code{beds_available_between}}
 }
 that specifies the type of function to be performed}
 
-\item{start}{The ReportStart variable created from user input - will be automatically retrieved from parent environments if not specified. If start is named other than ReportStart, it must be specified.}
+\item{start}{\code{character/Date} of the end of the timeframe. Characters in format mdY, Ymd, dmY acceptable.  **Default `ReportStart`** will be automatically retrieved from parent environments if not specified. If end is named other than ReportStart, it must be specified.}
 
-\item{end}{The ReportEnd variable created from user input - will be automatically retrieved from parent environments if not specified. If end is named other than ReportEnd, it must be specified.}
+\item{end}{\code{character/Date} of the end of the timeframe. Characters in format mdY, Ymd, dmY acceptable.  **Default `ReportEnd`** will be automatically retrieved from parent environments if not specified. If end is named other than ReportEnd, it must be specified.}
+
+\item{lgl}{\code{logical} Flag to force logical vector output. **Default `FALSE`**}
 }
 \value{
-\code{data.frame} after filtering the appropriate columns
+\code{data.frame/logical} after filtering/applying conditional to the appropriate columns
 }
 \description{
-Performs quick filtering of qpr_* data.frames with the input of the type of filtering
+Context sensitive quick filtering or output of logical based on `start` and `end` Dates.
 }
+\details{
+Context-sensitive: Automatically detects if nested inside of \link[dplyr]{filter} call, if so returns `logical` instead of `data.frame`
+}
+\examples{
+\dontrun{
+ReportStart = Sys.Date() - lubridate::weeks(4)
+ReportEnd = Sys.Date()
+qpr_leavers \%>\% served_between()
+}
+}
+\seealso{
+Other _between: 
+\code{\link{beds_available_between}()},
+\code{\link{entered_between}()},
+\code{\link{exited_between}()},
+\code{\link{operating_between}()},
+\code{\link{served_between}()},
+\code{\link{stayed_between}()}
+}
+\concept{_between}
 \keyword{Internal}

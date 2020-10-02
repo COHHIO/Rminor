@@ -4,17 +4,40 @@
 \alias{entered_between}
 \title{entered_between}
 \usage{
-entered_between(., start = ReportStart, end = ReportEnd)
+entered_between(., start = ReportStart, end = ReportEnd, lgl = FALSE)
+}
+\arguments{
+\item{.}{\code{(data.frame/tibble)} Input to be filtered. In a `magrittr` pipe this will always be the first object}
+
+\item{start}{\code{character/Date} of the end of the timeframe. Characters in format mdY, Ymd, dmY acceptable.  **Default `ReportStart`** will be automatically retrieved from parent environments if not specified. If end is named other than ReportStart, it must be specified.}
+
+\item{end}{\code{character/Date} of the end of the timeframe. Characters in format mdY, Ymd, dmY acceptable.  **Default `ReportEnd`** will be automatically retrieved from parent environments if not specified. If end is named other than ReportEnd, it must be specified.}
+
+\item{lgl}{\code{logical} Flag to force logical vector output. **Default `FALSE`**}
+}
+\value{
+\code{data.frame/logical} after filtering/applying conditional to the appropriate columns
 }
 \description{
-entered_between
+Context sensitive quick filtering or output of logical based on `start` and `end` Dates.
+}
+\details{
+Context-sensitive: Automatically detects if nested inside of \link[dplyr]{filter} call, if so returns `logical` instead of `data.frame`
+}
+\examples{
+\dontrun{
+ReportStart = Sys.Date() - lubridate::weeks(4)
+ReportEnd = Sys.Date()
+qpr_leavers \%>\% served_between()
+}
 }
 \seealso{
-Other *_between: 
+Other _between: 
 \code{\link{beds_available_between}()},
+\code{\link{between_df}()},
 \code{\link{exited_between}()},
 \code{\link{operating_between}()},
 \code{\link{served_between}()},
 \code{\link{stayed_between}()}
 }
-\concept{*_between}
+\concept{_between}
