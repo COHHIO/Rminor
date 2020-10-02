@@ -9,8 +9,6 @@
 #' @importFrom shiny NS tagList 
 #TODO sinew::makeImport
 
-#QUESTION could we use choices_project_type for PH, NCB, and HI? Like HI <- choices_project_type, etc.?
-
 tab_choices <-
   list(
     LoS = c(
