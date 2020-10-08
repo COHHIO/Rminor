@@ -21,6 +21,7 @@ library(scales)
 library(plotly)
 library(zoo)
 library(DT)
+library(HMIS)
 
 env <- environment()
 
