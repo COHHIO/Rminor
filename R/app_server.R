@@ -619,7 +619,7 @@ app_server <- function( input, output, session ) {
               validation %>%
                 dplyr::filter(
                   ProjectName == input$providerList &
-                    exited_between(., ReportStart, FileEnd) &
+                    HMIS::exited_between(., ReportStart, FileEnd) &
                     Destination == 31
                 )
             )
@@ -1147,7 +1147,7 @@ app_server <- function( input, output, session ) {
       )), "%m-%d-%Y")
       # counting all hhs who were scored AND SERVED between the report dates
       CountyAverageScores <- qpr_spdats_county %>%
-        dplyr::filter(served_between(., ReportStart, ReportEnd)) %>%
+        dplyr::filter(HMIS::served_between(., ReportStart, ReportEnd)) %>%
         dplyr::select(CountyServed, PersonalID, Score) %>%
         dplyr::distinct() %>%
         dplyr::group_by(CountyServed) %>%
@@ -1275,12 +1275,12 @@ app_server <- function( input, output, session ) {
              #exited to ph or still in PSH/HP
              is.na(ExitDate)) &
             ProjectType %in% c(3, 9, 12) &
-            served_between(., ReportStart, ReportEnd)# PSH & HP
+            HMIS::served_between(., ReportStart, ReportEnd)# PSH & HP
         ) |
           (
             DestinationGroup == "Permanent" & # exited to ph
               ProjectType %in% c(1, 2, 4, 8, 13) &
-              exited_between(., ReportStart, ReportEnd)
+              HMIS::exited_between(., ReportStart, ReportEnd)
           )
         )) %>% # ES, TH, SH, RRH, OUT) %>%
       dplyr::group_by(FriendlyProjectName, 
@@ -1292,11 +1292,11 @@ app_server <- function( input, output, session ) {
     # calculating the total households to compare successful placements to
     TotalHHsSuccessfulPlacement <- qpr_leavers %>%
       dplyr::filter((
-        served_between(., ReportStart, ReportEnd) &
+        HMIS::served_between(., ReportStart, ReportEnd) &
           ProjectType %in% c(3, 9, 12) # PSH & HP
       ) |
         (
-          exited_between(., ReportStart, ReportEnd) &
+          HMIS::exited_between(., ReportStart, ReportEnd) &
             ProjectType %in% c(1, 2, 4, 8, 13) # ES, TH, SH, OUT, RRH
         )) %>%
       dplyr::group_by(FriendlyProjectName, 
@@ -1416,7 +1416,7 @@ app_server <- function( input, output, session ) {
       )), "%m-%d-%Y")
       
       totalServed <- qpr_leavers %>%
-        dplyr::filter(exited_between(., ReportStart, ReportEnd) &
+        dplyr::filter(HMIS::exited_between(., ReportStart, ReportEnd) &
                         ProjectType == 4) %>%
         dplyr::group_by(FriendlyProjectName,
                         ProjectType,
@@ -1429,7 +1429,7 @@ app_server <- function( input, output, session ) {
           ProjectType == 4 &
             Destination != 16 &
             DestinationGroup %in% c("Temporary", "Permanent") &
-            exited_between(., ReportStart, ReportEnd)
+            HMIS::exited_between(., ReportStart, ReportEnd)
         ) %>%
         dplyr::group_by(FriendlyProjectName,
                         ProjectType,
@@ -1565,7 +1565,7 @@ app_server <- function( input, output, session ) {
       dplyr::filter(
         ProjectRegion %in% input$QPRNCBRegionSelect &
           ProjectType == input$radioQPR_NCB_PTC &
-          exited_between(., ReportStart, ReportEnd) &
+          HMIS::exited_between(., ReportStart, ReportEnd) &
           BenefitsFromAnySource == 1
       ) %>% 
       dplyr::group_by(FriendlyProjectName, 
@@ -1578,7 +1578,7 @@ app_server <- function( input, output, session ) {
     all_hhs <- qpr_benefits %>%
       dplyr::filter(ProjectRegion %in% c(input$QPRNCBRegionSelect) &
                       ProjectType == input$radioQPR_NCB_PTC &
-                      exited_between(., ReportStart, ReportEnd)) %>%
+                      HMIS::exited_between(., ReportStart, ReportEnd)) %>%
       dplyr::group_by(FriendlyProjectName, 
                       ProjectType, 
                       ProjectCounty, 
@@ -1720,7 +1720,7 @@ app_server <- function( input, output, session ) {
       dplyr::filter(
         ProjectRegion %in% input$QPRHIRegionSelect &
           ProjectType == input$radioQPR_HI_PTC &
-          exited_between(., ReportStart, ReportEnd) &
+          HMIS::exited_between(., ReportStart, ReportEnd) &
           InsuranceFromAnySource == 1
       ) %>% 
       dplyr::group_by(FriendlyProjectName,
@@ -1733,7 +1733,7 @@ app_server <- function( input, output, session ) {
     all_hhs <- qpr_benefits %>%
       dplyr::filter(ProjectRegion %in% input$QPRHIRegionSelect &
                       ProjectType == input$radioQPR_HI_PTC &
-                      exited_between(., ReportStart, ReportEnd)) %>%
+                      HMIS::exited_between(., ReportStart, ReportEnd)) %>%
       dplyr::group_by(FriendlyProjectName,
                       ProjectType,
                       ProjectCounty,
@@ -1875,7 +1875,7 @@ app_server <- function( input, output, session ) {
       dplyr::filter(
         ProjectRegion %in% input$QPRIncomeRegionSelect &
           ProjectType == input$radioQPR_Income_PTC &
-          stayed_between(., ReportStart, ReportEnd) &
+          HMIS::stayed_between(., ReportStart, ReportEnd) &
           Difference > 0
       ) %>% 
       dplyr::group_by(FriendlyProjectName,
@@ -1888,7 +1888,7 @@ app_server <- function( input, output, session ) {
     all_hhs <- qpr_income %>%
       dplyr::filter(ProjectRegion %in% input$QPRIncomeRegionSelect &
                       ProjectType == input$radioQPR_Income_PTC &
-                      stayed_between(., ReportStart, ReportEnd)) %>%
+                      HMIS::stayed_between(., ReportStart, ReportEnd)) %>%
       dplyr::group_by(FriendlyProjectName,
                       ProjectType,
                       ProjectCounty,
@@ -2033,7 +2033,7 @@ app_server <- function( input, output, session ) {
         dplyr::filter(
           !is.na(MoveInDateAdjust) &
             ProjectRegion %in% c(input$RapidRRHRegion) &
-            entered_between(., ReportStart, ReportEnd)
+            HMIS::entered_between(., ReportStart, ReportEnd)
         )
       
       RRHgoal <- goals %>%
@@ -2144,7 +2144,7 @@ app_server <- function( input, output, session ) {
         dplyr::filter(
           !is.na(OrganizationName) &
             ProjectRegion %in% c(input$RRHRegion) &
-            entered_between(., ReportStart, ReportEnd)
+            HMIS::entered_between(., ReportStart, ReportEnd)
         ) %>%
         dplyr::mutate(ProjectType = dplyr::if_else(ProjectType == 12,
                                                    "HP",
@@ -2155,7 +2155,7 @@ app_server <- function( input, output, session ) {
         dplyr::filter(
           !is.na(OrganizationName) &
             ProjectRegion %in% c(input$RRHRegion) &
-            entered_between(., ReportStart, ReportEnd)
+            HMIS::entered_between(., ReportStart, ReportEnd)
         ) %>%
         dplyr::select(OrganizationName, ProjectRegion) %>%
         unique() %>%
