@@ -33,3 +33,112 @@ qend_date <- function(input) {
     substr(input, 1, 4)
   )), "%m-%d-%Y")
 }
+
+#' @title qpr_plotly
+#' @description A boilerplate plot_ly layout for QPR tab bar graphs with arguments for values that change across tabs.
+#' @param .data \code{(data.frame)} Input data
+#' @param title \code{(character/list)} 
+#' @param xaxis \code{(list)} of x-axis label parameters
+#' @param yaxis \code{(list)} of y-axis label parameters
+#' @param ... \code{(named lists)} of arguments passed on to \link[plotly]{layout}. These will take the place of boilerplate values, preserving unspecified boilerplate parameters. If boilerplate parameters should be replaced entirely with specified values, set `.sub = FALSE`. For boilerplate layout parameters, see examples.
+#' @param .sub \code{(logical)} flag to specify whether boilerplate parameters should be switched out for those specified to `...` or replaced entirely.
+#' @return \code{(plotly)} graph object to be passed to \link[plotly]{renderPlotly}
+#' @examples 
+#' \dontrun{
+#' # Boilerplate plotly layout options
+#' .opts_layout <- list(
+#'p = .p,
+#'xaxis = xaxis,
+#'yaxis = yaxis,
+#'title = list(
+#'  text = title,
+#'  font = list(
+#'    size = 15
+#'  )),
+#'margin = list(
+#'  l = 50,
+#'  r = 50,
+#'  b = 100,
+#'  t = 100,
+#'  pad = 4
+#'),
+#'shapes = list(
+#'  type = "rect",
+#'  name = "CoC Goal",
+#'  fillcolor = "#008000",
+#'  line = list(color = "white", width = .01),
+#'  layer = "below",
+#'  xref = "paper",
+#'  yref = "y",
+#'  x0 = 0,
+#'  x1 = 1,
+#'  y0 = ~ Goal[1],
+#'  y1 = 1,
+#'  opacity = .2
+#'),
+#'title = title
+#')
+#' }
+qpr_plotly <- function(.data, title, x = ~ FriendlyProjectName, xaxis = list(title = ""), y = ~ Percent, yaxis =  list(title = "Households", tickformat = "%"), ..., .sub = TRUE) {
+  # If no data return no graph
+  if (nrow(.data) < 1) return(NULL)
+  .p <- plotly::plot_ly(
+    .data,
+    x = substitute(x),
+    y = substitute(y),
+    text = ~ hover,
+    hoverinfo = 'text',
+    type = "bar"
+  )
+  # Get the named dot params
+  .dot_params <- rlang::dots_list(..., .named = TRUE)
+  # Create the boilerplate options
+  .opts_layout <- list(
+    p = .p,
+    xaxis = xaxis,
+    yaxis = yaxis,
+    title = list(
+      text = title,
+      font = list(
+        size = 15
+      )),
+    margin = list(
+      l = 50,
+      r = 50,
+      b = 100,
+      t = 100,
+      pad = 4
+    ),
+    shapes = list(
+      type = "rect",
+      name = "CoC Goal",
+      fillcolor = "#008000",
+      line = list(color = "white", width = .01),
+      layer = "below",
+      xref = "paper",
+      yref = "y",
+      x0 = 0,
+      x1 = 1,
+      y0 = ~ Goal[1],
+      y1 = 1,
+      opacity = .2
+    ),
+    title = title
+  )
+  # If dot params were specified
+  if (length(.dot_params) > 0) {
+    # If we're substituting them into the boilerplate
+    if (isTRUE(.sub)) {
+      # Map over the parameters specified with dots
+      .opts_layout[names(.dot_params)] <- purrr::map2(.opts_layout[names(.dot_params)], .dot_params, ~{
+        # Trade the values in boilerplate list with those specified by dots
+        purrr::list_modify(.x, .y)
+      })
+    } else {
+      # Replace the values outright
+      .opts[names(.dot_params)] <- .dot_params
+    }
+  }
+  do.call(plotly::layout, .opts_layout)
+}
+
