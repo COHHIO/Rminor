@@ -36,7 +36,7 @@ qend_date <- function(input) {
 
 #' @title qpr_plotly
 #' @description A boilerplate plot_ly layout for QPR tab bar graphs with arguments for values that change across tabs.
-#' @param .data \code{(data.frame)} Input data
+#' @param .d \code{(data.frame)} Input data
 #' @param title \code{(character/list)} 
 #' @param xaxis \code{(list)} of x-axis label parameters
 #' @param yaxis \code{(list)} of y-axis label parameters
@@ -79,13 +79,13 @@ qend_date <- function(input) {
 #'title = title
 #')
 #' }
-qpr_plotly <- function(.data, title, x = ~ FriendlyProjectName, xaxis = list(title = ""), y = ~ Percent, yaxis =  list(title = "Households", tickformat = "%"), ..., .sub = TRUE) {
+qpr_plotly <- function(.d, title, x = ~ FriendlyProjectName, xaxis = list(title = ""), y = ~ Percent, yaxis =  list(title = "Households", tickformat = "%"), ..., .sub = TRUE) {
   # If no data return no graph
-  if (nrow(.data) < 1) return(NULL)
+  if (nrow(.d) < 1) return(NULL)
   .p <- plotly::plot_ly(
-    .data,
-    x = substitute(x),
-    y = substitute(y),
+    .d,
+    x = x,
+    y = y,
     text = ~ hover,
     hoverinfo = 'text',
     type = "bar"
@@ -139,6 +139,7 @@ qpr_plotly <- function(.data, title, x = ~ FriendlyProjectName, xaxis = list(tit
       .opts[names(.dot_params)] <- .dot_params
     }
   }
-  do.call(plotly::layout, .opts_layout)
+  .out <- do.call(plotly::layout, .opts_layout)
+  return(.out)
 }
 
