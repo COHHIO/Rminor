@@ -60,7 +60,7 @@ if (golem::app_prod()) {
 choices_project_type <- list(
   `Coordinated Entry` = 14,
   `Emergency Shelters` = 1, 
-  `Homelessness Prevention` = 12, 
+  `Prevention` = 12, 
   `Permanent Supportive Housing` = c(3, 9),
   `Rapid Rehousing` = 13,
   `Safe Haven` = 8, 

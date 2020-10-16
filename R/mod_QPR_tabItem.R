@@ -111,6 +111,17 @@ mod_QPR_server <- function(id, header){
       End = qend_date(input$slider)
       )
     })
+    ProjectType <- eventReactive(req(input$ProjectType), {
+      # The RadioPicker input returns a character regardless of the type of objects passed to the UI element. If the object returned is meant to be a list or vector, ie  Permanent Supportive Housing = c(3,9), it returns a character "list(`3` = 3, `9` = 9)". This must then be parsed into an actual list.
+      .pt <- unlist(eval(rlang::parse_expr(input$ProjectType)))
+      # message(paste("ProjectType-class:",class(.pt)))
+      # message(paste("ProjectType:",.pt))
+      #browser(expr = is.na(.pt))
+      # Get the selected project type
+      ProjectType <- purrr::keep(choices_project_type, ~{any(unlist(.x) %in% .pt)})
+      message(paste0(names(ProjectType),":", paste0(ProjectType, collapse = ",")))
+      ProjectType
+    })
     # Header
     output$header <- shiny::renderUI({
       message(paste0(as.character(Report()$Start), " \ ", as.character(Report()$End)))
@@ -121,124 +132,10 @@ mod_QPR_server <- function(id, header){
     # Gather Objects
     
     # Process Data
-    # data_env <- reactive({
-    #  rlang::eval_bare(expressions[[id]]) 
-    # })
+    data_env <- reactive(qpr_expr[[id]]$expr, quoted = TRUE)
+    
     output$plot <- plotly::renderPlotly({
-      ReportStart <- Report()$Start
-      ReportEnd <- Report()$End
-      
-      LoSGoals <- goals %>%
-        dplyr::select(-Measure) %>%
-        dplyr::filter(SummaryMeasure == "Length of Stay" &
-                        ProjectType %in% c(input$ProjectType)) %>%
-        unique()
-      
-      LoSDetail <- qpr_leavers %>%
-        dplyr::filter(((
-          !is.na(MoveInDateAdjust) &
-            ProjectType == 13
-        ) |
-          (
-            ProjectType %in% c(1, 2, 8) &
-              !is.na(ExitDate)
-          )) &
-          exited_between(., ReportStart, ReportEnd)) %>%
-        dplyr::filter(
-          ProjectRegion %in% c(input$Region) &
-            ProjectType %in% c(input$ProjectType)
-        ) # this filter needs
-      # to be here so the selection text matches the mutated data
-      TotalLeavers <- LoSDetail %>%
-        dplyr::group_by(FriendlyProjectName) %>%
-        dplyr::summarise(Leavers = dplyr::n())
-      
-      title <-
-        paste0(
-          "Length of Stay (",
-          input$radio_mean,
-          ")\n",
-          names(choices_project_type)[choices_project_type %in% input$ProjectType],
-          "\n",
-          ReportStart,
-          " to ",
-          ReportEnd
-        )
-      
-      LoSSummary <- LoSDetail %>%
-        dplyr::group_by(FriendlyProjectName,
-                        ProjectRegion,
-                        ProjectCounty,
-                        ProjectType) %>%
-        dplyr::summarise(
-          Days = dplyr::case_when(
-            input$radio_mean == "Average Days" ~
-              as.numeric(mean(DaysinProject)),
-            input$radio_mean == "Median Days" ~
-              as.numeric(stats::median(DaysinProject))
-          )
-        ) %>%
-        dplyr::left_join(LoSGoals, by = "ProjectType") %>%
-        dplyr::left_join(TotalLeavers, by = ("FriendlyProjectName")) %>%
-        dplyr::mutate(
-          hover = paste0(
-            FriendlyProjectName,
-            "\nTotal Leavers: ",
-            Leavers,
-            "\nDays: ",
-            Days,
-            sep = "\n"
-          )
-        )
-      message(paste0("LosSummary:", nrow(LoSSummary)))
-      if (nrow(LoSDetail) > 0) {
-        plotly::plot_ly(
-          data = LoSSummary,
-          x = ~ FriendlyProjectName,
-          y = ~ Days,
-          text = ~ hover,
-          hoverinfo = 'text'
-        ) %>%
-          plotly::add_trace(type = "bar") %>%
-          plotly::layout(
-            shapes = list(
-              type = "rect",
-              name = "CoC Goal",
-              fillcolor = "#008000",
-              line = list(color = "white"),
-              layer = "below",
-              xref = "paper",
-              yref = "y",
-              x0 = 0,
-              x1 = 1,
-              y0 = 0,
-              y1 = ~ Goal[1],
-              opacity = .2
-            ),
-            title = list(text = title,
-                         font = list(size = 15)),
-            margin = list(
-              l = 50,
-              r = 50,
-              b = 100,
-              t = 100,
-              pad = 4
-            ),
-            yaxis = list(
-              title = "Days",
-              rangemode = "tozero",
-              showgrid = TRUE
-            ),
-            xaxis = list(
-              title = "",
-              showgrid = TRUE,
-              rangemode = "tozero"
-            )
-          )
-      }
-      else {
-        
-      }
+      rlang::eval_bare(qpr_expr[[id]]$plot)
     })
   })
 }
