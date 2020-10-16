@@ -90,10 +90,13 @@ mod_ceAPs_server <- function(id) {
     
     output$AP_list <- renderDataTable({
       SearchColumn <- rlang::sym(input$radio_search)
+      
       AP_list <- APs %>%
         filter(!!SearchColumn %in% c(input$AP)) %>%
         select(ProjectID) %>% unique()
+      
       message(paste0("AP_list", nrow(AP_list)))
+      
       AP_final <- APs %>%
         right_join(AP_list, by = "ProjectID") %>%
         mutate(Address = if_else(
@@ -102,6 +105,7 @@ mod_ceAPs_server <- function(id) {
           "Please call- address not available."
         )) %>%
         group_by(OrgLink,
+                 TargetPop,
                  Address,
                  ProjectHours,
                  ProjectTelNo) %>%
@@ -113,11 +117,12 @@ mod_ceAPs_server <- function(id) {
         unique() %>%
         select(
           "Organization" = OrgLink,
+          "Target Population" = TargetPop,
+          "County/-ies" = Counties,
+          "Service Area(s)" = Regions,
           Address,
           "Hours" = ProjectHours,
-          "Phone" = ProjectTelNo,
-          "County/-ies" = Counties,
-          "Service Area(s)" = Regions
+          "Phone" = ProjectTelNo
         )
       
       datatable(
