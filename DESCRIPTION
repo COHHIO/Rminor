@@ -1,7 +1,9 @@
 Package: Rminor
 Title: Rminor
 Version: 0.0.0.9000
-Authors@R: person('Genelle', 'Denzin', email = 'genelledenzin@cohhio.org', role = c('cre', 'aut'))
+Authors@R: person('Genelle', 'Denzin', 
+  email = 'genelledenzin@cohhio.org', 
+  role = c('cre', 'aut'))
 Description: An open-source HMIS custom reporting Shiny app
 License: AGPL-3
 Imports: 
