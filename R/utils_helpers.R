@@ -79,6 +79,8 @@ qend_date <- function(input) {
 #'title = title
 #')
 #' }
+#' @importFrom purrr map2 list_modify
+#' @importFrom rlang dots_list
 qpr_plotly <- function(.d, title, x = ~ FriendlyProjectName, xaxis = list(title = ""), y = ~ Percent, yaxis =  list(title = "Households", tickformat = "%"), ..., .sub = TRUE) {
   # If no data return no graph
   if (nrow(.d) < 1) return(NULL)
