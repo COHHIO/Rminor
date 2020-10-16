@@ -1,84 +1,72 @@
-# ReportStart <- lubridate::ymd("2020-01-01")
-# ReportEnd <- lubridate::today()
-# input <- list(
-#   ProjectType = c(1, 2, 8),
-#   Region = c(
-#     "Homeless Planning Region 14",
-#     "Homeless Planning Region 4",
-#     "Homeless Planning Region 16",
-#     "Homeless Planning Region 14"
-#   ),
-#   radio_mean = "Average Days"
-# )
-# .data <- LoSSummary
 qpr_expr$LoS <- list()
-qpr_expr$LoS$expr <- rlang::expr({ReportStart <- Report()$Start
-ReportEnd <- Report()$End
-
-LoSGoals <- goals %>%
-  dplyr::select(-Measure) %>%
-  dplyr::filter(SummaryMeasure == "Length of Stay" &
-                  ProjectType %in% c(input$ProjectType)) %>%
-  unique()
-
-LoSDetail <- qpr_leavers %>%
-  dplyr::filter(((
-    !is.na(MoveInDateAdjust) &
-      ProjectType == 13
-  ) |
-    (
-      ProjectType %in% c(1, 2, 8) &
-        !is.na(ExitDate)
-    )) &
-    HMIS::exited_between(., ReportStart, ReportEnd)) %>%
-  dplyr::filter(
-    ProjectRegion %in% c(input$Region) &
-      ProjectType %in% c(input$ProjectType)
-  ) # this filter needs
-# to be here so the selection text matches the mutated data
-TotalLeavers <- LoSDetail %>%
-  dplyr::group_by(FriendlyProjectName) %>%
-  dplyr::summarise(Leavers = dplyr::n())
-
-title <-
-  paste0(
-    "Length of Stay (",
-    input$radio_mean,
-    ")\n",
-    names(choices_project_type)[choices_project_type %in% input$ProjectType],
-    "\n",
-    ReportStart,
-    " to ",
-    ReportEnd
-  )
-
-LoSSummary <- LoSDetail %>%
-  dplyr::group_by(FriendlyProjectName,
-                  ProjectRegion,
-                  ProjectCounty,
-                  ProjectType) %>%
-  dplyr::summarise(
-    Days = dplyr::case_when(
-      input$radio_mean == "Average Days" ~
-        as.numeric(mean(DaysinProject)),
-      input$radio_mean == "Median Days" ~
-        as.numeric(stats::median(DaysinProject))
+qpr_expr$LoS$expr <- rlang::expr({
+  ReportStart <- Report()$Start
+  ReportEnd <- Report()$End
+  
+  LoSGoals <- goals %>%
+    dplyr::select(-Measure) %>%
+    dplyr::filter(SummaryMeasure == "Length of Stay" &
+                    ProjectType %in% unlist(ProjectType())) %>%
+    unique()
+  
+  LoSDetail <- qpr_leavers %>%
+    dplyr::filter(((
+      !is.na(MoveInDateAdjust) &
+        ProjectType == 13
+    ) |
+      (
+        ProjectType %in% c(1, 2, 8) &
+          !is.na(ExitDate)
+      )) &
+      HMIS::exited_between(., ReportStart, ReportEnd)) %>%
+    dplyr::filter(
+      ProjectRegion %in% c(input$Region) &
+        ProjectType %in% unlist(ProjectType())
+    ) # this filter needs
+  # to be here so the selection text matches the mutated data
+  TotalLeavers <- LoSDetail %>%
+    dplyr::group_by(FriendlyProjectName) %>%
+    dplyr::summarise(Leavers = dplyr::n())
+  
+  title <-
+    paste0(
+      "Length of Stay (",
+      input$radio_mean,
+      ")\n",
+      names(ProjectType()),
+      "\n",
+      ReportStart,
+      " to ",
+      ReportEnd
     )
-  ) %>%
-  dplyr::left_join(LoSGoals, by = "ProjectType") %>%
-  dplyr::left_join(TotalLeavers, by = ("FriendlyProjectName")) %>%
-  dplyr::mutate(
-    hover = paste0(
-      FriendlyProjectName,
-      "\nTotal Leavers: ",
-      Leavers,
-      "\nDays: ",
-      Days,
-      sep = "\n"
+  
+  LoSSummary <- LoSDetail %>%
+    dplyr::group_by(FriendlyProjectName,
+                    ProjectRegion,
+                    ProjectCounty,
+                    ProjectType) %>%
+    dplyr::summarise(
+      Days = dplyr::case_when(
+        input$radio_mean == "Average Days" ~
+          as.numeric(mean(DaysinProject)),
+        input$radio_mean == "Median Days" ~
+          as.numeric(stats::median(DaysinProject))
+      )
+    ) %>%
+    dplyr::left_join(LoSGoals, by = "ProjectType") %>%
+    dplyr::left_join(TotalLeavers, by = ("FriendlyProjectName")) %>%
+    dplyr::mutate(
+      hover = paste0(
+        FriendlyProjectName,
+        "\nTotal Leavers: ",
+        Leavers,
+        "\nDays: ",
+        Days,
+        sep = "\n"
+      )
     )
-  )
-attr(LoSSummary, "title") <- title
-LoSSummary
+  attr(LoSSummary, "title") <- title
+  LoSSummary
 })
 qpr_expr$LoS$plot <- rlang::expr({
   qpr_plotly(

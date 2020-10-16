@@ -247,74 +247,14 @@ app_ui <- function(request) {
                              , region_choices = choices_regions
                              , radio_mean = TRUE)
           ,
-          shinydashboard::tabItem(tabName = "PH-Tab",
-                                  shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerQPRExitsToPH"), width = 12)),
-                                  shinyWidgets::chooseSliderSkin("Round"),
-                                  shinyWidgets::setSliderColor("#56B4E9", 1),
-                                  shinyWidgets::sliderTextInput("ExitsToPHSlider",
-                                                                "",
-                                                                c(
-                                                                  unique(zoo::Sys.yearqtr() - 6 / 4:zoo::Sys.yearqtr() + 1 / 4)
-                                                                ),
-                                                                selected = zoo::Sys.yearqtr() - 1 / 4),
-                                  shinyWidgets::pickerInput(
-                                    inputId = "ExitsToPHRegionSelect",
-                                    "Select Region(s)",
-                                    choices = choices_regions,
-                                    options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
-                                                                          actionsBox = TRUE),
-                                    multiple = TRUE,
-                                    selected = sample(choices_regions, 1)
-                                  ),
-                                  shinyWidgets::prettyRadioButtons(
-                                    inputId = "radioExitsToPHPTC",
-                                    label = "Program Type",
-                                    thick = TRUE,
-                                    animation = "pulse",
-                                    status = "info",
-                                    choices = c("Emergency Shelters", "Transitional Housing",
-                                                "Safe Haven", "Prevention", "Rapid Rehousing", 
-                                                "Permanent Supportive Housing", "Street Outreach"),
-                                    selected = "Emergency Shelters"
-                                  ),
-                                  plotly::plotlyOutput("ExitsToPH"),
-                                  htmltools::br(),
-                                  htmltools::br(),
-                                  plotly::plotlyOutput("ExitsToPHOutreach")
-          ),
-          shinydashboard::tabItem(tabName = "NCB-Tab",
-                                  shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerQPRNCBs"), width = 12)),
-                                  shinyWidgets::chooseSliderSkin("Round"),
-                                  shinyWidgets::setSliderColor("#56B4E9", 1),
-                                  shinyWidgets::sliderTextInput("QPRNCBDateSlider",
-                                                                "",
-                                                                c(
-                                                                  unique(zoo::Sys.yearqtr() - 6 / 4:zoo::Sys.yearqtr() + 1 / 4)
-                                                                ),
-                                                                selected = zoo::Sys.yearqtr() - 1 / 4),
-                                  shinyWidgets::pickerInput(
-                                    inputId = "QPRNCBRegionSelect",
-                                    "Select Region(s)",
-                                    choices = choices_regions,
-                                    options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
-                                                                          actionsBox = TRUE),
-                                    multiple = TRUE,
-                                    selected = sample(choices_regions, 1)
-                                  ),
-                                  shinyWidgets::prettyRadioButtons(
-                                    inputId = "radioQPR_NCB_PTC",
-                                    label = "Program Type",
-                                    thick = TRUE,
-                                    animation = "pulse",
-                                    status = "info",
-                                    choices = c("Emergency Shelters", "Transitional Housing",
-                                                "Safe Haven", "Prevention", "Rapid Rehousing", 
-                                                "Permanent Supportive Housing", "Street Outreach"),
-                                    selected = "Emergency Shelters"
-                                  ),
-                                  plotly::plotlyOutput("QPRNCBs"),
-                                  htmltools::br()
-          ),
+          mod_QPR_tabItem_ui("PH"
+                             , project_choices = choices_project_type[tab_choices$PH]
+                             , region_choices = choices_regions)
+          ,
+          mod_QPR_tabItem_ui("NCB"
+                             , project_choices = choices_project_type[tab_choices$NCB]
+                             , region_choices = choices_regions)
+          ,
           shinydashboard::tabItem(tabName = "HI-Tab",
                                   shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerQPRHI"), width = 12)),
                                   shinyWidgets::chooseSliderSkin("Round"),
