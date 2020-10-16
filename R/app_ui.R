@@ -67,7 +67,7 @@ app_ui <- function(request) {
             shinydashboard::menuSubItem("Income Growth",
                                         tabName = "income-Tab"),
             shinydashboard::menuSubItem("Rapid Placement for RRH",
-                                        tabName = "rapid-Tab"),
+                                        tabName = "RRH-Tab"),
             shinydashboard::menuSubItem("RRH vs HP Spending",
                                         tabName = "spending-Tab")
           ),
@@ -319,26 +319,7 @@ app_ui <- function(request) {
                                   ),
                                   plotly::plotlyOutput("QPRIncome"),
                                   htmltools::br()),
-          shinydashboard::tabItem(tabName = "rapid-Tab",
-                                  shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerRRHRapidPlacement"), width = 12)),
-                                  shinyWidgets::chooseSliderSkin("Round"),
-                                  shinyWidgets::setSliderColor("#56B4E9", 1),
-                                  shinyWidgets::sliderTextInput("RapidRRHDateSlider",
-                                                                "",
-                                                                c(
-                                                                  unique(zoo::Sys.yearqtr() - 6 / 4:zoo::Sys.yearqtr() + 1 / 4)
-                                                                ),
-                                                                selected = zoo::Sys.yearqtr() - 1 / 4),
-                                  shinyWidgets::pickerInput(
-                                    inputId = "RapidRRHRegion",
-                                    "Select Region(s)",
-                                    choices = choices_regions,
-                                    options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
-                                                                          actionsBox = TRUE),
-                                    multiple = TRUE,
-                                    selected = sample(choices_regions, 1)
-                                  ),
-                                  plotly::plotlyOutput("DaysToHouse")),
+      mod_QPR_tabItem_ui("RRH", region_choices = choices_regions),
           shinydashboard::tabItem(tabName = "spending-Tab",
                                   shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerRRHSpending"), width = 12)),
                                   shinyWidgets::chooseSliderSkin("Round"),

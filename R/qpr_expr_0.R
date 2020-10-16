@@ -1,7 +1,7 @@
 # ReportStart <- lubridate::ymd("2020-01-01")
 # ReportEnd <- lubridate::today()
 # input <- list(
-#   ProjectType = list("Permanent Supportive Housing" = c(3,9)),
+#   ProjectType = choices_project_type["Rapid Rehousing"],
 #   Region = c(
 #     "Homeless Planning Region 14",
 #     "Homeless Planning Region 4",
