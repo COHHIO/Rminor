@@ -37,7 +37,7 @@ app_server <- function( input, output, session ) {
   # cat("Length of Stay", input$LoSRegionSelect)
   # })
   observeEvent(input$browser,{
-    browser()
+    # browser()
   })
   output$headerUtilization <- shiny::renderUI({
     ReportEnd <- 
