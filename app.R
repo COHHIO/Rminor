@@ -4,5 +4,5 @@
 
 pkgload::load_all(export_all = FALSE, helpers = FALSE, attach_testthat = FALSE)
 options( "golem.app.prod" = TRUE)
-golem::add_resource_path("www", "inst/app/www")
+# golem::add_resource_path("www", "inst/app/www")
 Rminor::run_app() # add parameters here (if any)
