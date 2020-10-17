@@ -3,7 +3,7 @@
 \docType{data}
 \name{tab_choices}
 \alias{tab_choices}
-\title{}
+\title{Tab Choices}
 \format{
 An object of class \code{list} of length 4.
 }

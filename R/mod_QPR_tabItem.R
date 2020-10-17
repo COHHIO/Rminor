@@ -1,5 +1,5 @@
 #' QPR_tabItem UI Function
-#' @title 
+#' @title Tab Choices
 #' @description A shiny Module to generate the QPR tabitems.
 #' @param id,input,output,session Internal parameters for {shiny}.
 #' @param program_choices \code{(named list)} of choices of program types for the radio picker. Default does not show the UI item - choices must be provided for the picker to show.
