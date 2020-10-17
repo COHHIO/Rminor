@@ -19,8 +19,27 @@
 #'     DO NOT REMOVE.
 #' @importFrom htmltools HTML br img
 #' @import shiny
-#' @importFrom shinydashboard dashboardPage dashboardHeader dashboardSidebar sidebarMenu menuItem menuSubItem dashboardBody tabItems tabItem box
-#' @importFrom shinyWidgets pickerInput pickerOptions airDatepickerInput chooseSliderSkin setSliderColor sliderTextInput prettyRadioButtons
+#' @importFrom 
+#'   shinydashboard 
+#'   dashboardPage 
+#'   dashboardHeader 
+#'   dashboardSidebar 
+#'   sidebarMenu 
+#'   menuItem 
+#'   menuSubItem 
+#'   dashboardBody 
+#'   tabItems 
+#'   tabItem 
+#'   box
+#' @importFrom 
+#'   shinyWidgets 
+#'   pickerInput 
+#'   pickerOptions 
+#'   airDatepickerInput 
+#'   chooseSliderSkin 
+#'   setSliderColor 
+#'   sliderTextInput 
+#'   prettyRadioButtons
 #' @importFrom dplyr sample_n select
 #' @importFrom lubridate ymd floor_date days
 #' @importFrom plotly plotlyOutput
@@ -148,13 +167,18 @@ app_ui <- function(request) {
                 inputId = "utilizationDate",
                 label = "Report End Month",
                 max =
-                  lubridate::ymd(lubridate::floor_date(update_date, unit = "month") - lubridate::days(1)),
+                  lubridate::ymd(lubridate::floor_date(update_date, 
+                                                       unit = "month") - 
+                                 lubridate::days(1)),
                 min =
-                  lubridate::ymd(lubridate::floor_date(update_date - lubridate::days(335), unit = "month")),
+                  lubridate::ymd(lubridate::floor_date(update_date - 
+                                                         lubridate::days(335), 
+                                                       unit = "month")),
                 dateFormat = "MM yyyy",
                 view = "month",
                 value =
-                  lubridate::ymd(lubridate::floor_date(update_date, unit = "month") - lubridate::days(1)),
+                  lubridate::ymd(lubridate::floor_date(update_date, unit = "month") - 
+                                   lubridate::days(1)),
                 minView = "months",
                 addon = "none",
                 autoClose = TRUE,
@@ -493,7 +517,7 @@ golem_add_external_resources <- function(){
     favicon(),
     bundle_resources(
       path = app_sys('app/www'),
-      app_title = 'Rminorgolem'
+      app_title = 'Rminor'
     )
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert() 
