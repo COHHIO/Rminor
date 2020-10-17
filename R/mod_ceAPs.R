@@ -119,7 +119,6 @@ mod_ceAPs_server <- function(id) {
           "Organization" = OrgLink,
           "Target Population" = TargetPop,
           "County/-ies" = Counties,
-          "Service Area(s)" = Regions,
           Address,
           "Hours" = ProjectHours,
           "Phone" = ProjectTelNo
