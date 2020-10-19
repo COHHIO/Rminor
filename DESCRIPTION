@@ -18,6 +18,7 @@ Imports:
     HMIS,
     htmltools,
     lubridate,
+    magrittr,
     plotly,
     processx,
     purrr,
