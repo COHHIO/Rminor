@@ -91,17 +91,24 @@ mod_ceAPs_server <- function(id) {
       )
     })
     
+    output$headerAPs <- shiny::renderUI({
+      list(htmltools::h2("Coordinated Entry Access Points"),
+           htmltools::h4("search term(s)"),
+           htmltools::h4("Effective Date Last Updated")
+      )
+    })    
+    
     output$AP_list <- renderDataTable({
       SearchColumn <- rlang::sym(input$radio_search)
       
       AP_list <- APs %>%
         filter(!!SearchColumn %in% c(input$AP)) %>%
-        select(ProjectID) %>% unique()
+        select(ProjectID, TargetPop) %>% unique()
       
       message(paste0("AP_list", nrow(AP_list)))
       
       AP_final <- APs %>%
-        right_join(AP_list, by = "ProjectID") %>%
+        right_join(AP_list, by = c("ProjectID", "TargetPop")) %>%
         mutate(Address = if_else(
           !is.na(CoCCode),
           paste(Addresses, City, sep = '<br>'),
