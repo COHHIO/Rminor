@@ -14,27 +14,31 @@ mod_ceAPs_ui <- function(id) {
   shinydashboard::tabItem(
     tabName = ns("Tab"),
     shiny::fluidRow(shinydashboard::box(
-      shinyWidgets::prettyRadioButtons(
-        inputId = ns("radio_search"),
-        label = "Search by:",
-        choices = c(
-          "County" = "ProjectCountyServed",
-          "Service Area" = "ProjectAreaServed",
-          "Organization" = "ProjectAKA"
+      shiny::htmlOutput(ns("headerAPs"))
+    )),    
+    shiny::fluidRow(
+      shinydashboard::box(
+        shinyWidgets::prettyRadioButtons(
+          inputId = ns("radio_search"),
+          label = "Search by:",
+          choices = c(
+            "County" = "ProjectCountyServed",
+            "Service Area" = "ProjectAreaServed",
+            "Organization" = "ProjectAKA"
+          ),
+          selected = "ProjectCountyServed"
         ),
-        selected = "ProjectCountyServed"
+        shinyWidgets::pickerInput(
+          inputId = ns("AP"),
+          label = "Select County/-ies",
+          options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
+                                                actionsBox = TRUE),
+          choices = bos_counties,
+          multiple = TRUE
+        ),
+        width = 12
       )
-    )),
-    shiny::fluidRow(shinydashboard::box(
-      shinyWidgets::pickerInput(
-        inputId = ns("AP"),
-        label = "Select County/-ies",
-        options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
-                                              actionsBox = TRUE),
-        choices = bos_counties,
-        multiple = TRUE
-      )
-    )),
+    ), 
     shiny::fluidRow(
       shinydashboard::box(
         title = "Coordinated Entry Access Points",
@@ -46,12 +50,11 @@ mod_ceAPs_ui <- function(id) {
       shinydashboard::box(
         title = "Ohio Balance of State CoC Homeless Planning Regions",
         htmltools::HTML(
-          "The solid-colored counties are all part of the Ohio
-                       Balance of State CoC. The Ohio Development Services
-                       Agency (ODSA) further divided the counties in the Balance
-                       of State into 17 Homeless Planning Regions to make
-                       implementation of state-funded programs in the Balance of
-                       State more localized."
+          "The solid-colored counties are all part of the Ohio Balance of State 
+          CoC. The Ohio Development Services Agency (ODSA) further divided the 
+          counties in the Balance of State into 17 Homeless Planning Regions to 
+          make implementation of state-funded programs in the Balance of State 
+          more localized."
         ),
         img(src =
               "www/Homeless-Region-Map-for-COHHIO-2017.png",
@@ -88,17 +91,24 @@ mod_ceAPs_server <- function(id) {
       )
     })
     
+    output$headerAPs <- shiny::renderUI({
+      list(htmltools::h2("Coordinated Entry Access Points"),
+           htmltools::h4("search term(s)"),
+           htmltools::h4("Effective Date Last Updated")
+      )
+    })    
+    
     output$AP_list <- renderDataTable({
       SearchColumn <- rlang::sym(input$radio_search)
       
       AP_list <- APs %>%
         filter(!!SearchColumn %in% c(input$AP)) %>%
-        select(ProjectID) %>% unique()
+        select(ProjectID, TargetPop) %>% unique()
       
       message(paste0("AP_list", nrow(AP_list)))
       
       AP_final <- APs %>%
-        right_join(AP_list, by = "ProjectID") %>%
+        right_join(AP_list, by = c("ProjectID", "TargetPop")) %>%
         mutate(Address = if_else(
           !is.na(CoCCode),
           paste(Addresses, City, sep = '<br>'),
@@ -119,7 +129,6 @@ mod_ceAPs_server <- function(id) {
           "Organization" = OrgLink,
           "Target Population" = TargetPop,
           "County/-ies" = Counties,
-          "Service Area(s)" = Regions,
           Address,
           "Hours" = ProjectHours,
           "Phone" = ProjectTelNo
