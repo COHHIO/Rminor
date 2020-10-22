@@ -147,28 +147,34 @@ qpr_plotly <- function(.d, title, x = ~ FriendlyProjectName, xaxis = list(title 
   return(.out)
 }
 
-#' @title find_and_load
-#' @description Finds a file and loads it into the parent environment. Useful for situations where files must be loaded from an unknown package directory structure.
-#' @param .fn The case-sensitive file name regex passed to \code{\link[base]{list.files}}.
-#' @param .cenv The environment in which to load the file. **Default: \code{\link[base]{parent.frame}}**
-#' @return The objects are loaded into the specified environment. If `.fn` is an *rds* file, the object is loaded with the filename as it's reference name. If `.fn` is an *R* file, the file is sourced into the specified environment.
-#' @examples
-#' find_and_load("Rminor.RData")
-#' @export
 
-find_and_load <- function(.fn, .cenv = parent.frame()) {
-  .path <- "."
-  .fs <- list.files(.path, pattern = .fn, all.files = TRUE, full.names = TRUE, recursive = TRUE)
-  while (length(.fs) < 1) {
-    .path <- file.path("..", .path)
-    .fs <- list.files(.path, pattern = .fn, all.files = TRUE, full.names = TRUE, recursive = TRUE)
+
+#' @title find_path
+#' @description Finds a file or directory by traversing the directory tree.
+#' @param .fn The case-sensitive regex for the file passed to \code{\link[base]{list.files}}.
+#' @param n the number of parent directories to traverse before erroring
+#' @return The objects are loaded into the specified environment. 
+#' @examples
+#' find_path("Rminor.RData")
+#' @export
+#' @importFrom rlang warn abort
+
+find_path <- function(.fn, n = 4) {
+  .path <- '.'
+  .fs <- list.files(.path, pattern = .fn, all.files = TRUE, full.names = TRUE, recursive = TRUE, include.dirs = TRUE)
+  i <- 1
+  while (length(.fs) < 1 && i <= n) {
+    .path <- file.path('..', .path)
+    .fs <- list.files(.path, pattern = .fn, all.files = TRUE, full.names = TRUE, recursive = TRUE, include.dirs = TRUE)
+    i <- 1 + i
   }
-  if (grepl("rds$", .fn, ignore.case = TRUE)) {
-     assign(.fn, readRDS(.fs), envir = .cenv)
-  } else if (grepl("rdata$", .fn, ignore.case = TRUE)) {
-    load(.fs, .cenv)
-  } else if (grepl("r$", .fn, ignore.case = TRUE)) {
-    source(.fs, local = .cenv)
-  }
+  if (length(.fs) > 1) {
+    .fs <- .fs[which.min(nchar(.fs))]
+   rlang::warn(paste0('More than one path found. Using ', 
+                      .fs))
+  } else if (length(.fs) < 1) {
+    rlang::abort('No path found for ', .fn)
+  }  
+  return(.fs)
 }
-find_and_load("Rminor.RData")
+

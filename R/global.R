@@ -12,13 +12,14 @@
 # GNU Affero General Public License for more details at
 # <https://www.gnu.org/licenses/>. 
 
+#' @include utils_helpers.R
 
 if (golem::app_prod() || testthat::is_testing()) {
   # Run only if in production mode or testing
   env <- environment()
   
   # loading the image files from the data/ folder
-  find_and_load("Rminor.RData", env)
+  load(find_path("Rminor.RData"), env)
   message("Data Loaded")
   # creating various lists needed in the app
   

@@ -4,9 +4,9 @@
 env <- environment()
 
 # loading the image files from the data/ folder
-find_and_load("Rminor.RData", env)
+load(find_path("Rminor.RData"), env)
 message("Data Loaded")
-message(paste0(ls(), collapse  = ", "))
+
 # creating various lists needed in the app
 data_ui <- list()
 data_ui$choices_month <-
@@ -92,4 +92,5 @@ data_ui$tab_choices <-
       "Street Outreach"
     )
   )
+env <- environment()
 
