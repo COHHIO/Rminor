@@ -18,6 +18,7 @@
 #' 
 #' @param request Internal parameter for `{shiny}`. 
 #'     DO NOT REMOVE.
+#' @param data_ui \code{(list)} List with variables passed to UI objects.
 #' @importFrom htmltools HTML br img
 #' @import shiny
 #' @importFrom 
@@ -48,7 +49,10 @@
 #' @importFrom zoo Sys.yearqtr
 #' @noRd
 #' 
-app_ui <- function(request) {
+app_ui <- function(request, data_ui) {
+  if (!missing(data_ui)) {
+    list2env(data_ui, environment())
+  }
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
