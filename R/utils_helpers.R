@@ -7,11 +7,11 @@
 #' @examples \dontrun{
 #' ReportStart <- qstart_date(input$slider)
 #' }
-qstart_date <- function(input) {
-  format.Date(lubridate::ymd(paste0(
-  substr(input, 1, 4),
+qstart_date <- function(.) {
+  lubridate::ymd(paste0(
+  substr(., 1, 4),
   "-01-01"
-)), "%m-%d-%Y")
+))
 }
 
 #' @title qend_date
@@ -22,23 +22,25 @@ qstart_date <- function(input) {
 #' @examples \dontrun{
 #' ReportEnd <- qend_date(input$slider)
 #' }
-qend_date <- function(input) {
-  format.Date(lubridate::mdy(paste0(
+qend_date <- function(.) {
+  lubridate::mdy(paste0(
     dplyr::case_when(
-      substr(input, 7, 7) == 1 ~ "03-31-",
-      substr(input, 7, 7) == 2 ~ "06-30-",
-      substr(input, 7, 7) == 3 ~ "09-30-",
-      substr(input, 7, 7) == 4 ~ "12-31-"
+      substr(., 7, 7) == 1 ~ "03-31-",
+      substr(., 7, 7) == 2 ~ "06-30-",
+      substr(., 7, 7) == 3 ~ "09-30-",
+      substr(., 7, 7) == 4 ~ "12-31-"
     ),
-    substr(input, 1, 4)
-  )), "%m-%d-%Y")
+    substr(., 1, 4)
+  ))
 }
 
 #' @title qpr_plotly
 #' @description A boilerplate plot_ly layout for QPR tab bar graphs with arguments for values that change across tabs.
 #' @param .d \code{(data.frame)} Input data
 #' @param title \code{(character/list)} 
+#' @param x \code{(formula)} Formula for variable on x-axis in plotly tilde format
 #' @param xaxis \code{(list)} of x-axis label parameters
+#' @param y \code{(formula)} Formula for variable on y-axis in plotly tilde format
 #' @param yaxis \code{(list)} of y-axis label parameters
 #' @param ... \code{(named lists)} of arguments passed on to \link[plotly]{layout}. These will take the place of boilerplate values, preserving unspecified boilerplate parameters. If boilerplate parameters should be replaced entirely with specified values, set `.sub = FALSE`. For boilerplate layout parameters, see examples.
 #' @param .sub \code{(logical)} flag to specify whether boilerplate parameters should be switched out for those specified to `...` or replaced entirely.
@@ -145,3 +147,28 @@ qpr_plotly <- function(.d, title, x = ~ FriendlyProjectName, xaxis = list(title 
   return(.out)
 }
 
+#' @title find_and_load
+#' @description Finds a file and loads it into the parent environment. Useful for situations where files must be loaded from an unknown package directory structure.
+#' @param .fn The case-sensitive file name regex passed to \code{\link[base]{list.files}}.
+#' @param .cenv The environment in which to load the file. **Default: \code{\link[base]{parent.frame}}**
+#' @return The objects are loaded into the specified environment. If `.fn` is an *rds* file, the object is loaded with the filename as it's reference name. If `.fn` is an *R* file, the file is sourced into the specified environment.
+#' @examples
+#' find_and_load("Rminor.RData")
+#' @export
+
+find_and_load <- function(.fn, .cenv = parent.frame()) {
+  .path <- "."
+  .fs <- list.files(.path, pattern = .fn, all.files = TRUE, full.names = TRUE, recursive = TRUE)
+  while (length(.fs) < 1) {
+    .path <- file.path("..", .path)
+    .fs <- list.files(.path, pattern = .fn, all.files = TRUE, full.names = TRUE, recursive = TRUE)
+  }
+  if (grepl("rds$", .fn, ignore.case = TRUE)) {
+     assign(.fn, readRDS(.fs), envir = .cenv)
+  } else if (grepl("rdata$", .fn, ignore.case = TRUE)) {
+    load(.fs, .cenv)
+  } else if (grepl("r$", .fn, ignore.case = TRUE)) {
+    source(.fs, local = .cenv)
+  }
+}
+find_and_load("Rminor.RData")
