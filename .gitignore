@@ -8,7 +8,8 @@
 *.html
 data/*
 rsconnect
-^Memory_Analysis_Rm\.html$
-^R/plotly_calls^
-^profvis$
-^\.here$
+Memory_Analysis_Rm\.html
+R/plotly_calls
+profvis
+.here
+*.log
