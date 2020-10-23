@@ -4,8 +4,18 @@
 \alias{mod_QPR_server}
 \title{QPR Server Functions}
 \usage{
-mod_QPR_server(id, header)
+mod_QPR_server(id, header, input, output, session)
+}
+\arguments{
+\item{id, input, output, session}{Internal parameters for {shiny}.}
+
+\item{header}{\code{(character)} The human legible name for the tabitem header.}
 }
 \description{
-QPR Server Functions
+A shiny server Module to generate the header, slider, pickers and plot for each tabitem.
 }
+\seealso{
+Other QPR: 
+\code{\link{mod_QPR_tabItem_ui}()}
+}
+\concept{QPR}

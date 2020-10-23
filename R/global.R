@@ -12,14 +12,14 @@
 # GNU Affero General Public License for more details at
 # <https://www.gnu.org/licenses/>. 
 
-#CHANGED Removed library calls - unnecessary as they are loaded by the package 
-# load process in run_dev.
-if (golem::app_prod()) {
-  # Run only if in production mode
+#' @include utils_helpers.R
+
+if (golem::app_prod() || testthat::is_testing()) {
+  # Run only if in production mode or testing
   env <- environment()
   
   # loading the image files from the data/ folder
-  load("data/Rminor.RData", envir = env)
+  load(find_path("Rminor.RData"), env)
   message("Data Loaded")
   # creating various lists needed in the app
   
@@ -54,7 +54,7 @@ if (golem::app_prod()) {
     dplyr::select(ProjectName) %>%
     unique() %>%
     dplyr::arrange(ProjectName)
-}
+
 # CHANGED Add names (which will be visible to users) and numeric values (for filtering data). Eliminates the need for mutating the data to human readable names
 # NOTE entries have been alphabetized.
 choices_project_type <- list(
@@ -68,3 +68,42 @@ choices_project_type <- list(
   `Street Outreach` = 4, 
   `Transitional Housing` = 2
 )
+
+
+tab_choices <-
+  list(
+    LoS = c(
+      "Emergency Shelters",
+      "Transitional Housing",
+      "Safe Haven",
+      "Rapid Rehousing"
+    ),
+    PH = c(
+      "Emergency Shelters",
+      "Transitional Housing",
+      "Safe Haven",
+      "Prevention",
+      "Rapid Rehousing",
+      "Permanent Supportive Housing",
+      "Street Outreach"
+    ),
+    NCB = c(
+      "Emergency Shelters",
+      "Transitional Housing",
+      "Safe Haven",
+      "Prevention",
+      "Rapid Rehousing",
+      "Permanent Supportive Housing",
+      "Street Outreach"
+    ),
+    HI = c(
+      "Emergency Shelters",
+      "Transitional Housing",
+      "Safe Haven",
+      "Prevention",
+      "Rapid Rehousing",
+      "Permanent Supportive Housing",
+      "Street Outreach"
+    )
+  )
+}

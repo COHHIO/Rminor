@@ -4,7 +4,7 @@
 \alias{qend_date}
 \title{qend_date}
 \usage{
-qend_date(input)
+qend_date(.)
 }
 \arguments{
 \item{.}{\code{(character)} The input to transform}

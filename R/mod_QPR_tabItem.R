@@ -1,50 +1,14 @@
-#' QPR_tabItem UI Function
-#' @title Tab Choices
+#' @family QPR
+#' @title QPR_tabItem UI Function
 #' @description A shiny Module to generate the QPR tabitems.
-#' @param id,input,output,session Internal parameters for {shiny}.
-#' @param program_choices \code{(named list)} of choices of program types for the radio picker. Default does not show the UI item - choices must be provided for the picker to show.
+#' @param id Internal parameters for {shiny}.
+#' @param project_choices \code{(named list)} of choices of program types for the radio picker. Default does not show the UI item - choices must be provided for the picker to show.
 #' @param region_choices \code{(named list)} of choices of regions for the region drop-down selector. Default does not show the UI item - choices must be provided for the picker to show options
 #QUESTION Should there be defaults for options?
 #' @param radio_mean \code{(logical)} whether to show the Mean/Median based average radio UI
 #' @importFrom shiny NS tagList 
-#TODO sinew::makeImport
+#' @importFrom rlang parse_expr
 
-tab_choices <-
-  list(
-    LoS = c(
-      "Emergency Shelters",
-      "Transitional Housing",
-      "Safe Haven",
-      "Rapid Rehousing"
-    ),
-    PH = c(
-      "Emergency Shelters",
-      "Transitional Housing",
-      "Safe Haven",
-      "Prevention",
-      "Rapid Rehousing",
-      "Permanent Supportive Housing",
-      "Street Outreach"
-    ),
-    NCB = c(
-      "Emergency Shelters",
-      "Transitional Housing",
-      "Safe Haven",
-      "Prevention",
-      "Rapid Rehousing",
-      "Permanent Supportive Housing",
-      "Street Outreach"
-    ),
-    HI = c(
-      "Emergency Shelters",
-      "Transitional Housing",
-      "Safe Haven",
-      "Prevention",
-      "Rapid Rehousing",
-      "Permanent Supportive Housing",
-      "Street Outreach"
-    )
-  )
 
 mod_QPR_tabItem_ui <- function(id, project_choices, region_choices, radio_mean = FALSE){
   ns <- NS(id)
@@ -98,11 +62,21 @@ mod_QPR_tabItem_ui <- function(id, project_choices, region_choices, radio_mean =
     ) 
 }
 
-#' QPR Server Functions
+#' @family QPR
+#' @title QPR Server Functions
+#' @description A shiny server Module to generate the header, slider, pickers and plot for each tabitem.
+#' @param id,input,output,session Internal parameters for {shiny}.
+#' @param header \code{(character)} The human legible name for the tabitem header.
+#' @importFrom shiny NS tagList 
+#' @importFrom rlang parse_expr eval_bare
+#' @importFrom purrr keep
 
-mod_QPR_server <- function(id, header){
-  if (missing(header)) {rlang::abort("Must provide header for mod_QPR_server(",id,")")}
-  moduleServer( id, function(input, output, session){
+
+mod_QPR_server <- function(id, header, input, output, session){
+  if (missing(header)) {
+    rlang::abort("Must provide header for mod_QPR_server(",id,")")
+  }
+  moduleServer(id, function(input, output, session){
     ns <- session$ns
     # Process Slider Inputs
     Report <- eventReactive(input$slider, {
@@ -124,10 +98,10 @@ mod_QPR_server <- function(id, header){
     })
     # Header
     output$header <- shiny::renderUI({
-      message(paste0(as.character(Report()$Start), " \ ", as.character(Report()$End)))
-      list(shiny::h2("Quarterly Performance Report"),
-           shiny::h3(paste(input$radio_mean, header)),
-           shiny::h4(Report()$Start, "-", Report()$End))
+      list(shiny::h2("Quarterly Performance Report")
+           , shiny::h3(paste(input$radio_mean, header))
+           , shiny::h4(format.Date(Report()$Start, "%m-%d-%Y"), "-", format.Date(Report()$End, "%m-%d-%Y"))
+           )
     })
     # Gather Objects
     

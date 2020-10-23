@@ -8,3 +8,8 @@ $run_dev.*
 ^README\.Rmd$
 ^app\.R$
 ^rsconnect$
+^golem_commands\.R$
+^Memory_Analysis_Rm\.html$
+^R/plotly_calls^
+^profvis$
+^\.here$

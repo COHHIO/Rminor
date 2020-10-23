@@ -13,10 +13,12 @@
 # <https://www.gnu.org/licenses/>.
 
 
+
 #' The application User-Interface
 #' 
 #' @param request Internal parameter for `{shiny}`. 
 #'     DO NOT REMOVE.
+#' @param data_ui \code{(list)} List with variables passed to UI objects.
 #' @importFrom htmltools HTML br img
 #' @import shiny
 #' @importFrom 
@@ -46,7 +48,11 @@
 #' @importFrom DT dataTableOutput
 #' @importFrom zoo Sys.yearqtr
 #' @noRd
-app_ui <- function(request) {
+#' 
+app_ui <- function(request, data_ui) {
+  if (!missing(data_ui)) {
+    list2env(data_ui, environment())
+  }
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
@@ -86,9 +92,9 @@ app_ui <- function(request) {
             shinydashboard::menuSubItem("Income Growth",
                                         tabName = "income-Tab"),
             shinydashboard::menuSubItem("Rapid Placement for RRH",
-                                        tabName = "rapid-Tab"),
+                                        tabName = "RRH-Tab"),
             shinydashboard::menuSubItem("RRH vs HP Spending",
-                                        tabName = "spending-Tab")
+                                        tabName = "RRHspending-Tab")
           ),
           shinydashboard::menuItem("About",
                                    tabName = "about-Tab")
@@ -343,47 +349,8 @@ app_ui <- function(request) {
                                   ),
                                   plotly::plotlyOutput("QPRIncome"),
                                   htmltools::br()),
-          shinydashboard::tabItem(tabName = "rapid-Tab",
-                                  shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerRRHRapidPlacement"), width = 12)),
-                                  shinyWidgets::chooseSliderSkin("Round"),
-                                  shinyWidgets::setSliderColor("#56B4E9", 1),
-                                  shinyWidgets::sliderTextInput("RapidRRHDateSlider",
-                                                                "",
-                                                                c(
-                                                                  unique(zoo::Sys.yearqtr() - 6 / 4:zoo::Sys.yearqtr() + 1 / 4)
-                                                                ),
-                                                                selected = zoo::Sys.yearqtr() - 1 / 4),
-                                  shinyWidgets::pickerInput(
-                                    inputId = "RapidRRHRegion",
-                                    "Select Region(s)",
-                                    choices = choices_regions,
-                                    options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
-                                                                          actionsBox = TRUE),
-                                    multiple = TRUE,
-                                    selected = sample(choices_regions, 1)
-                                  ),
-                                  plotly::plotlyOutput("DaysToHouse")),
-          shinydashboard::tabItem(tabName = "spending-Tab",
-                                  shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerRRHSpending"), width = 12)),
-                                  shinyWidgets::chooseSliderSkin("Round"),
-                                  shinyWidgets::setSliderColor("#56B4E9", 1),
-                                  shinyWidgets::sliderTextInput("RRHSpendingDateSlider",
-                                                                "",
-                                                                c(
-                                                                  unique(zoo::Sys.yearqtr() - 6 / 4:zoo::Sys.yearqtr() + 1 / 4)
-                                                                ),
-                                                                selected = zoo::Sys.yearqtr() - 1 / 4),
-                                  shinyWidgets::pickerInput(
-                                    inputId = "RRHRegion",
-                                    "Select Region(s)",
-                                    choices = choices_regions,
-                                    options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
-                                                                          actionsBox = TRUE),
-                                    multiple = TRUE,
-                                    selected = sample(choices_regions, 1)
-                                  ),
-                                  plotly::plotlyOutput("RRHSpending")
-          ),
+      mod_QPR_tabItem_ui("RRH", region_choices = choices_regions),
+      mod_QPR_tabItem_ui("RRHspending", region_choices = choices_regions),
           shinydashboard::tabItem(
             tabName = "spdat-Tab",
             shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerQPRCommunityNeed"), width = 12)),
@@ -512,14 +479,15 @@ golem_add_external_resources <- function(){
   add_resource_path(
     'www', app_sys('app/www')
   )
- 
+  
   tags$head(
     favicon(),
     bundle_resources(
       path = app_sys('app/www'),
       app_title = 'Rminor'
     )
-    # Add here other external resources
+
+    
     # for example, you can add shinyalert::useShinyalert() 
   )
 }

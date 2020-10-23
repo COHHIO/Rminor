@@ -20,7 +20,11 @@ qpr_plotly(
 
 \item{title}{\code{(character/list)}}
 
+\item{x}{\code{(formula)} Formula for variable on x-axis in plotly tilde format}
+
 \item{xaxis}{\code{(list)} of x-axis label parameters}
+
+\item{y}{\code{(formula)} Formula for variable on y-axis in plotly tilde format}
 
 \item{yaxis}{\code{(list)} of y-axis label parameters}
 
