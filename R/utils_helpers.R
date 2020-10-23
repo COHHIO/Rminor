@@ -156,8 +156,8 @@ qpr_plotly <- function(.d, title, x = ~ FriendlyProjectName, xaxis = list(title 
 #' @return The objects are loaded into the specified environment. 
 #' @examples
 #' find_path("Rminor.RData")
-#' @export
 #' @importFrom rlang warn abort
+#' @export
 
 find_path <- function(.fn, n = 4) {
   .path <- '.'
