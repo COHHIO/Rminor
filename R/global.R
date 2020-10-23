@@ -14,7 +14,15 @@
 
 #' @include utils_helpers.R
 
-if (golem::app_prod() || testthat::is_testing()) {
+message(paste("working directory", getwd()))
+message(paste("parent directory", list.dirs(full.names = TRUE)))
+message(paste("prod mode:", golem::app_prod()))
+message(paste("env", Sys.getenv("R_CONFIG_ACTIVE") == "shinyapps"))
+try(packageVersion("Rminor"))
+
+if (golem::app_prod() || 
+    testthat::is_testing() || 
+    Sys.getenv("R_CONFIG_ACTIVE") == "shinyapps") {
   # Run only if in production mode or testing
   env <- environment()
   
