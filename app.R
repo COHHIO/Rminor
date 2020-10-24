@@ -2,7 +2,7 @@
 # To deploy, run: rsconnect::deployApp()
 # Or use the blue button on top of this file
 
-pkgload::load_all(export_all = FALSE, helpers = FALSE, attach_testthat = FALSE)
+install.packages(".", repos = NULL, type = "source")
 options(golem.app.prod = TRUE)
 # golem::add_resource_path("www", "inst/app/www")
 Rminor::run_app() # add parameters here (if any)
