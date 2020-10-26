@@ -13,3 +13,4 @@ $run_dev.*
 ^R/plotly_calls^
 ^profvis$
 ^\.here$
+^log$
