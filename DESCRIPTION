@@ -21,7 +21,6 @@ Imports:
     magrittr,
     plotly,
     purrr,
-    Rminor,
     rlang,
     scales,
     shiny,
