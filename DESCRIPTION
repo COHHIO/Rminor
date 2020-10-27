@@ -19,6 +19,7 @@ Imports:
     htmltools,
     lubridate,
     magrittr,
+    pkgload,
     plotly,
     purrr,
     rlang,

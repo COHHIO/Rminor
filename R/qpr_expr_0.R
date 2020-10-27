@@ -24,4 +24,8 @@
 #   radio_mean = "Average Days"
 # )
 # ProjectType <- rlang::as_function(~{input$ProjectType})
+#' @title qpr_expr
+#' @description List to hold all module dependency expressions
+#' @export
+
 qpr_expr <- list()

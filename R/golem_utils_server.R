@@ -26,7 +26,7 @@ drop_nulls <- function(x){
 #' @param x,y Two elements to test, one potentially `NULL`
 #' 
 #' @noRd
-#' 
+#' @export
 #' @examples
 #' NULL %||% 1
 "%||%" <- function(x, y){
