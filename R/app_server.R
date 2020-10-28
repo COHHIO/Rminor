@@ -29,6 +29,7 @@
 #' @importFrom plotly renderPlotly plot_ly add_trace layout
 #' @importFrom scales percent
 #' @importFrom purrr as_vector
+#' 
 #' @noRd
 app_server <- function( input, output, session ) {
   # List the first level callModules here

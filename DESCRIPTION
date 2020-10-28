@@ -42,10 +42,11 @@ Suggests:
     testthat,
     callr
 Collate: 
+    '0_utils-pipe.R'
+    '0_utils_helpers.R'
     'app_config.R'
     'app_server.R'
     'app_ui.R'
-    'utils_helpers.R'
     'global.R'
     'golem_utils_server.R'
     'golem_utils_ui.R'
@@ -58,4 +59,3 @@ Collate:
     'qpr_expr_RRH.R'
     'qpr_expr_RRHspending.R'
     'run_app.R'
-    'utils-pipe.R'
