@@ -12,13 +12,10 @@
 # GNU Affero General Public License for more details at
 # <https://www.gnu.org/licenses/>. 
 
-#' @include 0_utils_helpers.R
 
 
-message(paste("working directory", getwd()))
-message(paste0("parent directory", list.dirs(full.names = TRUE), collapse = ", "))
-message(paste("prod mode:", golem::app_prod()))
-message(paste0(search(), ", "))
+
+
 
 if (golem::app_prod() || 
     testthat::is_testing() || 
