@@ -7,6 +7,7 @@
 #' @examples \dontrun{
 #' ReportStart <- qstart_date(input$slider)
 #' }
+#' @export
 qstart_date <- function(.) {
   lubridate::ymd(paste0(
   substr(., 1, 4),
@@ -22,6 +23,7 @@ qstart_date <- function(.) {
 #' @examples \dontrun{
 #' ReportEnd <- qend_date(input$slider)
 #' }
+#' @export
 qend_date <- function(.) {
   lubridate::mdy(paste0(
     dplyr::case_when(
@@ -83,6 +85,7 @@ qend_date <- function(.) {
 #' }
 #' @importFrom purrr map2 list_modify
 #' @importFrom rlang dots_list
+#' @export
 qpr_plotly <- function(.d, title, x = ~ FriendlyProjectName, xaxis = list(title = ""), y = ~ Percent, yaxis =  list(title = "Households", tickformat = "%"), ..., .sub = TRUE) {
   # If no data return no graph
   if (nrow(.d) < 1) return(NULL)

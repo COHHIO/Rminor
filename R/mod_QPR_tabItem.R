@@ -6,6 +6,7 @@
 #' @param region_choices \code{(named list)} of choices of regions for the region drop-down selector. Default does not show the UI item - choices must be provided for the picker to show options
 #QUESTION Should there be defaults for options?
 #' @param radio_mean \code{(logical)} whether to show the Mean/Median based average radio UI
+#' @export
 #' @importFrom shiny NS tagList 
 #' @importFrom rlang parse_expr
 
@@ -70,6 +71,7 @@ mod_QPR_tabItem_ui <- function(id, project_choices, region_choices, radio_mean =
 #' @importFrom shiny NS tagList 
 #' @importFrom rlang parse_expr eval_bare
 #' @importFrom purrr keep
+#' @export
 
 
 mod_QPR_server <- function(id, header, input, output, session){
