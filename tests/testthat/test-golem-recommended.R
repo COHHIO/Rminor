@@ -23,9 +23,12 @@ test_that(
     .fun <- function(find_path)({
       Sys.setenv('TESTTHAT' = 'true')
       pkgload::load_all(find_path('^Rminor$'))
+      message(paste0(search(), collapse = ","))
       run_app()
     })
     x <- callr::r_bg(.fun,
+                     #, stdout = normalizePath("~/R/Contributor_Repos/COHHIO/tests.log")
+                     #, stderr = "2>&1",
                      args = list(find_path = find_path)
     )
     Sys.sleep(5)
@@ -33,13 +36,3 @@ test_that(
     x$kill()
   }
 )
-
-
-
-
-
-
-
-
-
-

@@ -1,11 +1,10 @@
 #' ceAPs UI Function
-#'
 #' @description A shiny Module.
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
 #' @noRd
-#' @export
+#' 
 #' @importFrom shiny NS tagList
 
 
@@ -67,6 +66,9 @@ mod_ceAPs_ui <- function(id) {
 
 #' ceAPs Server Functions
 #'
+#' 
+#' @description Server module for ceAPs UI
+#' 
 #' @noRd
 mod_ceAPs_server <- function(id) {
   moduleServer(id, function(input, output, session) {

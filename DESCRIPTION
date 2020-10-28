@@ -41,21 +41,4 @@ Depends: R (>= 3.5.0)
 Suggests: 
     testthat,
     callr
-Collate: 
-    'app_config.R'
-    'app_server.R'
-    'app_ui.R'
-    'utils_helpers.R'
-    'global.R'
-    'golem_utils_server.R'
-    'golem_utils_ui.R'
-    'mod_QPR_tabItem.R'
-    'mod_ceAPs.R'
-    'qpr_expr_0.R'
-    'qpr_expr_LoS.R'
-    'qpr_expr_NCB.R'
-    'qpr_expr_PH.R'
-    'qpr_expr_RRH.R'
-    'qpr_expr_RRHspending.R'
-    'run_app.R'
-    'utils-pipe.R'
+
