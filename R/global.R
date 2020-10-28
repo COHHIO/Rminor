@@ -23,7 +23,7 @@ message(paste("prod mode:", golem::app_prod()))
 if (golem::app_prod() || 
     testthat::is_testing() || 
     Sys.getenv("R_CONFIG_ACTIVE") == "shinyapps") {
-  if (Sys.getenv("R_CONFIG_ACTIVE") == "shinyapps") library(Rminor)
+  
   # Run only if in production mode or testing
   env <- environment()
   
