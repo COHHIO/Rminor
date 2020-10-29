@@ -29,15 +29,17 @@ mod_QPR_tabItem_ui <- function(id,
     
     shinydashboard::tabItem(
       tabName = ns("Tab"),
-      shiny::fluidRow(shinydashboard::box(shiny::htmlOutput(ns("header")), width = 12)),
-      shinyWidgets::chooseSliderSkin("Round"),
+      shiny::fluidRow(shinydashboard::box(shiny::htmlOutput(ns("header")), 
+                                          width = 12)),
+      shiny::fluidRow(shinydashboard::box(shinyWidgets::chooseSliderSkin("Round"),
       shinyWidgets::setSliderColor("#56B4E9", 1),
       shinyWidgets::sliderTextInput(ns("slider"),
                                     "",
                                      unique(zoo::Sys.yearqtr() - 6 / 
                                               4:zoo::Sys.yearqtr() + 1 / 4)
                                     ,
-                                    selected = zoo::Sys.yearqtr() - 1 / 4),
+                                    selected = zoo::Sys.yearqtr() - 1 / 4,
+                                    width = '50%'),
       if (!missing(project_choices)) {
         shinyWidgets::prettyRadioButtons(
         inputId = ns("ProjectType"),
@@ -56,9 +58,11 @@ mod_QPR_tabItem_ui <- function(id,
         options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
                                               actionsBox = TRUE),
         multiple = TRUE,
-        selected = NULL
+        selected = NULL,
+        width = '50%'
       )},
-      if (radio_mean) {
+      width = 12)),
+      shiny::fluidRow(shinydashboard::box(if (radio_mean) {
       shinyWidgets::prettyRadioButtons(
         inputId = ns("radio_mean"),
         label = "",
@@ -69,8 +73,9 @@ mod_QPR_tabItem_ui <- function(id,
         selected = "Average Days"
       )},
       # verbatimTextOutput("res"),
-      plotly::plotlyOutput(ns("plot"))
-    ) 
+      plotly::plotlyOutput(ns("plot")),
+      width = 12
+    ))) 
 }
 
 #' @family QPR
