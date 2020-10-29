@@ -14,3 +14,4 @@ $run_dev.*
 ^profvis$
 ^\.here$
 ^log$
+^CODE_OF_CONDUCT\.md$

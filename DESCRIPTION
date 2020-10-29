@@ -1,8 +1,8 @@
 Package: Rminor
-Title: Rminor
+Title: R minor
 Version: 0.0.0.9000
 Authors@R: person('Genelle', 'Denzin', email = 'genelledenzin@cohhio.org', role = c('cre', 'aut'))
-Description: An open-source HMIS custom reporting Shiny app.
+Description: HMIS Data Analysis for the Ohio Balance of State and Youngstown CoCs
 License: AGPL-3
 Imports: 
     attempt,
@@ -41,4 +41,3 @@ Depends: R (>= 3.5.0)
 Suggests: 
     testthat,
     callr
-
