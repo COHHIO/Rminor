@@ -12,11 +12,6 @@
 # GNU Affero General Public License for more details at
 # <https://www.gnu.org/licenses/>. 
 
-
-
-
-
-
 if (golem::app_prod() || 
     testthat::is_testing() || 
     Sys.getenv("R_CONFIG_ACTIVE") == "shinyapps") {
@@ -61,7 +56,9 @@ if (golem::app_prod() ||
     unique() %>%
     dplyr::arrange(ProjectName)
 
-# CHANGED Add names (which will be visible to users) and numeric values (for filtering data). Eliminates the need for mutating the data to human readable names
+# CHANGED Add names (which will be visible to users) and numeric values (for 
+  # filtering data). Eliminates the need for mutating the data to human readable 
+  # names
 # NOTE entries have been alphabetized.
 choices_project_type <- list(
   `Coordinated Entry` = 14,
@@ -109,6 +106,15 @@ tab_choices <-
       "Prevention",
       "Rapid Rehousing",
       "Permanent Supportive Housing",
+      "Street Outreach"
+    ),
+    Income = c(
+      "Emergency Shelters", 
+      "Transitional Housing",
+      "Safe Haven", 
+      "Prevention", 
+      "Rapid Rehousing",
+      "Permanent Supportive Housing", 
       "Street Outreach"
     )
   )
