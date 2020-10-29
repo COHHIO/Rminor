@@ -62,7 +62,7 @@ mod_QPR_tabItem_ui <- function(id,
         width = '50%'
       )},
       width = 12)),
-      shiny::fluidRow(shinydashboard::box(if (radio_mean) {
+      shiny::fluidRow(shinydashboard::box(if(radio_mean){
       shinyWidgets::prettyRadioButtons(
         inputId = ns("radio_mean"),
         label = "",

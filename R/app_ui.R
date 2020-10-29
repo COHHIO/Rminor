@@ -90,7 +90,7 @@ app_ui <- function(request, data_ui) {
             shinydashboard::menuSubItem("Health Insurance at Exit",
                                         tabName = "HI-Tab"),
             shinydashboard::menuSubItem("Income Growth",
-                                        tabName = "income-Tab"),
+                                        tabName = "Income-Tab"),
             shinydashboard::menuSubItem("Rapid Placement for RRH",
                                         tabName = "RRH-Tab"),
             shinydashboard::menuSubItem("RRH vs HP Spending",

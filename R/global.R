@@ -72,7 +72,6 @@ choices_project_type <- list(
   `Transitional Housing` = 2
 )
 
-
 tab_choices <-
   list(
     LoS = c(
