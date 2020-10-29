@@ -2,19 +2,28 @@
 #' @title QPR_tabItem UI Function
 #' @description A shiny Module to generate the QPR tabitems.
 #' @param id Internal parameters for {shiny}.
-#' @param project_choices \code{(named list)} of choices of program types for the radio picker. Default does not show the UI item - choices must be provided for the picker to show.
-#' @param region_choices \code{(named list)} of choices of regions for the region drop-down selector. Default does not show the UI item - choices must be provided for the picker to show options
+#' @param project_choices \code{(named list)} of choices of program types for 
+#'   the radio picker. Default does not show the UI item - choices must be 
+#'   provided for the picker to show.
+#' @param region_choices \code{(named list)} of choices of regions for the 
+#'   region drop-down selector. Default does not show the UI item - choices must 
+#'   be provided for the picker to show options
 #QUESTION Should there be defaults for options?
-#' @param radio_mean \code{(logical)} whether to show the Mean/Median based average radio UI
+#' @param radio_mean \code{(logical)} whether to show the Mean/Median based 
+#'   average radio UI
 #' @export
 #' @importFrom shiny NS tagList 
 #' @importFrom rlang parse_expr
 
 
-mod_QPR_tabItem_ui <- function(id, project_choices, region_choices, radio_mean = FALSE){
+mod_QPR_tabItem_ui <- function(id, 
+                               project_choices, 
+                               region_choices, 
+                               radio_mean = FALSE){
   ns <- NS(id)
   # Create labeled Quarter List
-  # .quarter_labels <- rev(unique(zoo::Sys.yearqtr() - 6 / 4:zoo::Sys.yearqtr() + 1 / 4))
+  # .quarter_labels <- rev(unique(zoo::Sys.yearqtr() - 6 / 
+  # 4:zoo::Sys.yearqtr() + 1 / 4))
   # slider_choices <- rev(purrr::map(.qs, ~lubridate::yq(.x) - lubridate::days(1)))
   # names(slider_choices) <- .quarter_labels
     
@@ -25,7 +34,8 @@ mod_QPR_tabItem_ui <- function(id, project_choices, region_choices, radio_mean =
       shinyWidgets::setSliderColor("#56B4E9", 1),
       shinyWidgets::sliderTextInput(ns("slider"),
                                     "",
-                                     unique(zoo::Sys.yearqtr() - 6 / 4:zoo::Sys.yearqtr() + 1 / 4)
+                                     unique(zoo::Sys.yearqtr() - 6 / 
+                                              4:zoo::Sys.yearqtr() + 1 / 4)
                                     ,
                                     selected = zoo::Sys.yearqtr() - 1 / 4),
       if (!missing(project_choices)) {
@@ -65,7 +75,8 @@ mod_QPR_tabItem_ui <- function(id, project_choices, region_choices, radio_mean =
 
 #' @family QPR
 #' @title QPR Server Functions
-#' @description A shiny server Module to generate the header, slider, pickers and plot for each tabitem.
+#' @description A shiny server Module to generate the header, slider, pickers 
+#'   and plot for each tabitem.
 #' @param id,input,output,session Internal parameters for {shiny}.
 #' @param header \code{(character)} The human legible name for the tabitem header.
 #' @importFrom shiny NS tagList 
@@ -88,7 +99,11 @@ mod_QPR_server <- function(id, header, input, output, session){
       )
     })
     ProjectType <- eventReactive(req(input$ProjectType), {
-      # The RadioPicker input returns a character regardless of the type of objects passed to the UI element. If the object returned is meant to be a list or vector, ie  Permanent Supportive Housing = c(3,9), it returns a character "list(`3` = 3, `9` = 9)". This must then be parsed into an actual list.
+      # The RadioPicker input returns a character regardless of the type of 
+      # objects passed to the UI element. If the object returned is meant to be 
+      # a list or vector, ie  Permanent Supportive Housing = c(3,9), it 
+      # returns a character "list(`3` = 3, `9` = 9)". This must then be parsed 
+      # into an actual list.
       .pt <- unlist(eval(rlang::parse_expr(input$ProjectType)))
       # message(paste("ProjectType-class:",class(.pt)))
       # message(paste("ProjectType:",.pt))
@@ -102,7 +117,9 @@ mod_QPR_server <- function(id, header, input, output, session){
     output$header <- shiny::renderUI({
       list(shiny::h2("Quarterly Performance Report")
            , shiny::h3(paste(input$radio_mean, header))
-           , shiny::h4(format.Date(Report()$Start, "%m-%d-%Y"), "-", format.Date(Report()$End, "%m-%d-%Y"))
+           , shiny::h4(format.Date(Report()$Start, "%m-%d-%Y"), 
+                       "-", 
+                       format.Date(Report()$End, "%m-%d-%Y"))
            )
     })
     # Gather Objects
