@@ -35,9 +35,9 @@ qpr_expr$LoS$expr <- rlang::expr({
       ")\n",
       names(ProjectType()),
       "\n",
-      ReportStart,
+      Report()$Start,
       " to ",
-      ReportEnd
+      Report()$End
     )
   
   LoSSummary <- LoSDetail %>%

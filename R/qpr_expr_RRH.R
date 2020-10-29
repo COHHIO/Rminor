@@ -31,7 +31,7 @@ qpr_expr$RRH$expr <- rlang::expr({
     ))
   
   title <- paste0("Average Days to House\nRapid Rehousing\n",
-                  ReportStart, " to ", ReportEnd)
+                  Report()$Start, " to ", Report()$End)
   attr(summaryDays, "title") <- title
   summaryDays
 })

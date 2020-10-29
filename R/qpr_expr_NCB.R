@@ -49,7 +49,7 @@ qpr_expr$NCB$expr <- rlang::expr({
   
   title <- paste0("Non-Cash Benefits at Exit\n", 
                   .PT_nm, "\n",
-                  ReportStart, " to ", ReportEnd)
+                  Report()$Start, " to ", Report()$End)
   
   
   

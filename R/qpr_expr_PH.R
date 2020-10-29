@@ -190,9 +190,9 @@ qpr_expr$PH$plot <- rlang::expr({
         "Exited to "
       ),
       dplyr::if_else(.PT_nm == "Street Outreach", "Temporary or Permanent Housing\nStreet Outreach\n", "Permanent Housing\n"),
-      ReportStart,
+      Report()$Start,
       " to ",
-      ReportEnd
+      Report()$End
     )
   yAxisTitle <- dplyr::if_else(
     .PT_nm ==

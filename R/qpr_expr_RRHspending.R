@@ -90,7 +90,7 @@ qpr_expr$RRHspending$expr <- rlang::expr({
                   ))
   
   title <- paste0("Percent Spent on Rapid Rehousing\n",
-                  ReportStart, " to ", ReportEnd)
+                  Report()$Start, " to ", Report()$End)
   attr(rrhSpending, "title") <- title
   rrhSpending
 })
