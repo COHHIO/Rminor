@@ -285,7 +285,8 @@ app_ui <- function(request, data_ui) {
                              , project_choices = choices_project_type[tab_choices$NCB]
                              , region_choices = choices_regions)
           ,
-          mod_QPR_tabItem_ui("HI", project_choices = choices_regions),
+          mod_QPR_tabItem_ui("HI", region_choices = choices_regions,
+                             project_choices = choices_project_type[tab_choices$HI]),
           # shinydashboard::tabItem(tabName = "HI-Tab",
           #                         shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerQPRHI"), width = 12)),
           #                         shinyWidgets::chooseSliderSkin("Round"),
@@ -350,7 +351,8 @@ app_ui <- function(request, data_ui) {
           #                         ),
           #                         plotly::plotlyOutput("QPRIncome"),
           #                         htmltools::br()),
-      mod_QPR_tabItem_ui("Income", region_choices = choices_regions),
+      mod_QPR_tabItem_ui("Income", region_choices = choices_regions,
+                         project_choices = choices_project_type[tab_choices$Income]),
       mod_QPR_tabItem_ui("RRH", region_choices = choices_regions),
       mod_QPR_tabItem_ui("RRHspending", region_choices = choices_regions),
           shinydashboard::tabItem(
