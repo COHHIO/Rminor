@@ -9,11 +9,16 @@ mod_QPR_tabItem_ui(id, project_choices, region_choices, radio_mean = FALSE)
 \arguments{
 \item{id}{Internal parameters for {shiny}.}
 
-\item{project_choices}{\code{(named list)} of choices of program types for the radio picker. Default does not show the UI item - choices must be provided for the picker to show.}
+\item{project_choices}{\code{(named list)} of choices of program types for 
+the radio picker. Default does not show the UI item - choices must be 
+provided for the picker to show.}
 
-\item{region_choices}{\code{(named list)} of choices of regions for the region drop-down selector. Default does not show the UI item - choices must be provided for the picker to show options}
+\item{region_choices}{\code{(named list)} of choices of regions for the 
+region drop-down selector. Default does not show the UI item - choices must 
+be provided for the picker to show options}
 
-\item{radio_mean}{\code{(logical)} whether to show the Mean/Median based average radio UI}
+\item{radio_mean}{\code{(logical)} whether to show the Mean/Median based 
+average radio UI}
 }
 \description{
 A shiny Module to generate the QPR tabitems.
