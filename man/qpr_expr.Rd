@@ -5,7 +5,7 @@
 \alias{qpr_expr}
 \title{qpr_expr}
 \format{
-An object of class \code{list} of length 5.
+An object of class \code{list} of length 7.
 }
 \usage{
 qpr_expr
