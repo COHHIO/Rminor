@@ -272,89 +272,26 @@ app_ui <- function(request, data_ui) {
               width = 12
             ))
           ),
-          mod_QPR_tabItem_ui("LoS"
-                             , project_choices = choices_project_type[tab_choices$LoS]
-                             , region_choices = choices_regions
-                             , radio_mean = TRUE)
-          ,
-          mod_QPR_tabItem_ui("PH"
-                             , project_choices = choices_project_type[tab_choices$PH]
-                             , region_choices = choices_regions)
-          ,
-          mod_QPR_tabItem_ui("NCB"
-                             , project_choices = choices_project_type[tab_choices$NCB]
-                             , region_choices = choices_regions)
-          ,
-          mod_QPR_tabItem_ui("HI", region_choices = choices_regions,
+          mod_QPR_tabItem_ui("LoS",
+                             project_choices = choices_project_type[tab_choices$LoS],
+                             region_choices = choices_regions,
+                             radio_mean = TRUE),
+          mod_QPR_tabItem_ui("PH",
+                             project_choices = choices_project_type[tab_choices$PH],
+                             region_choices = choices_regions),
+          mod_QPR_tabItem_ui("NCB", 
+                             project_choices = choices_project_type[tab_choices$NCB],
+                             region_choices = choices_regions),
+          mod_QPR_tabItem_ui("HI", 
+                             region_choices = choices_regions,
                              project_choices = choices_project_type[tab_choices$HI]),
-          # shinydashboard::tabItem(tabName = "HI-Tab",
-          #                         shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerQPRHI"), width = 12)),
-          #                         shinyWidgets::chooseSliderSkin("Round"),
-          #                         shinyWidgets::setSliderColor("#56B4E9", 1),
-          #                         shinyWidgets::sliderTextInput("QPRHIDateSlider",
-          #                                                       "",
-          #                                                       c(
-          #                                                         unique(zoo::Sys.yearqtr() - 6 / 4:zoo::Sys.yearqtr() + 1 / 4)
-          #                                                       ),
-          #                                                       selected = zoo::Sys.yearqtr() - 1 / 4),
-          #                         shinyWidgets::pickerInput(
-          #                           inputId = "QPRHIRegionSelect",
-          #                           "Select Region(s)",
-          #                           choices = choices_regions,
-          #                           options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
-          #                                                                 actionsBox = TRUE),
-          #                           multiple = TRUE,
-          #                           selected = sample(choices_regions, 1)
-          #                         ),
-          #                         shinyWidgets::prettyRadioButtons(
-          #                           inputId = "radioQPR_HI_PTC",
-          #                           label = "Program Type",
-          #                           thick = TRUE,
-          #                           animation = "pulse",
-          #                           status = "info",
-          #                           choices = c("Emergency Shelters", "Transitional Housing",
-          #                                       "Safe Haven", "Prevention", "Rapid Rehousing", 
-          #                                       "Permanent Supportive Housing", "Street Outreach"),
-          #                           selected = "Emergency Shelters"
-          #                         ),
-          #                         plotly::plotlyOutput("QPRHIs"),
-          #                         htmltools::br()),
-          # shinydashboard::tabItem(tabName = "income-Tab",
-          #                         shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerQPRIncome"), width = 12)),
-          #                         shinyWidgets::chooseSliderSkin("Round"),
-          #                         shinyWidgets::setSliderColor("#56B4E9", 1),
-          #                         shinyWidgets::sliderTextInput("QPRIncomeDateSlider",
-          #                                                       "",
-          #                                                       c(
-          #                                                         unique(zoo::Sys.yearqtr() - 6 / 4:zoo::Sys.yearqtr() + 1 / 4)
-          #                                                       ),
-          #                                                       selected = zoo::Sys.yearqtr() - 1 / 4),
-          #                         shinyWidgets::pickerInput(
-          #                           inputId = "QPRIncomeRegionSelect",
-          #                           "Select Region(s)",
-          #                           choices = choices_regions,
-          #                           options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
-          #                                                                 actionsBox = TRUE),
-          #                           multiple = TRUE,
-          #                           selected = sample(choices_regions, 1)
-          #                         ),
-          #                         shinyWidgets::prettyRadioButtons(
-          #                           inputId = "radioQPR_Income_PTC",
-          #                           label = "Program Type",
-          #                           thick = TRUE,
-          #                           animation = "pulse",
-          #                           status = "info",
-          #                           choices = c("Emergency Shelters", "Transitional Housing",
-          #                                       "Safe Haven", "Prevention", "Rapid Rehousing", 
-          #                                       "Permanent Supportive Housing", "Street Outreach"),
-          #                           selected = "Emergency Shelters"
-          #                         ),
-          #                         plotly::plotlyOutput("QPRIncome"),
-          #                         htmltools::br()),
-      mod_QPR_tabItem_ui("Income", region_choices = choices_regions,
-                         project_choices = choices_project_type[tab_choices$Income]),
-      mod_QPR_tabItem_ui("RRH", region_choices = choices_regions),
-      mod_QPR_tabItem_ui("RRHspending", region_choices = choices_regions),
+          mod_QPR_tabItem_ui("Income", 
+                             region_choices = choices_regions,
+                             project_choices = choices_project_type[tab_choices$Income]),
+          mod_QPR_tabItem_ui("RRH", 
+                             region_choices = choices_regions),
+          mod_QPR_tabItem_ui("RRHspending", 
+                             region_choices = choices_regions),
           shinydashboard::tabItem(
             tabName = "spdat-Tab",
             shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerQPRCommunityNeed"), width = 12)),

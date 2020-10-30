@@ -4,7 +4,7 @@ qpr_expr$NCB$expr <- rlang::expr({
   .PT_nm <- names(ProjectType()) 
   meeting_objective <- qpr_benefits %>%
     dplyr::filter(
-      ProjectRegion %in% input$Region &
+      ProjectRegion %in% c(input$Region) &
         ProjectType %in% .PT_nm &
         HMIS::exited_between(., ReportStart, ReportEnd) &
         BenefitsFromAnySource == 1
@@ -42,7 +42,8 @@ qpr_expr$NCB$expr <- rlang::expr({
   
   NCBGoal <-
     goals %>%
-    dplyr::filter(Measure == "Non-cash Benefits" & ProjectType %in% unlist(ProjectType())) %>% 
+    dplyr::filter(Measure == "Non-cash Benefits" & 
+                    ProjectType %in% unlist(ProjectType())) %>% 
     # TODO This won't be necessary once qpr_benefits also uses numeric
     dplyr::distinct(Goal)
   NCBGoal[["ProjectType"]] <- .PT_nm
@@ -50,8 +51,6 @@ qpr_expr$NCB$expr <- rlang::expr({
   title <- paste0("Non-Cash Benefits at Exit\n", 
                   .PT_nm, "\n",
                   Report()$Start, " to ", Report()$End)
-  
-  
   
   stagingNCBs <- NCBsAtExit %>%
     dplyr::left_join(NCBGoal, by = "ProjectType") %>%
@@ -73,6 +72,6 @@ qpr_expr$NCB$expr <- rlang::expr({
 qpr_expr$NCB$plot <- rlang::expr({
   qpr_plotly(
     data_env(),
-    title = attr(data_env(), "title"),
+    title = attr(data_env(), "title")
   )
 })
