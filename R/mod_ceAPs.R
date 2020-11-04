@@ -95,8 +95,8 @@ mod_ceAPs_server <- function(id) {
     
     output$headerAPs <- shiny::renderUI({
       list(htmltools::h2("Coordinated Entry Access Points"),
-           htmltools::h4("search term(s)"),
-           htmltools::h4("Effective Date Last Updated")
+           htmltools::h4("As of",
+                         format.Date(update_date, "%B %d, %Y"))
       )
     })    
     
