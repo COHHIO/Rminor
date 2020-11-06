@@ -2,13 +2,15 @@
 qpr_expr$Income <- list()
 
 qpr_expr$Income$expr <- rlang::expr({
+  .PT_nm <- names(ProjectType()) 
+  
   ReportStart <- Report()$Start
   ReportEnd <- Report()$End
    
   meeting_objective <- qpr_income %>%
     dplyr::filter(
-      ProjectRegion %in% input$QPRIncomeRegionSelect &
-        ProjectType == input$radioQPR_Income_PTC &
+      ProjectRegion %in% c(input$Region) &
+        ProjectType == .PT_nm &
         HMIS::stayed_between(., ReportStart, ReportEnd) &
         Difference > 0
     ) %>%
@@ -20,8 +22,8 @@ qpr_expr$Income$expr <- rlang::expr({
   
   # calculating the total households for comparison
   all_hhs <- qpr_income %>%
-    dplyr::filter(ProjectRegion %in% input$QPRIncomeRegionSelect &
-                    ProjectType == input$radioQPR_Income_PTC &
+    dplyr::filter(ProjectRegion %in% c(input$Region) &
+                    ProjectType == .PT_nm &
                     HMIS::stayed_between(., ReportStart, ReportEnd)) %>%
     dplyr::group_by(FriendlyProjectName,
                     ProjectType,
@@ -45,28 +47,19 @@ qpr_expr$Income$expr <- rlang::expr({
   
   IncomeGoal <-
     goals %>%
-    dplyr::filter(Measure == "Gain or Increase Income") %>%
-    dplyr::mutate(ProjectType = dplyr::case_when(
-      ProjectType == 1 ~ "Emergency Shelters",
-      ProjectType == 2 ~ "Transitional Housing",
-      ProjectType == 3 ~ "Permanent Supportive Housing",
-      ProjectType == 4 ~ "Street Outreach",
-      ProjectType == 8 ~ "Safe Haven",
-      ProjectType == 9 ~ "Permanent Supportive Housing",
-      ProjectType == 12 ~ "Prevention",
-      ProjectType == 13 ~ "Rapid Rehousing"
-    )) %>% unique()
+    dplyr::filter(Measure == "Gain or Increase Income" & 
+                    ProjectType %in% unlist(ProjectType())) %>%
+    dplyr::distinct(Goal)
+  IncomeGoal[["ProjectType"]] <- .PT_nm
   
   title <- paste0("Increased Income\n",
-                  input$radioQPR_Income_PTC, "\n",
+                  .PT_nm, "\n",
                   Report()$Start, " to ", Report()$End)
-  
-  region <- c(input$QPRIncomeRegionSelect)
   
   stagingIncome <- IncreasedIncome %>%
     dplyr::left_join(IncomeGoal, by = "ProjectType") %>%
-    dplyr::filter(ProjectType == input$radioQPR_Income_PTC &
-                    ProjectRegion %in% region) %>%
+    dplyr::filter(ProjectType == .PT_nm &
+                    ProjectRegion %in% c(input$Region)) %>%
     dplyr::mutate(
       hover = paste0(
         FriendlyProjectName,
@@ -83,10 +76,6 @@ qpr_expr$Income$expr <- rlang::expr({
 qpr_expr$Income$plot <- rlang::expr({
   qpr_plotly(
     data_env(),
-    title = attr(data_env(), "title"),
-    y = ~ Percent,
-    text = ~ hover,
-    hoverinfo = 'text',
-    type = "bar"
+    title = attr(data_env(), "title")
   )
 })
