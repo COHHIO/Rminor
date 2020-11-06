@@ -133,6 +133,7 @@ mod_QPR_server <- function(id, header, input, output, session){
     data_env <- reactive(qpr_expr[[id]]$expr, quoted = TRUE)
     
     output$plot <- plotly::renderPlotly({
+      shiny::req(input$Region)
       rlang::eval_bare(qpr_expr[[id]]$plot)
     })
   })
