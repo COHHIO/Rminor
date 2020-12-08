@@ -101,7 +101,7 @@ app_ui <- function(request, data_ui) {
         ),
         htmltools::HTML(paste0(
           "<br>&emsp;Data last refreshed:&emsp;<br>&emsp;",
-          format(update_date, "%m-%d-%Y %I:%M %p", tz = "US/Eastern")
+          format(update_date, "%m-%d-%Y %I:%M %p")
           ,
           "<p><p>&emsp;Wear your mask! Be well."
         ))

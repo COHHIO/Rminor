@@ -937,11 +937,9 @@ app_server <- function( input, output, session ) {
   mod_QPR_server("NCB", "Access to Mainstream Benefits: Non-cash Benefits")
   
   # QPR Health Insurance
-  
   mod_QPR_server("HI", "Access to Mainstream Benefits: Health Insurance")
   
   # QPR Increase Income
-  
   mod_QPR_server("Income", "Access to Mainstream Benefits: Increased Income")
   
   # QPR Rapid Placement into RRH
