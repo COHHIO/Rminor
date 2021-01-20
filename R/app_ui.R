@@ -101,7 +101,7 @@ app_ui <- function(request, data_ui) {
         ),
         htmltools::HTML(paste0(
           "<br>&emsp;Data last refreshed:&emsp;<br>&emsp;",
-          format(update_date, "%m-%d-%Y %I:%M %p")
+          format(meta_HUDCSV_Export_Date, "%m-%d-%Y %I:%M %p")
           ,
           "<p><p>&emsp;Wear your mask! Be well."
         ))
@@ -173,17 +173,17 @@ app_ui <- function(request, data_ui) {
                 inputId = "utilizationDate",
                 label = "Report End Month",
                 max =
-                  lubridate::ymd(lubridate::floor_date(update_date, 
+                  lubridate::ymd(lubridate::floor_date(meta_HUDCSV_Export_Date, 
                                                        unit = "month") - 
                                  lubridate::days(1)),
                 min =
-                  lubridate::ymd(lubridate::floor_date(update_date - 
+                  lubridate::ymd(lubridate::floor_date(meta_HUDCSV_Export_Date - 
                                                          lubridate::days(335), 
                                                        unit = "month")),
                 dateFormat = "MM yyyy",
                 view = "month",
                 value =
-                  lubridate::ymd(lubridate::floor_date(update_date, unit = "month") - 
+                  lubridate::ymd(lubridate::floor_date(meta_HUDCSV_Export_Date, unit = "month") - 
                                    lubridate::days(1)),
                 minView = "months",
                 addon = "none",
