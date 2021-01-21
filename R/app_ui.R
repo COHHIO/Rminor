@@ -101,7 +101,7 @@ app_ui <- function(request, data_ui) {
         ),
         htmltools::HTML(paste0(
           "<br>&emsp;Data last refreshed:&emsp;<br>&emsp;",
-          format(meta_HUDCSV_Export_End, "%m-%d-%Y %I:%M %p")
+          format(meta_HUDCSV_Export_Date, "%m-%d-%Y %I:%M %p")
           ,
           "<p><p>&emsp;Wear your mask! Be well."
         ))
