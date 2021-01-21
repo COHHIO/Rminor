@@ -59,7 +59,7 @@ app_server <- function( input, output, session ) {
   output$headerCovid19 <- shiny::renderUI({
     
     ReportStart <- format.Date(hc_began_collecting_covid_data, "%B %d, %Y")
-    ReportEnd <- format.Date(lubridate::ymd(meta_HUDCSV_Export_Date), "%B %d, %Y")
+    ReportEnd <- format.Date(lubridate::ymd(meta_HUDCSV_Export_End), "%B %d, %Y")
     
     list(
       shiny::h2("Ohio Balance of State CoC Covid-19 Data Analysis"),
