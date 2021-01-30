@@ -3,13 +3,13 @@ qpr_expr$LoS$expr <- rlang::expr({
   ReportStart <- Report()$Start
   ReportEnd <- Report()$End
   
-  LoSGoals <- goals %>%
+  LoSGoals <- goals() %>%
     dplyr::select(-Measure) %>%
     dplyr::filter(SummaryMeasure == "Length of Stay" &
                     ProjectType %in% unlist(ProjectType())) %>%
     unique()
   
-  LoSDetail <- qpr_leavers %>%
+  LoSDetail <- qpr_leavers() %>%
     dplyr::filter(((
       !is.na(MoveInDateAdjust) &
         ProjectType == 13

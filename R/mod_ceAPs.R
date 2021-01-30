@@ -85,7 +85,7 @@ mod_ceAPs_server <- function(id) {
         choices = list(
           "ProjectCountyServed" = sort(bos_counties),
           "ProjectAreaServed" = choices_service_areas,
-          "ProjectAKA" = APs %>%
+          "ProjectAKA" = APs() %>%
             arrange(ProjectAKA) %>%
             pull(ProjectAKA) %>%
             unique()
@@ -106,13 +106,13 @@ mod_ceAPs_server <- function(id) {
     output$AP_list <- renderDataTable({
       SearchColumn <- rlang::sym(input$radio_search)
       
-      AP_list <- APs %>%
+      AP_list <- APs() %>%
         filter(!!SearchColumn %in% c(input$AP)) %>%
         select(ProjectID, TargetPop) %>% unique()
       
       message(paste0("AP_list", nrow(AP_list)))
       
-      AP_final <- APs %>%
+      AP_final <- APs() %>%
         right_join(AP_list, by = c("ProjectID", "TargetPop")) %>%
         mutate(Address = if_else(
           !is.na(CoCCode),

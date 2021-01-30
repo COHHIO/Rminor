@@ -5,7 +5,7 @@ qpr_expr$HI$expr <- rlang::expr({
   ReportStart <- Report()$Start
   ReportEnd <- Report()$End
   .PT_nm <- names(ProjectType())
-  meeting_objective <- qpr_benefits %>%
+  meeting_objective <- qpr_benefits() %>%
     dplyr::filter(
       ProjectRegion %in% input$Region &
         ProjectType == .PT_nm &
@@ -19,7 +19,7 @@ qpr_expr$HI$expr <- rlang::expr({
     dplyr::summarise(InsuranceAtExit = dplyr::n())
   
   # calculating the total households for comparison
-  all_hhs <- qpr_benefits %>%
+  all_hhs <- qpr_benefits() %>%
     dplyr::filter(ProjectRegion %in% c(input$Region) &
                     ProjectType == names(ProjectType()) &
                     HMIS::exited_between(., ReportStart, ReportEnd)) %>%
@@ -44,7 +44,7 @@ qpr_expr$HI$expr <- rlang::expr({
     dplyr::mutate(Percent = InsuranceAtExit / TotalHHs)
   
   HIGoal <-
-    goals %>%
+    goals() %>%
     dplyr::filter(Measure == "Health Insurance at Exit" & 
                     ProjectType %in% unlist(ProjectType())) %>%
     dplyr::distinct(Goal)

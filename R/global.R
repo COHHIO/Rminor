@@ -31,11 +31,11 @@ if (golem::app_prod() ||
       length.out = 24
     ), "%b %Y")
   
-  choices_service_areas <- sort(unique(APs$ProjectAreaServed)) 
+  choices_service_areas <- sort(unique(APs()$ProjectAreaServed)) 
   
-  choices_regions <- unique(regions$RegionName[regions$County != "Mahoning"])
+  choices_regions <- unique(regions()$RegionName)
   
-  providers <- validation %>%
+  providers <- validation() %>%
     dplyr::select(ProjectName, ProjectType) %>%
     unique() %>%
     dplyr::filter(stringr::str_detect(ProjectName, "zz", negate = TRUE) == TRUE &
@@ -50,7 +50,7 @@ if (golem::app_prod() ||
     unique()
   
   provider_dash_selected <- providers %>%
-    dplyr::left_join(validation, by = c("ProjectName", "ProjectType")) %>%
+    dplyr::left_join(validation(), by = c("ProjectName", "ProjectType")) %>%
     dplyr::filter(is.na(ExitDate)) %>%
     dplyr::select(ProjectName) %>%
     unique() %>%
