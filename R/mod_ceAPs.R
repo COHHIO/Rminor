@@ -83,20 +83,23 @@ mod_ceAPs_server <- function(id) {
           "ProjectAKA" = "Select Organization"
         )[[input$radio_search]], 
         choices = list(
-          "ProjectCountyServed" = bos_counties,
+          "ProjectCountyServed" = sort(bos_counties),
           "ProjectAreaServed" = choices_service_areas,
           "ProjectAKA" = APs %>%
             arrange(ProjectAKA) %>%
             pull(ProjectAKA) %>%
             unique()
-        )[[input$radio_search]]
+        )[[input$radio_search]],
+        selected = list("ProjectCountyServed" = "Athens",
+                        "ProjectAreaServed" = "Homeless Planning Region 01",
+                        "ProjectAKA" = NULL)[[input$radio_search]]
       )
     })
     
     output$headerAPs <- shiny::renderUI({
-      list(htmltools::h2("Coordinated Entry Access Points"),
+      list(htmltools::h2("Ohio Balance of State CoC Coordinated Entry Access Points"),
            htmltools::h4("As of",
-                         format.Date(update_date, "%B %d, %Y"))
+                         format.Date(meta_HUDCSV_Export_End, "%B %d, %Y"))
       )
     })    
     

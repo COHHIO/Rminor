@@ -58,8 +58,8 @@ app_server <- function( input, output, session ) {
   
   output$headerCovid19 <- shiny::renderUI({
     
-    ReportStart <- format.Date(lubridate::mdy("04012020"), "%B %d, %Y")
-    ReportEnd <- format.Date(lubridate::ymd_hms(update_date), "%B %d, %Y")
+    ReportStart <- format.Date(hc_began_collecting_covid_data, "%B %d, %Y")
+    ReportEnd <- format.Date(lubridate::ymd(meta_HUDCSV_Export_End), "%B %d, %Y")
     
     list(
       shiny::h2("Ohio Balance of State CoC Covid-19 Data Analysis"),
@@ -476,7 +476,7 @@ app_server <- function( input, output, session ) {
             dplyr::filter(ProjectName == input$providerList &
                             is.na(MoveInDateAdjust) &
                             is.na(ExitDate)) %>%
-            dplyr::mutate(Waiting = as.numeric(lubridate::mdy(FileEnd) - lubridate::ymd(EntryDate))) %>%
+            dplyr::mutate(Waiting = as.numeric(lubridate::ymd(meta_HUDCSV_Export_End) - lubridate::ymd(EntryDate))) %>%
             dplyr::group_by(ProjectID) %>%
             dplyr::summarise(avgWait = as.integer(mean(Waiting)))
           
@@ -593,7 +593,7 @@ app_server <- function( input, output, session ) {
         shinydashboard::renderInfoBox({
           shinydashboard::infoBox(
             title = paste("Client Exits to Rapid Rehousing in", 
-                          lubridate::year(lubridate::mdy(FileEnd))),
+                          lubridate::year(lubridate::ymd(meta_HUDCSV_Export_End))),
             subtitle = "Destination: Rental by client, with RRH...",
             color = "light-blue",
             icon = shiny::icon("door-open"),
@@ -601,7 +601,7 @@ app_server <- function( input, output, session ) {
               validation %>%
                 dplyr::filter(
                   ProjectName == input$providerList &
-                    HMIS::exited_between(., ReportStart, FileEnd) &
+                    HMIS::exited_between(., ReportStart, ymd(meta_HUDCSV_Export_End)) &
                     Destination == 31
                 )
             )
@@ -937,11 +937,9 @@ app_server <- function( input, output, session ) {
   mod_QPR_server("NCB", "Access to Mainstream Benefits: Non-cash Benefits")
   
   # QPR Health Insurance
-  
   mod_QPR_server("HI", "Access to Mainstream Benefits: Health Insurance")
   
   # QPR Increase Income
-  
   mod_QPR_server("Income", "Access to Mainstream Benefits: Increased Income")
   
   # QPR Rapid Placement into RRH
