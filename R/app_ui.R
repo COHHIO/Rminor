@@ -125,7 +125,7 @@ app_ui <- function(request, data_ui) {
                                       shiny::uiOutput("currentBedUtilization"),
                                       shiny::uiOutput("veteranEngagement"),
                                       shiny::uiOutput("TAYEngagement"),
-                                      shiny::uiOutput("ShelterExitsToRRH"),
+                                      # shiny::uiOutput("ShelterExitsToRRH"),
                                       shiny::uiOutput("CurrentlyAwaitingPH")
                                     )
                                   )), 
