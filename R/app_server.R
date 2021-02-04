@@ -714,7 +714,7 @@ app_server <- function( input, output, session ) {
   
   output$spmLoTH <- DT::renderDataTable({
     
-    a <- spm_Metric_1b %>%
+    a <- spm_Metric_1b() %>%
       dplyr::filter(Metric1b == "Persons in ES, SH, TH, and PH" &
                       CoCName == "OH-507") %>%
       dplyr::mutate(AvgLoT_Current = paste(as.integer(AvgLoT_Current), "days"),
@@ -737,7 +737,7 @@ app_server <- function( input, output, session ) {
   
   output$spmRecurrence <- DT::renderDataTable({
     
-    a <- spm_Metric_2 %>%
+    a <- spm_Metric_2() %>%
       dplyr::filter(ProjectType == "TOTAL Returns to Homelessness" &
                       CoCName == "OH-507") %>%
       dplyr::mutate_at(dplyr::vars(-ProjectType, -CoCName), as.integer) %>%
@@ -771,7 +771,7 @@ app_server <- function( input, output, session ) {
   
   output$spmExitsToPH <- DT::renderDataTable({
     
-    a <- spm_Metric_7 %>%
+    a <- spm_Metric_7() %>%
       dplyr::filter(
         str_starts(ClientsCounted, "% Successful exits") &
           CoCName == "OH-507" &
@@ -796,7 +796,7 @@ app_server <- function( input, output, session ) {
   
   output$spmPIT <- DT::renderDataTable({
     
-    a <- BoS_PIT %>%
+    a <- BoS_PIT() %>%
       dplyr::mutate(
         Difference = scales::percent((January2020Count - January2019Count)
                                      /January2019Count,
