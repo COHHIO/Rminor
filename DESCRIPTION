@@ -11,6 +11,7 @@ Imports:
     devtools,
     dplyr,
     DT,
+    feather,
     ggplot2,
     glue,
     golem,
