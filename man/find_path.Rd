@@ -18,5 +18,5 @@ The objects are loaded into the specified environment.
 Finds a file or directory by traversing the directory tree.
 }
 \examples{
-find_path("Rminor.RData")
+find_path("Rminor.rds")
 }

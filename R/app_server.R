@@ -29,6 +29,7 @@
 #' @importFrom plotly renderPlotly plot_ly add_trace layout
 #' @importFrom scales percent
 #' @importFrom purrr as_vector
+#' @importFrom feather read_feather
 #' 
 #' @noRd
 app_server <- function( input, output, session ) {
@@ -107,13 +108,13 @@ app_server <- function( input, output, session ) {
   
   output$pe_ProjectSummary <-
     DT::renderDataTable({
-      ptc <- summary_pe_final_scoring %>%
+      ptc <- summary_pe_final_scoring() %>%
         dplyr::filter(AltProjectName == input$pe_provider) %>%
         dplyr::pull(ProjectType)
       
       #CHANGED Removed substitution of / for division symbol as division symbol is non-ASCII and causes package warnings
       
-      a <- summary_pe_final_scoring %>%
+      a <- summary_pe_final_scoring() %>%
         dplyr::filter(AltProjectName == input$pe_provider) %>%
         dplyr::select(
           "Exits to Permanent Housing" = ExitsToPHPoints,
@@ -138,7 +139,7 @@ app_server <- function( input, output, session ) {
                             names_to = "Measure",
                             values_to = "Estimated Score")
       
-      b <- summary_pe_final_scoring %>%
+      b <- summary_pe_final_scoring() %>%
         dplyr::filter(AltProjectName == input$pe_provider) %>%
         dplyr::select(
           "Exits to Permanent Housing" = ExitsToPHDQ,
@@ -158,7 +159,7 @@ app_server <- function( input, output, session ) {
                             names_to = "Measure",
                             values_to = "DQflag")
       
-      c <- summary_pe_final_scoring %>%
+      c <- summary_pe_final_scoring() %>%
         dplyr::filter(AltProjectName == input$pe_provider) %>%
         dplyr::select(
           "Exits to Permanent Housing" = ExitsToPHPossible,
@@ -183,7 +184,7 @@ app_server <- function( input, output, session ) {
                             names_to = "Measure",
                             values_to = "Possible Score")
       
-      d <- summary_pe_final_scoring %>%
+      d <- summary_pe_final_scoring() %>%
         dplyr::filter(AltProjectName == input$pe_provider) %>%
         dplyr::select(
           "Exits to Permanent Housing" = ExitsToPHMath,
@@ -312,7 +313,7 @@ app_server <- function( input, output, session ) {
   
   shiny::observeEvent(c(input$providerList), {
     output$currentUnitUtilization <-
-      if (nrow(utilization %>%
+      if (nrow(utilization() %>%
                dplyr::filter(
                  ProjectName == input$providerList &
                  ProjectType %in% c(1, 2, 3, 8, 9)
@@ -322,18 +323,18 @@ app_server <- function( input, output, session ) {
           shinydashboard::infoBox(
             title = "Current Unit Utilization",
             subtitle = paste(
-              utilization %>%
+              utilization() %>%
                 dplyr::filter(ProjectName == input$providerList) %>%
                 dplyr::select(Households),
               "Households in",
-              utilization %>%
+              utilization() %>%
                 dplyr::filter(ProjectName == input$providerList) %>%
                 dplyr::select(UnitCount),
               "Units"
             ),
             color = "aqua",
             icon = shiny::icon("building"),
-            value = utilization %>%
+            value = utilization() %>%
               dplyr::filter(ProjectName == input$providerList) %>%
               dplyr::select(UnitUtilization)
           )
@@ -344,7 +345,7 @@ app_server <- function( input, output, session ) {
     }
     
     output$currentBedUtilization <-
-      if (nrow(utilization %>%
+      if (nrow(utilization() %>%
                dplyr::filter(
                  ProjectName == input$providerList &
                  ProjectType %in% c(1:3, 8, 9)
@@ -353,18 +354,18 @@ app_server <- function( input, output, session ) {
           shinydashboard::infoBox(
             title = "Current Bed Utilization",
             subtitle = paste(
-              utilization %>%
+              utilization() %>%
                 dplyr::filter(ProjectName == input$providerList) %>%
                 dplyr::select(Clients),
               "Clients in",
-              utilization %>%
+              utilization() %>%
                 dplyr::filter(ProjectName == input$providerList) %>%
                 dplyr::select(BedCount),
               "Beds"
             ),
             color = "purple",
             icon = shiny::icon("bed"),
-            utilization %>%
+            utilization() %>%
               dplyr::filter(ProjectName == input$providerList) %>%
               dplyr::select(BedUtilization)
           )
@@ -407,19 +408,19 @@ app_server <- function( input, output, session ) {
     
     output$veteranEngagement <-
       if (nrow(
-        veteran_current_in_project %>%
+        veteran_current_in_project() %>%
         dplyr::filter(ProjectName == input$providerList) %>%
         dplyr::select(Veterans)
       ) > 0) {
         shinydashboard::renderInfoBox({
           shinydashboard::infoBox(
             title = "Current Veterans",
-            subtitle = veteran_current_in_project %>%
+            subtitle = veteran_current_in_project() %>%
               dplyr::filter(ProjectName == input$providerList) %>% 
               dplyr::pull(Summary),
             color = "green",
             icon = shiny::icon("ribbon"),
-            veteran_current_in_project %>%
+            veteran_current_in_project() %>%
               dplyr::filter(ProjectName == input$providerList) %>%
               dplyr::select(Veterans)
           )
@@ -431,17 +432,17 @@ app_server <- function( input, output, session ) {
     
     output$TAYEngagement <-
       if (nrow(
-        current_tay_hohs %>%
+        current_tay_hohs() %>%
         dplyr::filter(ProjectName == input$providerList)
       ) > 0) {
         shinydashboard::renderInfoBox({
           shinydashboard::infoBox(
             title = "Current Transition Aged Youth Households",
-            subtitle = current_tay_hohs %>%
+            subtitle = current_tay_hohs() %>%
               dplyr::filter(ProjectName == input$providerList) %>% dplyr::pull(Summary),
             color = "black",
             icon = shiny::icon("id-card"),
-            current_tay_hohs %>%
+            current_tay_hohs() %>%
               dplyr::filter(ProjectName == input$providerList) %>%
               dplyr::select(TAYHHs)
           )
@@ -452,12 +453,12 @@ app_server <- function( input, output, session ) {
     }
     
     output$CurrentlyAwaitingPH <-
-      if (nrow(validation %>%
+      if (nrow(validation() %>%
                dplyr::filter(ProjectType %in% c(3, 9, 13) &
                              ProjectName == input$providerList)) > 0) {
         shinydashboard::renderInfoBox({
           hhs <- nrow(
-            validation %>%
+            validation() %>%
               dplyr::filter(
                 ProjectName == input$providerList &
                   is.na(MoveInDateAdjust) &
@@ -467,7 +468,7 @@ app_server <- function( input, output, session ) {
               unique()
           )
           
-          daysWaiting <- validation %>%
+          daysWaiting <- validation() %>%
             dplyr::filter(ProjectName == input$providerList &
                             is.na(MoveInDateAdjust) &
                             is.na(ExitDate)) %>%
@@ -489,18 +490,18 @@ app_server <- function( input, output, session ) {
     }
     
     output$CurrentClientCount <-
-      if (nrow(validation %>%
+      if (nrow(validation() %>%
                dplyr::filter(
                  ProjectType %in% c(12, 13, 4) &
                  ProjectName == input$providerList
                )) > 0) {
-        current <- validation %>%
+        current <- validation() %>%
           dplyr::filter(ProjectName == input$providerList &
                           is.na(ExitDate)) %>%
           dplyr::select(PersonalID) %>%
           unique()
         
-        movedin <- validation %>%
+        movedin <- validation() %>%
           dplyr::filter(
             ProjectName == input$providerList &
               is.na(ExitDate) &
@@ -510,7 +511,7 @@ app_server <- function( input, output, session ) {
           dplyr::select(PersonalID) %>%
           unique()
         
-        PTC <- validation %>%
+        PTC <- validation() %>%
           dplyr::filter(ProjectName == input$providerList) %>%
           dplyr::select(ProjectType) %>% unique()
         
@@ -534,18 +535,18 @@ app_server <- function( input, output, session ) {
     }
     
     output$CurrentHHCount <-
-      if (nrow(validation %>%
+      if (nrow(validation() %>%
                dplyr::filter(
                  ProjectType %in% c(12, 13, 4) &
                  ProjectName == input$providerList
                )) > 0) {
-        current <- validation %>%
+        current <- validation() %>%
           dplyr::filter(ProjectName == input$providerList &
                           is.na(ExitDate)) %>%
           dplyr::select(HouseholdID) %>%
           unique()
         
-        movedin <- validation %>%
+        movedin <- validation() %>%
           dplyr::filter(
             ProjectName == input$providerList &
               is.na(ExitDate) &
@@ -555,7 +556,7 @@ app_server <- function( input, output, session ) {
           dplyr::select(HouseholdID) %>%
           unique()
         
-        PTC <- validation %>%
+        PTC <- validation() %>%
           dplyr::filter(ProjectName == input$providerList) %>%
           dplyr::select(ProjectType) %>% unique()
         
@@ -579,7 +580,7 @@ app_server <- function( input, output, session ) {
     }
     
     output$ShelterExitsToRRH <-
-      if (nrow(validation %>%
+      if (nrow(validation() %>%
                dplyr::filter(ProjectType == 1 &
                              ProjectName == input$providerList)) > 0) {
         ReportStart <-
@@ -593,7 +594,7 @@ app_server <- function( input, output, session ) {
             color = "light-blue",
             icon = shiny::icon("door-open"),
             nrow(
-              validation %>%
+              validation() %>%
                 dplyr::filter(
                   ProjectName == input$providerList &
                     HMIS::exited_between(., ReportStart, ymd(meta_HUDCSV_Export_End)) &
@@ -629,7 +630,7 @@ app_server <- function( input, output, session ) {
       
       Provider <- input$providerListUtilization
       
-      bedPlot <- utilization_bed %>% 
+      bedPlot <- utilization_bed() %>% 
         tidyr::gather("Month",
                       "Utilization",
                       -ProjectID,
@@ -643,7 +644,7 @@ app_server <- function( input, output, session ) {
           Utilization = NULL
         )
       
-      unitPlot <- utilization_unit %>% 
+      unitPlot <- utilization_unit() %>% 
         tidyr::gather("Month",
                       "Utilization",
                       -ProjectID,
@@ -714,7 +715,7 @@ app_server <- function( input, output, session ) {
   
   output$spmLoTH <- DT::renderDataTable({
     
-    a <- spm_Metric_1b %>%
+    a <- spm_Metric_1b() %>%
       dplyr::filter(Metric1b == "Persons in ES, SH, TH, and PH" &
                       CoCName == "OH-507") %>%
       dplyr::mutate(AvgLoT_Current = paste(as.integer(AvgLoT_Current), "days"),
@@ -737,7 +738,7 @@ app_server <- function( input, output, session ) {
   
   output$spmRecurrence <- DT::renderDataTable({
     
-    a <- spm_Metric_2 %>%
+    a <- spm_Metric_2() %>%
       dplyr::filter(ProjectType == "TOTAL Returns to Homelessness" &
                       CoCName == "OH-507") %>%
       dplyr::mutate_at(dplyr::vars(-ProjectType, -CoCName), as.integer) %>%
@@ -771,7 +772,7 @@ app_server <- function( input, output, session ) {
   
   output$spmExitsToPH <- DT::renderDataTable({
     
-    a <- spm_Metric_7 %>%
+    a <- spm_Metric_7() %>%
       dplyr::filter(
         str_starts(ClientsCounted, "% Successful exits") &
           CoCName == "OH-507" &
@@ -796,7 +797,7 @@ app_server <- function( input, output, session ) {
   
   output$spmPIT <- DT::renderDataTable({
     
-    a <- BoS_PIT %>%
+    a <- BoS_PIT() %>%
       dplyr::mutate(
         Difference = scales::percent((January2020Count - January2019Count)
                                      /January2019Count,
@@ -853,7 +854,7 @@ app_server <- function( input, output, session ) {
         substr(input$spdatSlider, 1, 4)
       )), "%m-%d-%Y")
       # counting all hhs who were scored AND SERVED between the report dates
-      CountyAverageScores <- qpr_spdats_county %>%
+      CountyAverageScores <- qpr_spdats_county() %>%
         dplyr::filter(HMIS::served_between(., ReportStart, ReportEnd)) %>%
         dplyr::select(CountyServed, PersonalID, Score) %>%
         dplyr::distinct() %>%
@@ -861,7 +862,7 @@ app_server <- function( input, output, session ) {
         dplyr::summarise(AverageScore = round(mean(Score), 1),
                          HHsLHinCounty = dplyr::n())
       # counting all hhs who ENTERED either RRH or PSH between the report dates
-      CountyHousedAverageScores <- qpr_spdats_project %>%
+      CountyHousedAverageScores <- qpr_spdats_project() %>%
         dplyr::filter(HMIS::entered_between(., ReportStart, ReportEnd)) %>%
         dplyr::group_by(CountyServed) %>%
         dplyr::summarise(HousedAverageScore = round(mean(ScoreAdjusted), 1),
@@ -872,7 +873,7 @@ app_server <- function( input, output, session ) {
                          CountyHousedAverageScores,
                          by = "CountyServed") %>%
         dplyr::arrange(CountyServed) %>%
-        dplyr::left_join(., regions, by = c("CountyServed" = "County")) %>%
+        dplyr::left_join(., regions(), by = c("CountyServed" = "County")) %>%
         dplyr::filter(RegionName == input$regionList)
       # the plot
       ggplot2::ggplot(Compare, ggplot2::aes(x = CountyServed, y = AverageScore)) +

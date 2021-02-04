@@ -2,14 +2,14 @@ qpr_expr$RRH <- list()
 qpr_expr$RRH$expr <- rlang::expr({
   ReportStart <- Report()$Start
   ReportEnd <- Report()$End
-  daysToHouse <- qpr_rrh_enterers %>%
+  daysToHouse <- qpr_rrh_enterers() %>%
     dplyr::filter(
       !is.na(MoveInDateAdjust) &
         ProjectRegion %in% c(input$Region) &
         HMIS::entered_between(., ReportStart, ReportEnd)
     )
   
-  RRHgoal <- goals %>%
+  RRHgoal <- goals() %>%
     dplyr::filter(SummaryMeasure == "Rapid Placement") %>%
     dplyr::select(ProjectType, Goal)
   

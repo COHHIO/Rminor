@@ -7,7 +7,7 @@ qpr_expr$Income$expr <- rlang::expr({
   ReportStart <- Report()$Start
   ReportEnd <- Report()$End
    
-  meeting_objective <- qpr_income %>%
+  meeting_objective <- qpr_income() %>%
     dplyr::filter(
       ProjectRegion %in% c(input$Region) &
         ProjectType == .PT_nm &
@@ -21,7 +21,7 @@ qpr_expr$Income$expr <- rlang::expr({
     dplyr::summarise(Increased = dplyr::n())
   
   # calculating the total households for comparison
-  all_hhs <- qpr_income %>%
+  all_hhs <- qpr_income() %>%
     dplyr::filter(ProjectRegion %in% c(input$Region) &
                     ProjectType == .PT_nm &
                     HMIS::stayed_between(., ReportStart, ReportEnd)) %>%
@@ -46,7 +46,7 @@ qpr_expr$Income$expr <- rlang::expr({
     dplyr::mutate(Percent = Increased / TotalHHs)
   
   IncomeGoal <-
-    goals %>%
+    goals() %>%
     dplyr::filter(Measure == "Gain or Increase Income" & 
                     ProjectType %in% unlist(ProjectType())) %>%
     dplyr::distinct(Goal)

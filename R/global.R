@@ -17,11 +17,13 @@ if (golem::app_prod() ||
     Sys.getenv("R_CONFIG_ACTIVE") == "shinyapps") {
   
   # Run only if in production mode or testing
-  env <- environment()
   
   # loading the image files from the data/ folder
-  load(find_path("Rminor.RData"), env)
-  message("Data Loaded")
+  if (!exists("validation")) {
+    env <- environment()
+    list2env(readRDS(find_path("Rminor.rds")), env)
+    message("Data Loaded")
+  }
   # creating various lists needed in the app
   
   choices_month <-
@@ -31,11 +33,11 @@ if (golem::app_prod() ||
       length.out = 24
     ), "%b %Y")
   
-  choices_service_areas <- sort(unique(APs$ProjectAreaServed)) 
+  choices_service_areas <- sort(unique(APs()$ProjectAreaServed)) 
   
-  choices_regions <- unique(regions$RegionName[regions$County != "Mahoning"])
+  choices_regions <- unique(regions()$RegionName)
   
-  providers <- validation %>%
+  providers <- validation() %>%
     dplyr::select(ProjectName, ProjectType) %>%
     unique() %>%
     dplyr::filter(stringr::str_detect(ProjectName, "zz", negate = TRUE) == TRUE &
@@ -50,7 +52,7 @@ if (golem::app_prod() ||
     unique()
   
   provider_dash_selected <- providers %>%
-    dplyr::left_join(validation, by = c("ProjectName", "ProjectType")) %>%
+    dplyr::left_join(validation(), by = c("ProjectName", "ProjectType")) %>%
     dplyr::filter(is.na(ExitDate)) %>%
     dplyr::select(ProjectName) %>%
     unique() %>%

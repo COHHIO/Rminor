@@ -2,7 +2,7 @@
 qpr_expr$NCB <- list()
 qpr_expr$NCB$expr <- rlang::expr({
   .PT_nm <- names(ProjectType()) 
-  meeting_objective <- qpr_benefits %>%
+  meeting_objective <- qpr_benefits() %>%
     dplyr::filter(
       ProjectRegion %in% c(input$Region) &
         ProjectType %in% .PT_nm &
@@ -16,7 +16,7 @@ qpr_expr$NCB$expr <- rlang::expr({
     dplyr::summarise(BenefitsAtExit = dplyr::n())
   
   # calculating the total households for comparison
-  all_hhs <- qpr_benefits %>%
+  all_hhs <- qpr_benefits() %>%
     dplyr::filter(ProjectRegion %in% c(input$Region) &
                     ProjectType == names(ProjectType()) &
                     HMIS::exited_between(., ReportStart, ReportEnd)) %>%
@@ -41,7 +41,7 @@ qpr_expr$NCB$expr <- rlang::expr({
     dplyr::mutate(Percent = BenefitsAtExit / TotalHHs)
   
   NCBGoal <-
-    goals %>%
+    goals() %>%
     dplyr::filter(Measure == "Non-cash Benefits" & 
                     ProjectType %in% unlist(ProjectType())) %>% 
     # TODO This won't be necessary once qpr_benefits also uses numeric

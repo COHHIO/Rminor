@@ -4,7 +4,7 @@ qpr_expr$PH$expr <- rlang::expr({
   ReportEnd <- Report()$End
   # hhs that achieved the goal
 
-  SuccessfullyPlaced <- qpr_leavers %>%
+  SuccessfullyPlaced <- qpr_leavers() %>%
   dplyr::filter(((
     ProjectType %in% c(3, 9, 13) &
       !is.na(MoveInDateAdjust)
@@ -30,7 +30,7 @@ qpr_expr$PH$expr <- rlang::expr({
   dplyr::summarise(SuccessfullyPlacedHHs = dplyr::n())
 
 # calculating the total households to compare successful placements to
-TotalHHsSuccessfulPlacement <- qpr_leavers %>%
+TotalHHsSuccessfulPlacement <- qpr_leavers() %>%
   dplyr::filter((
     HMIS::served_between(., ReportStart, ReportEnd) &
       ProjectType %in% c(3, 9, 12) # PSH & HP
@@ -59,7 +59,7 @@ SuccessfulPlacement <- TotalHHsSuccessfulPlacement %>%
 SuccessfulPlacement[is.na(SuccessfulPlacement)] <- 0
 
 PlacementGoal <-
-  goals %>%
+  goals() %>%
   dplyr::filter(
     SummaryMeasure == "Obtaining and Maintaining Permanent Housing" &
       Measure != "Exits to Temporary or Permanent Housing"
@@ -84,7 +84,7 @@ stagingExitsToPH <- SuccessfulPlacement %>%
 
 if (names(ProjectType()) == "Street Outreach") {
     
-    totalServed <- qpr_leavers %>%
+    totalServed <- qpr_leavers() %>%
       dplyr::filter(HMIS::exited_between(., ReportStart, ReportEnd) &
                       ProjectType == 4) %>%
       dplyr::group_by(FriendlyProjectName,
@@ -93,7 +93,7 @@ if (names(ProjectType()) == "Street Outreach") {
                       ProjectRegion) %>%
       dplyr::summarise(TotalHHs = dplyr::n())
     
-    notUnsheltered <- qpr_leavers %>%
+    notUnsheltered <- qpr_leavers() %>%
       dplyr::filter(
         ProjectType == 4 &
           Destination != 16 &
@@ -106,7 +106,7 @@ if (names(ProjectType()) == "Street Outreach") {
                       ProjectRegion) %>%
       dplyr::summarise(NotUnsheltered = dplyr::n())
     
-    goalOutreach <- goals %>%
+    goalOutreach <- goals() %>%
       dplyr::filter(Measure == "Exits to Temporary or Permanent Housing") %>%
       dplyr::select(Goal, ProjectType)
     

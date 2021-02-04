@@ -2,7 +2,7 @@ qpr_expr$RRHspending <- list()
 qpr_expr$RRHspending$expr <- rlang::expr({
   ReportStart <- Report()$Start
   ReportEnd <- Report()$End
-  rrhSpending <- qpr_spending %>%
+  rrhSpending <- qpr_spending() %>%
     dplyr::filter(
       !is.na(OrganizationName) &
         ProjectRegion %in% c(input$Region) &
@@ -14,7 +14,7 @@ qpr_expr$RRHspending$expr <- rlang::expr({
                   ProjectType = factor(ProjectType, levels = c("HP", "RRH")))
   
   
-  rrhSpending <- qpr_spending %>%
+  rrhSpending <- qpr_spending() %>%
     dplyr::filter(
       !is.na(OrganizationName) &
         ProjectRegion %in% c(input$Region) &

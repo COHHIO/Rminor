@@ -42,7 +42,7 @@
 #'   setSliderColor 
 #'   sliderTextInput 
 #'   prettyRadioButtons
-#' @importFrom dplyr sample_n select
+#' @importFrom dplyr select
 #' @importFrom lubridate ymd floor_date days
 #' @importFrom plotly plotlyOutput
 #' @importFrom DT dataTableOutput
@@ -117,8 +117,7 @@ app_ui <- function(request, data_ui) {
                                         options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
                                                                               liveSearch = TRUE),
                                         width = "100%",
-                                        selected = dplyr::sample_n(provider_dash_selected, 1)
-                                      ),
+                                        ),
                                       shiny::uiOutput("CurrentClientCount"),
                                       shiny::uiOutput("CurrentHHCount"),
                                       shiny::uiOutput("currentUnitUtilization"),
@@ -163,10 +162,10 @@ app_ui <- function(request, data_ui) {
             shiny::fluidRow(shinydashboard::box(
               shinyWidgets::pickerInput(
                 inputId = "providerListUtilization",
-                choices = c(sort(utilization_bed$ProjectName)),
+                choices = c(sort(utilization_bed()$ProjectName)),
                 options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
                                                       liveSearch = TRUE),   
-                selected = dplyr::sample_n(utilization_bed %>% dplyr::select(ProjectName), 1),
+                selected = utilization_bed() %>% dplyr::pull(ProjectName) %>% `[`(1),
                 width = "100%"
               ),
               shinyWidgets::airDatepickerInput(
@@ -223,9 +222,9 @@ app_ui <- function(request, data_ui) {
           #           pickerInput(
           #             inputId = "pe_provider",
           #             label = "Select your CoC-funded Provider",
-          #             choices = sort(pe_validation_summary$AltProjectName) %>%
+          #             choices = sort(pe_validation_summary()$AltProjectName) %>%
           #               unique(),
-          #             selected = sample(pe_validation_summary$AltProjectName, 1),
+          #             selected = sample(pe_validation_summary()$AltProjectName, 1),
           #             options = list('live-search' = TRUE),
           #             width = "100%"
           #           ),

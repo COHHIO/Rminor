@@ -1,10 +1,11 @@
 
+setwd("../..")
 
 # Run only if in production mode or testing
 env <- environment()
 
 # loading the image files from the data/ folder
-load(find_path("Rminor.RData"), env)
+list2env(readRDS(find_path("Rminor.rds")), env)
 message("Data Loaded")
 
 # creating various lists needed in the app
@@ -16,11 +17,11 @@ data_ui$choices_month <-
     length.out = 24
   ), "%b %Y")
 
-data_ui$choices_service_areas <- sort(unique(APs$ProjectAreaServed)) 
+data_ui$choices_service_areas <- sort(unique(APs()$ProjectAreaServed)) 
 
-data_ui$choices_regions <- unique(regions$RegionName[regions$County != "Mahoning"])
+data_ui$choices_regions <- unique(regions()$RegionName[regions()$County != "Mahoning"])
 
-providers <- validation %>%
+providers <- validation() %>%
   dplyr::select(ProjectName, ProjectType) %>%
   unique() %>%
   dplyr::filter(stringr::str_detect(ProjectName, "zz", negate = TRUE) == TRUE &
@@ -35,7 +36,7 @@ data_ui$provider_dash_choices <-
   unique()
 
 data_ui$provider_dash_selected <- providers %>%
-  dplyr::left_join(validation, by = c("ProjectName", "ProjectType")) %>%
+  dplyr::left_join(validation(), by = c("ProjectName", "ProjectType")) %>%
   dplyr::filter(is.na(ExitDate)) %>%
   dplyr::select(ProjectName) %>%
   unique() %>%
