@@ -375,17 +375,12 @@ app_server <- function( input, output, session ) {
     }
     
     output$headerSPMs <- shiny::renderUI({
-      ReportStart <- spm_current_start_date
-      ReportEnd <- spm_current_end_date - lubridate::days(1)
+
+      ReportStart <- format.Date(lubridate::ymd(spm_current_start_date), "%B %d, %Y")
+      ReportEnd <- format.Date(lubridate::ymd(spm_current_end_date), "%B %d, %Y")
       
-      ReportStart <- format.Date(lubridate::ymd(ReportStart), "%B %d, %Y")
-      ReportEnd <- format.Date(lubridate::ymd(ReportEnd), "%B %d, %Y")
-      
-      PriorReportStart <- spm_prior_start_date
-      PriorReportEnd <- spm_prior_end_date - lubridate::days(1)
-      
-      PriorReportStart <- format.Date(lubridate::ymd(PriorReportStart), "%B %d, %Y")
-      PriorReportEnd <- format.Date(lubridate::ymd(PriorReportEnd), "%B %d, %Y")
+      PriorReportStart <- format.Date(lubridate::ymd(spm_prior_start_date), "%B %d, %Y")
+      PriorReportEnd <- format.Date(lubridate::ymd(spm_prior_end_date), "%B %d, %Y")
       
       list(
         shiny::h2("HUD System Performance Measures"),
@@ -719,17 +714,18 @@ app_server <- function( input, output, session ) {
   
   output$spmLoTH <- DT::renderDataTable({
     
-    a <- spm_1b_loth_self_report %>%
-      dplyr::filter(Metric1b == "Persons in ES, SH, TH, and PH") %>%
-      dplyr::mutate(AvgLoT = paste(as.integer(AvgLoT), "days"),
-                    Prior_AvgLoT = paste(as.integer(Prior_AvgLoT), "days"),
-                    MedLoT = paste(MedLoT, "days"),
-                    Prior_MedLoT = paste(Prior_MedLoT, "days")) %>%
+    a <- spm_Metric_1b %>%
+      dplyr::filter(Metric1b == "Persons in ES, SH, TH, and PH" &
+                      CoCName == "OH-507") %>%
+      dplyr::mutate(AvgLoT_Current = paste(as.integer(AvgLoT_Current), "days"),
+                    AvgLoT_Prior = paste(as.integer(AvgLoT_Prior), "days"),
+                    MedLoT_Current = paste(MedLoT_Current, "days"),
+                    MedLoT_Prior = paste(MedLoT_Prior, "days")) %>%
       dplyr::select(
-        "Prior Year<br>Average" = Prior_AvgLoT,
-        "Current Year<br>Average" = AvgLoT,
-        "Prior Year<br>Median" = Prior_MedLoT,
-        "Current Year<br>Median" = MedLoT
+        "Prior Year<br>Average" = AvgLoT_Prior,
+        "Current Year<br>Average" = AvgLoT_Current,
+        "Prior Year<br>Median" = MedLoT_Prior,
+        "Current Year<br>Median" = MedLoT_Current
       )
     
     DT::datatable(a,
@@ -741,21 +737,22 @@ app_server <- function( input, output, session ) {
   
   output$spmRecurrence <- DT::renderDataTable({
     
-    a <- spm_2_recurrence %>%
-      dplyr::filter(ProjectType == "TOTAL Returns to Homelessness") %>%
-      dplyr::mutate_at(dplyr::vars(-ProjectType), as.integer) %>%
+    a <- spm_Metric_2 %>%
+      dplyr::filter(ProjectType == "TOTAL Returns to Homelessness" &
+                      CoCName == "OH-507") %>%
+      dplyr::mutate_at(dplyr::vars(-ProjectType, -CoCName), as.integer) %>%
       dplyr::mutate(
-        Percent6moPrior = scales::percent(Prior_LessThan6mo / Prior_ExitedToPHPast2Yrs,
+        Percent6moPrior = scales::percent(LessThan6mo_Prior / ExitedToPHPast2Yrs_Prior,
                                           accuracy = .1),
-        Percent6moCurrent = scales::percent(LessThan6mo / ExitedToPHPast2Yrs,
+        Percent6moCurrent = scales::percent(LessThan6mo_Current / ExitedToPHPast2Yrs_Current,
                                             accuracy = .1),
-        Percent2yrPrior = scales::percent((Prior_ThirteenTo24mo +
-                                             Prior_SixTo12mo +
-                                             Prior_LessThan6mo) / Prior_ExitedToPHPast2Yrs,
+        Percent2yrPrior = scales::percent((ThirteenTo24mo_Prior +
+                                             SixTo12mo_Prior +
+                                             LessThan6mo_Prior) / ExitedToPHPast2Yrs_Prior,
                                           accuracy = .1),
-        Percent2yrCurrent = scales::percent((ThirteenTo24mo +
-                                               LessThan6mo +
-                                               SixTo12mo) / ExitedToPHPast2Yrs,
+        Percent2yrCurrent = scales::percent((ThirteenTo24mo_Current +
+                                               LessThan6mo_Current +
+                                               SixTo12mo_Current) / ExitedToPHPast2Yrs_Current,
                                             accuracy = .1)
       ) %>%
       dplyr::select(
@@ -774,26 +771,24 @@ app_server <- function( input, output, session ) {
   
   output$spmExitsToPH <- DT::renderDataTable({
     
-    a <- spm_7b1_exits_lh %>%
-      dplyr::filter(Metric7b1 == "% Successful exits") %>%
-      dplyr::mutate(Metric7b1 = "ES, TH, SH, RRH: Successful Exits") %>%
-      dplyr::select(
-        "Metric" = Metric7b1,
-        "Prior Year" = PriorYear,
-        "Current Year" = CurrentYear)
+    a <- spm_Metric_7 %>%
+      dplyr::filter(
+        str_starts(ClientsCounted, "% Successful exits") &
+          CoCName == "OH-507" &
+          Metric %in% c("7b1", "7b2")
+      ) %>%
+      dplyr::mutate(
+        Metric = if_else(
+          Metric == "7b1",
+          "ES, TH, SH, RRH: Successful Exits",
+          "PSH: Successful Exits/Retention of Housing in PSH"
+        )
+      ) %>%
+      dplyr::select(Metric,
+                    "Prior Year" = Prior,
+                    "Current Year" = Current)
     
-    b <- spm_7b2_exits_ph %>%
-      dplyr::filter(Metric7b2 == "% Successful exits/retention") %>%
-      dplyr::mutate(Metric7b2 = "PSH: Successful Exits/Retention of Housing in PSH") %>%
-      dplyr::select(
-        "Metric" = Metric7b2,
-        "Prior Year" = PriorYear,
-        "Current Year" = CurrentYear
-      )
-    
-    c <- rbind(a, b)
-    
-    DT::datatable(c,
+    DT::datatable(a,
                   rownames = FALSE,
                   options = list(dom = 't'))
     
@@ -801,13 +796,7 @@ app_server <- function( input, output, session ) {
   
   output$spmPIT <- DT::renderDataTable({
     
-    a <- dplyr::tribble(
-      ~Population, ~January2019Count, ~January2020Count,
-      "Total", 3479, 3577,
-      "Sheltered", 2665, 3577 - 986,
-      "Veterans", 159, 162,
-      "Chronic", 330, 192
-    ) %>%
+    a <- BoS_PIT %>%
       dplyr::mutate(
         Difference = scales::percent((January2020Count - January2019Count)
                                      /January2019Count,
