@@ -165,7 +165,7 @@ qpr_plotly <- function(.d,
 #' @param n the number of parent directories to traverse before erroring
 #' @return The objects are loaded into the specified environment. 
 #' @examples
-#' find_path("Rminor.RData")
+#' find_path("Rminor.rds")
 #' @importFrom rlang warn abort
 #' @export
 

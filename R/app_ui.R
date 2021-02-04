@@ -113,12 +113,11 @@ app_ui <- function(request, data_ui) {
                                     shinydashboard::box(
                                       shinyWidgets::pickerInput(
                                         inputId = "providerList",
-                                        choices = provider_dash_choices$ProjectName[1],
+                                        choices = provider_dash_choices,
                                         options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
                                                                               liveSearch = TRUE),
                                         width = "100%",
-                                        selected = 
-                                      ),
+                                        ),
                                       shiny::uiOutput("CurrentClientCount"),
                                       shiny::uiOutput("CurrentHHCount"),
                                       shiny::uiOutput("currentUnitUtilization"),

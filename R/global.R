@@ -17,11 +17,13 @@ if (golem::app_prod() ||
     Sys.getenv("R_CONFIG_ACTIVE") == "shinyapps") {
   
   # Run only if in production mode or testing
-  env <- environment()
   
   # loading the image files from the data/ folder
-  load(find_path("Rminor.RData"), env)
-  message("Data Loaded")
+  if (!exists("validation")) {
+    env <- environment()
+    list2env(readRDS(find_path("Rminor.rds")), env)
+    message("Data Loaded")
+  }
   # creating various lists needed in the app
   
   choices_month <-
