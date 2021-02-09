@@ -296,7 +296,7 @@ app_ui <- function(request, data_ui) {
             shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerQPRCommunityNeed"), width = 12)),
             shinyWidgets::pickerInput(
               inputId = "regionList",
-              choices = choices_regions,
+              choices = choices_regions[choices_regions != "Mahoning County CoC"],
               options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
                                                     liveSearch = TRUE),
               width = "70%"
