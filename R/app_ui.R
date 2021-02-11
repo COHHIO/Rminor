@@ -139,12 +139,12 @@ app_ui <- function(request, data_ui) {
               collapsed = FALSE,
               width = 12
             )),
-            shiny::fluidRow(shinydashboard::box(shiny::plotOutput("covidStatus"),
+            shiny::fluidRow(shinydashboard::box(shiny::img(src = covid19_status_plot, width = "100%", height = "auto"),
                                           title = "Covid-19 Status at Last Screening",
-                                          width = 6),
-                            shinydashboard::box(shiny::plotOutput("covidPrioritization"),
+                                          width = 12)),
+            shiny::fluidRow(shinydashboard::box(shiny::img(src = covid19_priority_plot, width = "100%", height = "auto"),
                                           title = "Prioritization Category at Coordinated Entry",
-                                          width = 6))
+                                          width = 12))
           ),
           shinydashboard::tabItem(
             tabName = "utilization-Tab",

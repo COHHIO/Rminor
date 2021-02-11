@@ -609,16 +609,8 @@ app_server <- function( input, output, session ) {
     }
     
   })
-  output$covidPrioritization <- shiny::renderPlot({
-    covid19_priority_plot
-  })  
   
   mod_ceAPs_server("ceAPs")
-  
-  output$covidStatus <- shiny::renderPlot({
-    covid19_status_plot
-    
-  })
   
   output$bedPlot <-
     plotly::renderPlotly({
