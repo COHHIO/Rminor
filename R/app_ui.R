@@ -70,8 +70,8 @@ app_ui <- function(request, data_ui) {
           #          tabName = "cocCompetitionTab"),
           shinydashboard::menuItem("Coordinated Entry Access Points",
                                    tabName = "ceAPs-Tab"),
-          shinydashboard::menuItem("Covid-19 Analysis",
-                                   tabName = "covid19-Tab"),
+          # shinydashboard::menuItem("Covid-19 Analysis",
+          #                          tabName = "covid19-Tab"),
           shinydashboard::menuItem("Bed and Unit Utilization",
                                    tabName = "utilization-Tab"),
           shinydashboard::menuItem(
