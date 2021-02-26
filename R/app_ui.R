@@ -273,26 +273,35 @@ app_ui <- function(request, data_ui) {
               width = 12
             ))
           ),
-          mod_QPR_tabItem_ui("LoS",
-                             project_choices = choices_project_type[tab_choices$LoS],
-                             region_choices = choices_regions[choices_regions != "Mahoning County CoC"],
-                             radio_mean = TRUE),
-          mod_QPR_tabItem_ui("PH",
-                             project_choices = choices_project_type[tab_choices$PH],
-                             region_choices = choices_regions[choices_regions != "Mahoning County CoC"]),
-          mod_QPR_tabItem_ui("NCB", 
-                             project_choices = choices_project_type[tab_choices$NCB],
-                             region_choices = choices_regions[choices_regions != "Mahoning County CoC"]),
-          mod_QPR_tabItem_ui("HI", 
-                             region_choices = choices_regions[choices_regions != "Mahoning County CoC"],
-                             project_choices = choices_project_type[tab_choices$HI]),
-          mod_QPR_tabItem_ui("Income", 
-                             region_choices = choices_regions[choices_regions != "Mahoning County CoC"],
-                             project_choices = choices_project_type[tab_choices$Income]),
-          mod_QPR_tabItem_ui("RRH", 
-                             region_choices = choices_regions[choices_regions != "Mahoning County CoC"]),
-          mod_QPR_tabItem_ui("RRHspending", 
-                             region_choices = choices_regions[choices_regions != "Mahoning County CoC"]),
+          mod_QPR_tabItem_ui(
+            "LoS",
+            project_choices = choices_project_type[tab_choices$LoS],
+            region_choices = choices_regions[choices_regions != "Mahoning County CoC"],
+            radio_mean = TRUE
+          ),
+          mod_QPR_tabItem_ui(
+            "PH",
+            project_choices = choices_project_type[tab_choices$PH],
+            region_choices = choices_regions[choices_regions != "Mahoning County CoC"]),
+          mod_QPR_tabItem_ui(
+            "NCB",
+            project_choices = choices_project_type[tab_choices$NCB],
+            region_choices = choices_regions[choices_regions != "Mahoning County CoC"]),
+          mod_QPR_tabItem_ui(
+            "HI",
+            region_choices = choices_regions[choices_regions != "Mahoning County CoC"],
+            project_choices = choices_project_type[tab_choices$HI]),
+          mod_QPR_tabItem_ui(
+            "Income",
+            region_choices = choices_regions[choices_regions != "Mahoning County CoC"],
+            project_choices = choices_project_type[tab_choices$Income]),
+          mod_QPR_tabItem_ui(
+            "RRH",
+            region_choices = choices_regions[choices_regions != "Mahoning County CoC"]),
+          mod_QPR_tabItem_ui(
+            "RRHspending",
+            region_choices = choices_regions[choices_regions != "Mahoning County CoC"]),
+          
           shinydashboard::tabItem(
             tabName = "spdat-Tab",
             shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerQPRCommunityNeed"), width = 12)),
