@@ -12,7 +12,7 @@ mod_QPR_server(id, header, input, output, session)
 \item{header}{\code{(character)} The human legible name for the tabitem header.}
 }
 \description{
-A shiny server Module to generate the header, slider, pickers 
+A shiny server Module to generate the header, slider, pickers
   and plot for each tabitem.
 }
 \seealso{
