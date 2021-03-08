@@ -244,7 +244,21 @@ app_ui <- function(request, data_ui) {
           #         )),
           shinydashboard::tabItem(
             tabName = "SPM-Tab",
-            shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerSPMs"), width = 12)),
+            shiny::fluidRow(shinydashboard::box(
+              shiny::htmlOutput("headerSPMs"), 
+              width = 12
+              )),
+            shiny::fluidRow(shinydashboard::box(
+              shiny::radioButtons(
+                inputId = "SPM_CoC_radio",
+                inline = TRUE,
+                label = "Choose CoC",
+                choices = c("Ohio Balance of State CoC", "Mahoning County CoC"),
+                selected = "Ohio Balance of State CoC",
+                width = '100%'
+              ),
+              width = 12
+            )),
             shiny::fluidRow(shinydashboard::box(
               DT::dataTableOutput("spmLoTH"),
               title = "Metric 1b: Length of Time Homeless",

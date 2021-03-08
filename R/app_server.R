@@ -385,7 +385,7 @@ app_server <- function( input, output, session ) {
       
       list(
         shiny::h2("HUD System Performance Measures"),
-        shiny::h4("Ohio Balance of State Continuum of Care"),
+        shiny::h4(input$SPM_CoC_radio),
         shiny::h4(ReportStart, "-", ReportEnd),
         p(
           "The data here is based on the HUD System Performance Measures. For a
@@ -709,7 +709,10 @@ app_server <- function( input, output, session ) {
     
     a <- spm_Metric_1b() %>%
       dplyr::filter(Metric1b == "Persons in ES, SH, TH, and PH" &
-                      CoCName == "OH-507") %>%
+                      CoCName == case_when(
+                        input$SPM_CoC_radio == "Ohio Balance of State CoC" ~ "OH-507",
+                        input$SPM_CoC_radio == "Mahoning County CoC" ~ "OH-504"
+                      )) %>%
       dplyr::mutate(AvgLoT_Current = paste(as.integer(AvgLoT_Current), "days"),
                     AvgLoT_Prior = paste(as.integer(AvgLoT_Prior), "days"),
                     MedLoT_Current = paste(MedLoT_Current, "days"),
@@ -732,7 +735,10 @@ app_server <- function( input, output, session ) {
     
     a <- spm_Metric_2() %>%
       dplyr::filter(ProjectType == "TOTAL Returns to Homelessness" &
-                      CoCName == "OH-507") %>%
+                      CoCName == case_when(
+                        input$SPM_CoC_radio == "Ohio Balance of State CoC" ~ "OH-507",
+                        input$SPM_CoC_radio == "Mahoning County CoC" ~ "OH-504"
+                      )) %>%
       dplyr::mutate_at(dplyr::vars(-ProjectType, -CoCName), as.integer) %>%
       dplyr::mutate(
         Percent6moPrior = scales::percent(LessThan6mo_Prior / ExitedToPHPast2Yrs_Prior,
@@ -767,7 +773,10 @@ app_server <- function( input, output, session ) {
     a <- spm_Metric_7() %>%
       dplyr::filter(
         str_starts(ClientsCounted, "% Successful exits") &
-          CoCName == "OH-507" &
+          CoCName == case_when(
+            input$SPM_CoC_radio == "Ohio Balance of State CoC" ~ "OH-507",
+            input$SPM_CoC_radio == "Mahoning County CoC" ~ "OH-504"
+          ) &
           Metric %in% c("7b1", "7b2")
       ) %>%
       dplyr::mutate(
@@ -803,10 +812,29 @@ app_server <- function( input, output, session ) {
                     "January 2020 Count" = January2020Count,
                     Difference)
     
-    DT::datatable(a,
-                  rownames = FALSE,
-                  options = list(dom = 't'))
+    b <- Mah_PIT() %>%
+      dplyr::mutate(
+        Difference = scales::percent((January2020Count - January2019Count)
+                                     /January2019Count,
+                                     accuracy = .1),
+        Difference = dplyr::if_else(stringr::str_starts(Difference, "-"),
+                                    Difference,
+                                    paste0("+", Difference))
+      ) %>%
+      dplyr::select(Population,
+                    "January 2019 Count" = January2019Count,
+                    "January 2020 Count" = January2020Count,
+                    Difference)
     
+    if (input$SPM_CoC_radio == "Ohio Balance of State CoC") {
+      DT::datatable(a,
+                    rownames = FALSE,
+                    options = list(dom = 't'))
+    } else {
+      DT::datatable(b,
+                    rownames = FALSE,
+                    options = list(dom = 't'))
+    }
   })
   
   output$headerQPRCommunityNeed <- shiny::renderUI({
