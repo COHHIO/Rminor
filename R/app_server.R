@@ -421,7 +421,7 @@ app_server <- function( input, output, session ) {
         input$SPM_CoC_radio == "Ohio Balance of State CoC",
         "Persons in ES, SH, TH, Outreach, RRH, and PSH.  BoS CoC Goals: 6 month
         goal = <10%, 24 month goal = <20%",
-        "Persons in ES, SH, TH, RRH, and PSH."
+        "Persons in ES, SH, TH, Outreach, RRH, and PSH."
       )
     })
     
