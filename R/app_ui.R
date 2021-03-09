@@ -63,7 +63,9 @@ app_ui <- function(request, data_ui) {
       shinydashboard::dashboardSidebar(
         shinydashboard::sidebarMenu(
           id = "sidebarmenuid",
-          #CHANGED standardize format of tabnames to shiny compatible namespaces [NS]-* where * in this case is "Tab". These will allow submenuitems to be generated programmatically
+          #CHANGED standardize format of tabnames to shiny compatible namespaces 
+          # [NS]-* where * in this case is "Tab". These will allow submenuitems 
+          # to be generated programmatically
           shinydashboard::menuItem("Provider Dashboard",
                                    tabName = "providerDashboard-Tab"),
           # menuItem("CoC Competition",
@@ -114,9 +116,10 @@ app_ui <- function(request, data_ui) {
                                       shinyWidgets::pickerInput(
                                         inputId = "providerList",
                                         choices = provider_dash_choices,
-                                        options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
-                                                                              liveSearch = TRUE,
-                                                                              liveSearchStyle = 'contains'),
+                                        options = shinyWidgets::pickerOptions(
+                                          dropupAuto = FALSE,
+                                          liveSearch = TRUE,
+                                          liveSearchStyle = 'contains'),
                                         width = "100%",
                                         ),
                                       shiny::uiOutput("CurrentClientCount"),
@@ -132,7 +135,8 @@ app_ui <- function(request, data_ui) {
           mod_ceAPs_ui("ceAPs"),
           shinydashboard::tabItem(
             tabName = "covid19-Tab",
-            shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerCovid19"), width = 12)),
+            shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerCovid19"), 
+                                                width = 12)),
             shiny::fluidRow(shinydashboard::box(
               shiny::uiOutput("covidText"),
               title = "Covid-19 Data Collection",
@@ -140,22 +144,31 @@ app_ui <- function(request, data_ui) {
               collapsed = FALSE,
               width = 12
             )),
-            shiny::fluidRow(shinydashboard::box(shiny::img(src = covid19_status_plot, width = "100%", height = "auto"),
-                                          title = "Covid-19 Status at Last Screening",
-                                          width = 12)),
-            shiny::fluidRow(shinydashboard::box(shiny::img(src = covid19_priority_plot, width = "100%", height = "auto"),
-                                          title = "Prioritization Category at Coordinated Entry",
-                                          width = 12))
+            shiny::fluidRow(shinydashboard::box(shiny::img(src = covid19_status_plot, 
+                                                           width = "100%", 
+                                                           height = "auto"),
+                                                title = "Covid-19 Status at Last Screening",
+                                                width = 12)),
+            shiny::fluidRow(shinydashboard::box(shiny::img(src = covid19_priority_plot, 
+                                                           width = "100%", 
+                                                           height = "auto"),
+                                                title = "Prioritization Category 
+                                                at Coordinated Entry",
+                                                width = 12))
           ),
           shinydashboard::tabItem(
             tabName = "utilization-Tab",
-            shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerUtilization"), width = 12)),
+            shiny::fluidRow(
+              shinydashboard::box(shiny::htmlOutput("headerUtilization"), 
+                                  width = 12)),
             shiny::fluidRow(
               shinydashboard::box(
                 title = "NOTICE",
                 status = "warning",
                 solidHeader = TRUE,
-                "During this time, congregate facilities should be aiming to deconcentrate. If this causes fluctuations in Utilization, that is okay. Please continue to keep your clients safe."
+                "During this time, congregate facilities should be aiming to 
+                deconcentrate. If this causes fluctuations in Utilization, that 
+                is okay. Please continue to keep your clients safe."
                 ,
                 width = 6
               )
@@ -259,31 +272,31 @@ app_ui <- function(request, data_ui) {
               ),
               width = 12
             )),
-            shiny::fluidRow(shinydashboard::box(
-              DT::dataTableOutput("spmLoTH"),
-              title = "Metric 1b: Length of Time Homeless",
-              footer = htmltools::HTML("Persons in ES, SH, TH, RRH, and PSH.<br><br>
-            CoC goal = no more than 90 days average and median"),
-              width = 12
-            )),
+            shiny::fluidRow(
+              shinydashboard::box(
+                DT::dataTableOutput("spmLoTH"),
+                title = "Metric 1b: Length of Time Homeless",
+                footer = shiny::textOutput("footerSPMLoTH"),
+                width = 12
+              )
+            ), 
             shiny::fluidRow(shinydashboard::box(
               DT::dataTableOutput("spmRecurrence"),
-              title = "Metrics 2a1 & 2b1: Clients Returning to Homelessness After Successful Placement",
-              footer = htmltools::HTML("Persons in ES, SH, TH, Outreach, RRH, and PSH.<br><br>
-            6 month goal = <10%, 24 month goal = <20%"),
+              title = "Metrics 2a1 & 2b1: Clients Returning to Homelessness After 
+              Successful Placement",
+              footer = shiny::textOutput("footerSPMRecurrence"),
               width = 12
             )),
             shiny::fluidRow(shinydashboard::box(
               DT::dataTableOutput("spmPIT"),
               title = "Metric 3.1: January 2019 and January 2020 PIT Counts",
-              footer = htmltools::HTML("Total and Sheltered goals: reduce by 4% annually. <br>
-            Veteran and Chronic goals: reduce by 10% annually."),
+              footer = textOutput("footerSPMPIT"),
               width = 12
             )),
             shiny::fluidRow(shinydashboard::box(
               DT::dataTableOutput("spmExitsToPH"),
               title = "Metrics 7b1 & 7b2: Exits to or Retention of Permanent Housing",
-              footer = htmltools::HTML("ES, SH, TH, RRH Goal: 75%<br>PSH Goal: 90%"),
+              footer = textOutput("footerSPMExitsToPH"),
               width = 12
             ))
           ),
@@ -379,7 +392,8 @@ app_ui <- function(request, data_ui) {
                                       ),
                                       width = 6
                                     ),
-                                    shinydashboard::box(htmltools::HTML("The Ohio Balance of State Continuum of Care (BoSCoC) 
+                                    shinydashboard::box(htmltools::HTML("The Ohio 
+                                    Balance of State Continuum of Care (BoSCoC) 
                          represents 80 of the 88 counties in Ohio and is the
                          planning body for homeless services in the area. The Ohio 
                          Development Services Agency (ODSA) and the Coalition on 
@@ -420,7 +434,8 @@ app_ui <- function(request, data_ui) {
                     <a href=\"https://CRAN.R-project.org/package=shiny\">R Shiny package</a>
                     and shinydashboard: Create Dashboards with 'Shiny'. R 
                     package version 0.7.1.
-                    <a href=\"https://CRAN.R-project.org/package=shinydashboard\">shinydashboard package</a>"
+                    <a href=\"https://CRAN.R-project.org/package=shinydashboard\">shinydashboard 
+                                        package</a>"
                                       ),
                                       title = "Citations"
                                     )

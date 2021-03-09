@@ -378,14 +378,14 @@ app_server <- function( input, output, session ) {
     output$headerSPMs <- shiny::renderUI({
 
       ReportStart <- format.Date(lubridate::ymd(spm_current_start_date), "%B %d, %Y")
-      ReportEnd <- format.Date(lubridate::ymd(spm_current_end_date), "%B %d, %Y")
+      ReportEnd <- format.Date(lubridate::ymd(spm_current_end_date) - days(1), "%B %d, %Y")
       
       PriorReportStart <- format.Date(lubridate::ymd(spm_prior_start_date), "%B %d, %Y")
-      PriorReportEnd <- format.Date(lubridate::ymd(spm_prior_end_date), "%B %d, %Y")
+      PriorReportEnd <- format.Date(lubridate::ymd(spm_prior_end_date) - days(1), "%B %d, %Y")
       
       list(
         shiny::h2("HUD System Performance Measures"),
-        shiny::h4(input$SPM_CoC_radio),
+        shiny::h4(sub(x = input$SPM_CoC_radio, "CoC", "Continuum of Care")),
         shiny::h4(ReportStart, "-", ReportEnd),
         p(
           "The data here is based on the HUD System Performance Measures. For a
@@ -403,6 +403,42 @@ app_server <- function( input, output, session ) {
           ReportStart,
           "to",
           ReportEnd)
+      )
+    })
+    
+    output$footerSPMLoTH <- shiny::renderText({
+      if_else(
+        input$SPM_CoC_radio == "Ohio Balance of State CoC",
+        "Persons in ES, SH, TH, RRH, and PSH. BoS CoC goal = no more than 90
+          days average and median",
+        "Persons in ES, SH, TH, RRH, and PSH."
+      )
+      
+    })
+    
+    output$footerSPMRecurrence <- shiny::renderText({
+      if_else(
+        input$SPM_CoC_radio == "Ohio Balance of State CoC",
+        "Persons in ES, SH, TH, Outreach, RRH, and PSH.  BoS CoC Goals: 6 month
+        goal = <10%, 24 month goal = <20%",
+        "Persons in ES, SH, TH, RRH, and PSH."
+      )
+    })
+    
+    output$footerSPMPIT <- shiny::renderText({
+      if_else(
+        input$SPM_CoC_radio == "Ohio Balance of State CoC",
+        "BoS CoC Goals: Total and Sheltered: reduce by 4% annually. Veteran
+        and Chronic: reduce by 10% annually.",
+        "Annual PIT Counts"
+      )
+    })
+    
+    output$footerSPMExitsToPH <- shiny::renderText({
+      if_else(
+        input$SPM_CoC_radio == "Ohio Balance of State CoC",
+        "BoS CoC Goals: Persons in ES, SH, TH, RRH: 75%, PSH: 90%",
+        ""
       )
     })
     
