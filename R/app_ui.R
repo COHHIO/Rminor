@@ -72,8 +72,8 @@ app_ui <- function(request, data_ui) {
           #          tabName = "cocCompetitionTab"),
           shinydashboard::menuItem("Coordinated Entry Access Points",
                                    tabName = "ceAPs-Tab"),
-          # shinydashboard::menuItem("Covid-19 Analysis",
-          #                          tabName = "covid19-Tab"),
+          shinydashboard::menuItem("Covid-19 Analysis",
+                                   tabName = "covid19-Tab"),
           shinydashboard::menuItem("Bed and Unit Utilization",
                                    tabName = "utilization-Tab"),
           shinydashboard::menuItem(
@@ -144,17 +144,14 @@ app_ui <- function(request, data_ui) {
               collapsed = FALSE,
               width = 12
             )),
-            shiny::fluidRow(shinydashboard::box(shiny::img(src = covid19_status_plot, 
-                                                           width = "100%", 
-                                                           height = "auto"),
-                                                title = "Covid-19 Status at Last Screening",
-                                                width = 12)),
-            shiny::fluidRow(shinydashboard::box(shiny::img(src = covid19_priority_plot, 
-                                                           width = "100%", 
-                                                           height = "auto"),
-                                                title = "Prioritization Category 
-                                                at Coordinated Entry",
-                                                width = 12))
+            shiny::fluidRow(shinydashboard::box(
+              shiny::plotOutput("plotCovid19Status"),
+              title = "Covid-19 Status at Last Screening",
+              width = 12)), 
+            shiny::fluidRow(shinydashboard::box(
+              shiny::plotOutput("plotCovid19Priority"),
+              title = "Prioritization Category at Coordinated Entry",
+              width = 12))
           ),
           shinydashboard::tabItem(
             tabName = "utilization-Tab",

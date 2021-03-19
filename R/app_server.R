@@ -68,6 +68,9 @@ app_server <- function( input, output, session ) {
     )
   })
   
+  output$plotCovid19Status <- shiny::renderPlot(covid19_status_plot)
+  output$plotCovid19Priority <- shiny::renderPlot(covid19_priority_plot)
+  
   output$headerCoCCompetitionProjectLevel <- shiny::renderUI({
     next_thing_due <- dplyr::tribble(
       ~ DueDate, ~ Event,
@@ -196,8 +199,7 @@ app_server <- function( input, output, session ) {
           "No Income at Entry" = NoIncomeAtEntryMath,
           "Median Homeless History Index" = MedianHHIMath,
           "Long Term Homeless" = LongTermHomelessMath,
-          "VISPDAT Completion at Entry" =
-            ScoredAtEntryMath,
+          "VISPDAT Completion at Entry" = ScoredAtEntryMath,
           "Data Quality" = DQMath,
           "Cost per Exit" = CostPerExitMath,
           "Housing First" = HousingFirstMath,
