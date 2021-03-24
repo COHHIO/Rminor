@@ -378,20 +378,21 @@ app_ui <- function(request, data_ui) {
               County CoC. Please find the code here:
               <a href=\"https://github.com/COHHIO/Rminor\">R minor code</a>
 
-              <p>This project would not exist were it not for the existence of 
-              other quality free and open source products. Following are 
-              citations for the products R minor relies on."),
+              <p>R minor contains up-to-date aggregate reporting at the project 
+              and system level. Its target audience is community planners, agency
+              management, funders, and HMIS users who are looking for more system-
+              level reporting."),
               title = "About R minor",
               width = 12)),
-              fluidRow(shinydashboard::box(htmltools::HTML("The Ohio Balance of State
-              Continuum of Care (BoSCoC) represents 80 of the 88 counties in Ohio 
-              and is the planning body for homeless services in the area. The Ohio
-              Development Services Agency (ODSA) and the Coalition on Homelessness 
-              and Housing in Ohio (COHHIO) serve as the lead staffing agencies 
-              and co-chairs of the Steering Committee for the Ohio BoSCoC. ODSA 
-              serves as the Ohio BoSCoC Collaborative Applicant (submits the
-              annual consolidated CoC Application) while COHHIO serves as the 
-              HMIS Lead Agency."),
+              fluidRow(shinydashboard::box(htmltools::HTML("The Ohio Balance of
+              State Continuum of Care (BoSCoC) represents 80 of the 88 counties 
+              in Ohio and is the planning body for homeless services in the area. 
+              The Ohio Development Services Agency (ODSA) and the Coalition on 
+              Homelessness and Housing in Ohio (COHHIO) serve as the lead 
+              staffing agencies and co-chairs of the Steering Committee for the 
+              Ohio BoSCoC. ODSA serves as the Ohio BoSCoC Collaborative Applicant 
+              (submits the annual consolidated CoC Application) while COHHIO 
+              serves as the HMIS Lead Agency."),
                                   title = "Ohio Balance of State CoC",
                                   htmltools::img(src ="www/MapBoS.png",
                                                  height = '100%',
@@ -428,7 +429,7 @@ app_ui <- function(request, data_ui) {
               ),
               shinydashboard::box(htmltools::HTML("<p>This project would not 
               exist were it not for the existence of other quality free and open 
-              source products. Following arecitations for the products R minor 
+              source products. Following are citations for the products R minor 
               relies on.</p>
               
               <p>R Core Team (2019). R: A 
