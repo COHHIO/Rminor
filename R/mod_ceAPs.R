@@ -31,7 +31,9 @@ mod_ceAPs_ui <- function(id) {
           inputId = ns("AP"),
           label = "Select County/-ies",
           options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
-                                                actionsBox = TRUE),
+                                                actionsBox = TRUE,
+                                                liveSearch = TRUE,
+                                                liveSearchStyle = 'contains'),
           choices = bos_counties,
           multiple = TRUE
         ),

@@ -68,6 +68,9 @@ app_server <- function( input, output, session ) {
     )
   })
   
+  output$plotCovid19Status <- shiny::renderPlot(covid19_status_plot)
+  output$plotCovid19Priority <- shiny::renderPlot(covid19_priority_plot)
+  
   output$headerCoCCompetitionProjectLevel <- shiny::renderUI({
     next_thing_due <- dplyr::tribble(
       ~ DueDate, ~ Event,
@@ -196,8 +199,7 @@ app_server <- function( input, output, session ) {
           "No Income at Entry" = NoIncomeAtEntryMath,
           "Median Homeless History Index" = MedianHHIMath,
           "Long Term Homeless" = LongTermHomelessMath,
-          "VISPDAT Completion at Entry" =
-            ScoredAtEntryMath,
+          "VISPDAT Completion at Entry" = ScoredAtEntryMath,
           "Data Quality" = DQMath,
           "Cost per Exit" = CostPerExitMath,
           "Housing First" = HousingFirstMath,
@@ -378,14 +380,14 @@ app_server <- function( input, output, session ) {
     output$headerSPMs <- shiny::renderUI({
 
       ReportStart <- format.Date(lubridate::ymd(spm_current_start_date), "%B %d, %Y")
-      ReportEnd <- format.Date(lubridate::ymd(spm_current_end_date), "%B %d, %Y")
+      ReportEnd <- format.Date(lubridate::ymd(spm_current_end_date) - days(1), "%B %d, %Y")
       
       PriorReportStart <- format.Date(lubridate::ymd(spm_prior_start_date), "%B %d, %Y")
-      PriorReportEnd <- format.Date(lubridate::ymd(spm_prior_end_date), "%B %d, %Y")
+      PriorReportEnd <- format.Date(lubridate::ymd(spm_prior_end_date) - days(1), "%B %d, %Y")
       
       list(
         shiny::h2("HUD System Performance Measures"),
-        shiny::h4("Ohio Balance of State Continuum of Care"),
+        shiny::h4(sub(x = input$SPM_CoC_radio, "CoC", "Continuum of Care")),
         shiny::h4(ReportStart, "-", ReportEnd),
         p(
           "The data here is based on the HUD System Performance Measures. For a
@@ -403,6 +405,42 @@ app_server <- function( input, output, session ) {
           ReportStart,
           "to",
           ReportEnd)
+      )
+    })
+    
+    output$footerSPMLoTH <- shiny::renderText({
+      if_else(
+        input$SPM_CoC_radio == "Ohio Balance of State CoC",
+        "Persons in ES, SH, TH, RRH, and PSH. BoS CoC goal = no more than 90
+          days average and median",
+        "Persons in ES, SH, TH, RRH, and PSH."
+      )
+      
+    })
+    
+    output$footerSPMRecurrence <- shiny::renderText({
+      if_else(
+        input$SPM_CoC_radio == "Ohio Balance of State CoC",
+        "Persons in ES, SH, TH, Outreach, RRH, and PSH.  BoS CoC Goals: 6 month
+        goal = <10%, 24 month goal = <20%",
+        "Persons in ES, SH, TH, Outreach, RRH, and PSH."
+      )
+    })
+    
+    output$footerSPMPIT <- shiny::renderText({
+      if_else(
+        input$SPM_CoC_radio == "Ohio Balance of State CoC",
+        "BoS CoC Goals: Total and Sheltered: reduce by 4% annually. Veteran
+        and Chronic: reduce by 10% annually.",
+        "Annual PIT Counts"
+      )
+    })
+    
+    output$footerSPMExitsToPH <- shiny::renderText({
+      if_else(
+        input$SPM_CoC_radio == "Ohio Balance of State CoC",
+        "BoS CoC Goals: Persons in ES, SH, TH, RRH: 75%, PSH: 90%",
+        ""
       )
     })
     
@@ -709,7 +747,10 @@ app_server <- function( input, output, session ) {
     
     a <- spm_Metric_1b() %>%
       dplyr::filter(Metric1b == "Persons in ES, SH, TH, and PH" &
-                      CoCName == "OH-507") %>%
+                      CoCName == case_when(
+                        input$SPM_CoC_radio == "Ohio Balance of State CoC" ~ "OH-507",
+                        input$SPM_CoC_radio == "Mahoning County CoC" ~ "OH-504"
+                      )) %>%
       dplyr::mutate(AvgLoT_Current = paste(as.integer(AvgLoT_Current), "days"),
                     AvgLoT_Prior = paste(as.integer(AvgLoT_Prior), "days"),
                     MedLoT_Current = paste(MedLoT_Current, "days"),
@@ -732,7 +773,10 @@ app_server <- function( input, output, session ) {
     
     a <- spm_Metric_2() %>%
       dplyr::filter(ProjectType == "TOTAL Returns to Homelessness" &
-                      CoCName == "OH-507") %>%
+                      CoCName == case_when(
+                        input$SPM_CoC_radio == "Ohio Balance of State CoC" ~ "OH-507",
+                        input$SPM_CoC_radio == "Mahoning County CoC" ~ "OH-504"
+                      )) %>%
       dplyr::mutate_at(dplyr::vars(-ProjectType, -CoCName), as.integer) %>%
       dplyr::mutate(
         Percent6moPrior = scales::percent(LessThan6mo_Prior / ExitedToPHPast2Yrs_Prior,
@@ -767,7 +811,10 @@ app_server <- function( input, output, session ) {
     a <- spm_Metric_7() %>%
       dplyr::filter(
         str_starts(ClientsCounted, "% Successful exits") &
-          CoCName == "OH-507" &
+          CoCName == case_when(
+            input$SPM_CoC_radio == "Ohio Balance of State CoC" ~ "OH-507",
+            input$SPM_CoC_radio == "Mahoning County CoC" ~ "OH-504"
+          ) &
           Metric %in% c("7b1", "7b2")
       ) %>%
       dplyr::mutate(
@@ -803,10 +850,29 @@ app_server <- function( input, output, session ) {
                     "January 2020 Count" = January2020Count,
                     Difference)
     
-    DT::datatable(a,
-                  rownames = FALSE,
-                  options = list(dom = 't'))
+    b <- Mah_PIT() %>%
+      dplyr::mutate(
+        Difference = scales::percent((January2020Count - January2019Count)
+                                     /January2019Count,
+                                     accuracy = .1),
+        Difference = dplyr::if_else(stringr::str_starts(Difference, "-"),
+                                    Difference,
+                                    paste0("+", Difference))
+      ) %>%
+      dplyr::select(Population,
+                    "January 2019 Count" = January2019Count,
+                    "January 2020 Count" = January2020Count,
+                    Difference)
     
+    if (input$SPM_CoC_radio == "Ohio Balance of State CoC") {
+      DT::datatable(a,
+                    rownames = FALSE,
+                    options = list(dom = 't'))
+    } else {
+      DT::datatable(b,
+                    rownames = FALSE,
+                    options = list(dom = 't'))
+    }
   })
   
   output$headerQPRCommunityNeed <- shiny::renderUI({

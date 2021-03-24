@@ -63,15 +63,17 @@ app_ui <- function(request, data_ui) {
       shinydashboard::dashboardSidebar(
         shinydashboard::sidebarMenu(
           id = "sidebarmenuid",
-          #CHANGED standardize format of tabnames to shiny compatible namespaces [NS]-* where * in this case is "Tab". These will allow submenuitems to be generated programmatically
+          #CHANGED standardize format of tabnames to shiny compatible namespaces 
+          # [NS]-* where * in this case is "Tab". These will allow submenuitems 
+          # to be generated programmatically
           shinydashboard::menuItem("Provider Dashboard",
                                    tabName = "providerDashboard-Tab"),
           # menuItem("CoC Competition",
           #          tabName = "cocCompetitionTab"),
           shinydashboard::menuItem("Coordinated Entry Access Points",
                                    tabName = "ceAPs-Tab"),
-          shinydashboard::menuItem("Covid-19 Analysis",
-                                   tabName = "covid19-Tab"),
+          # shinydashboard::menuItem("Covid-19 Analysis",
+          #                          tabName = "covid19-Tab"),
           shinydashboard::menuItem("Bed and Unit Utilization",
                                    tabName = "utilization-Tab"),
           shinydashboard::menuItem(
@@ -114,8 +116,10 @@ app_ui <- function(request, data_ui) {
                                       shinyWidgets::pickerInput(
                                         inputId = "providerList",
                                         choices = provider_dash_choices,
-                                        options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
-                                                                              liveSearch = TRUE),
+                                        options = shinyWidgets::pickerOptions(
+                                          dropupAuto = FALSE,
+                                          liveSearch = TRUE,
+                                          liveSearchStyle = 'contains'),
                                         width = "100%",
                                         ),
                                       shiny::uiOutput("CurrentClientCount"),
@@ -131,7 +135,8 @@ app_ui <- function(request, data_ui) {
           mod_ceAPs_ui("ceAPs"),
           shinydashboard::tabItem(
             tabName = "covid19-Tab",
-            shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerCovid19"), width = 12)),
+            shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerCovid19"), 
+                                                width = 12)),
             shiny::fluidRow(shinydashboard::box(
               shiny::uiOutput("covidText"),
               title = "Covid-19 Data Collection",
@@ -139,22 +144,28 @@ app_ui <- function(request, data_ui) {
               collapsed = FALSE,
               width = 12
             )),
-            shiny::fluidRow(shinydashboard::box(shiny::img(src = covid19_status_plot, width = "100%", height = "auto"),
-                                          title = "Covid-19 Status at Last Screening",
-                                          width = 12)),
-            shiny::fluidRow(shinydashboard::box(shiny::img(src = covid19_priority_plot, width = "100%", height = "auto"),
-                                          title = "Prioritization Category at Coordinated Entry",
-                                          width = 12))
+            shiny::fluidRow(shinydashboard::box(
+              shiny::plotOutput("plotCovid19Status"),
+              title = "Covid-19 Status at Last Screening",
+              width = 12)), 
+            shiny::fluidRow(shinydashboard::box(
+              shiny::plotOutput("plotCovid19Priority"),
+              title = "Prioritization Category at Coordinated Entry",
+              width = 12))
           ),
           shinydashboard::tabItem(
             tabName = "utilization-Tab",
-            shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerUtilization"), width = 12)),
+            shiny::fluidRow(
+              shinydashboard::box(shiny::htmlOutput("headerUtilization"), 
+                                  width = 12)),
             shiny::fluidRow(
               shinydashboard::box(
                 title = "NOTICE",
                 status = "warning",
                 solidHeader = TRUE,
-                "During this time, congregate facilities should be aiming to deconcentrate. If this causes fluctuations in Utilization, that is okay. Please continue to keep your clients safe."
+                "During this time, congregate facilities should be aiming to 
+                deconcentrate. If this causes fluctuations in Utilization, that 
+                is okay. Please continue to keep your clients safe."
                 ,
                 width = 6
               )
@@ -164,7 +175,8 @@ app_ui <- function(request, data_ui) {
                 inputId = "providerListUtilization",
                 choices = c(sort(utilization_bed()$ProjectName)),
                 options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
-                                                      liveSearch = TRUE),   
+                                                      liveSearch = TRUE,
+                                                      liveSearchStyle = 'contains'),   
                 selected = utilization_bed() %>% dplyr::pull(ProjectName) %>% `[`(1),
                 width = "100%"
               ),
@@ -242,55 +254,78 @@ app_ui <- function(request, data_ui) {
           #         )),
           shinydashboard::tabItem(
             tabName = "SPM-Tab",
-            shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerSPMs"), width = 12)),
             shiny::fluidRow(shinydashboard::box(
-              DT::dataTableOutput("spmLoTH"),
-              title = "Metric 1b: Length of Time Homeless",
-              footer = htmltools::HTML("Persons in ES, SH, TH, RRH, and PSH.<br><br>
-            CoC goal = no more than 90 days average and median"),
+              shiny::htmlOutput("headerSPMs"), 
+              width = 12
+              )),
+            shiny::fluidRow(shinydashboard::box(
+              shiny::radioButtons(
+                inputId = "SPM_CoC_radio",
+                inline = TRUE,
+                label = "Choose CoC",
+                choices = c("Ohio Balance of State CoC", "Mahoning County CoC"),
+                selected = "Ohio Balance of State CoC",
+                width = '100%'
+              ),
               width = 12
             )),
+            shiny::fluidRow(
+              shinydashboard::box(
+                DT::dataTableOutput("spmLoTH"),
+                title = "Metric 1b: Length of Time Homeless",
+                footer = shiny::textOutput("footerSPMLoTH"),
+                width = 12
+              )
+            ), 
             shiny::fluidRow(shinydashboard::box(
               DT::dataTableOutput("spmRecurrence"),
-              title = "Metrics 2a1 & 2b1: Clients Returning to Homelessness After Successful Placement",
-              footer = htmltools::HTML("Persons in ES, SH, TH, Outreach, RRH, and PSH.<br><br>
-            6 month goal = <10%, 24 month goal = <20%"),
+              title = "Metrics 2a1 & 2b1: Clients Returning to Homelessness After 
+              Successful Placement",
+              footer = shiny::textOutput("footerSPMRecurrence"),
               width = 12
             )),
             shiny::fluidRow(shinydashboard::box(
               DT::dataTableOutput("spmPIT"),
               title = "Metric 3.1: January 2019 and January 2020 PIT Counts",
-              footer = htmltools::HTML("Total and Sheltered goals: reduce by 4% annually. <br>
-            Veteran and Chronic goals: reduce by 10% annually."),
+              footer = textOutput("footerSPMPIT"),
               width = 12
             )),
             shiny::fluidRow(shinydashboard::box(
               DT::dataTableOutput("spmExitsToPH"),
               title = "Metrics 7b1 & 7b2: Exits to or Retention of Permanent Housing",
-              footer = htmltools::HTML("ES, SH, TH, RRH Goal: 75%<br>PSH Goal: 90%"),
+              footer = textOutput("footerSPMExitsToPH"),
               width = 12
             ))
           ),
-          mod_QPR_tabItem_ui("LoS",
-                             project_choices = choices_project_type[tab_choices$LoS],
-                             region_choices = choices_regions,
-                             radio_mean = TRUE),
-          mod_QPR_tabItem_ui("PH",
-                             project_choices = choices_project_type[tab_choices$PH],
-                             region_choices = choices_regions),
-          mod_QPR_tabItem_ui("NCB", 
-                             project_choices = choices_project_type[tab_choices$NCB],
-                             region_choices = choices_regions),
-          mod_QPR_tabItem_ui("HI", 
-                             region_choices = choices_regions,
-                             project_choices = choices_project_type[tab_choices$HI]),
-          mod_QPR_tabItem_ui("Income", 
-                             region_choices = choices_regions,
-                             project_choices = choices_project_type[tab_choices$Income]),
-          mod_QPR_tabItem_ui("RRH", 
-                             region_choices = choices_regions),
-          mod_QPR_tabItem_ui("RRHspending", 
-                             region_choices = choices_regions),
+          mod_QPR_tabItem_ui(
+            "LoS",
+            project_choices = choices_project_type[tab_choices$LoS],
+            region_choices = choices_regions[choices_regions != "Mahoning County CoC"],
+            radio_mean = TRUE
+          ),
+          mod_QPR_tabItem_ui(
+            "PH",
+            project_choices = choices_project_type[tab_choices$PH],
+            region_choices = choices_regions[choices_regions != "Mahoning County CoC"]),
+          mod_QPR_tabItem_ui(
+            "NCB",
+            project_choices = choices_project_type[tab_choices$NCB],
+            region_choices = choices_regions[choices_regions != "Mahoning County CoC"]),
+          mod_QPR_tabItem_ui(
+            "HI",
+            region_choices = choices_regions[choices_regions != "Mahoning County CoC"],
+            project_choices = choices_project_type[tab_choices$HI]),
+          mod_QPR_tabItem_ui(
+            "Income",
+            region_choices = choices_regions[choices_regions != "Mahoning County CoC"],
+            project_choices = choices_project_type[tab_choices$Income]),
+          mod_QPR_tabItem_ui(
+            "RRH",
+            region_choices = choices_regions[choices_regions != "Mahoning County CoC"]),
+          mod_QPR_tabItem_ui(
+            "RRHspending",
+            region_choices = choices_regions[choices_regions != "Mahoning County CoC"]),
+          
           shinydashboard::tabItem(
             tabName = "spdat-Tab",
             shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerQPRCommunityNeed"), width = 12)),
@@ -298,7 +333,8 @@ app_ui <- function(request, data_ui) {
               inputId = "regionList",
               choices = choices_regions[choices_regions != "Mahoning County CoC"],
               options = shinyWidgets::pickerOptions(dropupAuto = FALSE,
-                                                    liveSearch = TRUE),
+                                                    liveSearch = TRUE,
+                                                    liveSearchStyle = 'contains'),
               width = "70%"
             ),
             shinyWidgets::chooseSliderSkin("Round"),
@@ -330,13 +366,51 @@ app_ui <- function(request, data_ui) {
               collapsed = TRUE
             ))
           ), #tabItem SPDAT tab
-          shinydashboard::tabItem(tabName = "about-Tab",
-                                  shiny::fluidRow(
-                                    actionButton("browser", "browser"),
-                                    tags$script("$('#browser').hide();"),
-                                    shinydashboard::box(
-                                      title = "Ohio Balance of State CoC Homeless Planning Regions",
-                                      htmltools::HTML("The solid-colored counties are all part of the Ohio
+          shinydashboard::tabItem(
+            tabName = "about-Tab",
+            shiny::fluidRow(
+              actionButton("browser", "browser"),
+              tags$script("$('#browser').hide();"),
+              shinydashboard::box(htmltools::HTML(
+              "<p>R minor is a free and open source project created and
+              maintained by the HMIS team at Coalition on Homelessness and Housing 
+              in Ohio (COHHIO) for the Ohio Balance of State CoC and the Mahoning
+              County CoC. Please find the code here:
+              <a href=\"https://github.com/COHHIO/Rminor\">R minor code</a>
+
+              <p>R minor contains up-to-date aggregate reporting at the project 
+              and system level. Its target audience is community planners, agency
+              management, funders, and HMIS users who are looking for more system-
+              level reporting."),
+              title = "About R minor",
+              width = 12)),
+              fluidRow(shinydashboard::box(htmltools::HTML("The Ohio Balance of
+              State Continuum of Care (BoSCoC) represents 80 of the 88 counties 
+              in Ohio and is the planning body for homeless services in the area. 
+              The Ohio Development Services Agency (ODSA) and the Coalition on 
+              Homelessness and Housing in Ohio (COHHIO) serve as the lead 
+              staffing agencies and co-chairs of the Steering Committee for the 
+              Ohio BoSCoC. ODSA serves as the Ohio BoSCoC Collaborative Applicant 
+              (submits the annual consolidated CoC Application) while COHHIO 
+              serves as the HMIS Lead Agency."),
+                                  title = "Ohio Balance of State CoC",
+                                  htmltools::img(src ="www/MapBoS.png",
+                                                 height = '100%',
+                                                 width = '100%'
+                                  )),
+              shinydashboard::box(htmltools::HTML("The Mahoning County
+              Continuum of Care (MCCoC) is the planning body for homeless services
+              in Mahoning County. The Board of Mahoning County Commissioners is
+              the Collaborative Applicant (submits the annual consolidated CoC 
+              Application) and HMIS Lead (is responsible for the Mahoning County
+              CoC HMIS) while COHHIO serves as HMIS System Administrators."),
+                                  title = "Mahoning County CoC",
+                                  htmltools::img(src ="www/MapMahoningCountyCoC.png",
+                                                 height = '100%',
+                                                 width = '100%'
+                                  )),
+              shinydashboard::box(title = "Ohio Balance of State CoC Homeless Planning Regions",
+              htmltools::HTML("The solid-colored counties are all part of the Ohio
                        Balance of State CoC. The Ohio Development Services 
                        Agency (ODSA) further divided the counties in the Balance
                        of State into 17 Homeless Planning Regions to make
@@ -345,60 +419,39 @@ app_ui <- function(request, data_ui) {
                        <p> Throughout R minor, you will notice references to 
                        Homeless Planning Regions. Please consult this map if you 
                        are unsure what Region your county is in."),
-                                      htmltools::img(
-                                        src =
-                                          "www/Homeless-Region-Map-for-COHHIO-2017.png",
-                                        height = '100%',
-                                        width = '100%'
+              htmltools::img(src ="www/Homeless-Region-Map-for-COHHIO-2017.png",
+                             height = '100%',
+                             width = '100%'
                                       ),
-                                      width = 6
-                                    ),
-                                    shinydashboard::box(htmltools::HTML("The Ohio Balance of State Continuum of Care (BoSCoC) 
-                         represents 80 of the 88 counties in Ohio and is the
-                         planning body for homeless services in the area. The Ohio 
-                         Development Services Agency (ODSA) and the Coalition on 
-                         Homelessness and Housing in Ohio (COHHIO) serve as the 
-                         lead staffing agencies and co-chairs of the Steering 
-                         Committee for the Ohio BoSCoC. ODSA serves as the Ohio 
-                         BoSCoC Collaborative Applicant (submits the annual 
-                         consolidated CoC Application) while COHHIO serves as 
-                         the HMIS Lead Agency."),
-                                                  title = "Ohio Balance of State CoC"),
-                                    shinydashboard::box(
-                                      htmltools::HTML(
-                                        "<p>R minor is a free and open source project created and 
-                    maintained by the HMIS team at Coalition on Homelessness 
-                    and Housing in Ohio (COHHIO). Please find the code here: 
-                    <a href=\"https://github.com/COHHIO/Rminor\">R minor code</a>
-
-                    <p>This project would not exist were it not for the 
-                    existence of other quality free and open source products. 
-                    Following are citations for the products R minor relies on."
-                                      ),
-                                      title = "About R minor"
-                                    ),
-                                    shinydashboard::box(
-                                      htmltools::HTML(
-                                        "<p>R Core Team (2019). R: A language and environment for 
-                    statistical computing. R Foundation for Statistical 
-                    Computing, Vienna, Austria.
-                    <a href=\"https://www.R-project.org/\">R programming language</a>.
+                      width = 6,
+              collapsible = TRUE,
+              collapsed = TRUE
+              ),
+              shinydashboard::box(htmltools::HTML("<p>This project would not 
+              exist were it not for the existence of other quality free and open 
+              source products. Following are citations for the products R minor 
+              relies on.</p>
+              
+              <p>R Core Team (2019). R: A 
+              language and environment for statistical computing. R Foundation 
+              for Statistical Computing, Vienna, Austria.
+              <a href=\"https://www.R-project.org/\">R programming language</a>.
                     
-                    <p>Hadley Wickham (2017). tidyverse: Easily Install and Load 
-                    the 'Tidyverse'. R package version 1.2.1.
-                    <a href=\"https://CRAN.R-project.org/package=tidyverse\">Tidyverse package</a>
+              <p>Hadley Wickham (2017). tidyverse: Easily Install and Load 
+              the 'Tidyverse'. R package version 1.2.1.
+              <a href=\"https://CRAN.R-project.org/package=tidyverse\">Tidyverse package</a>
                     
-                    <p>Winston Chang, Joe Cheng, JJ Allaire, Yihui Xie and 
-                    Jonathan McPherson (2019). shiny: Web Application Framework 
-                    for R. R package version 1.3.2. 
-                    <a href=\"https://CRAN.R-project.org/package=shiny\">R Shiny package</a>
-                    and shinydashboard: Create Dashboards with 'Shiny'. R 
-                    package version 0.7.1.
-                    <a href=\"https://CRAN.R-project.org/package=shinydashboard\">shinydashboard package</a>"
-                                      ),
-                                      title = "Citations"
-                                    )
-                                  )
+              <p>Winston Chang, Joe Cheng, JJ Allaire, Yihui Xie and 
+              Jonathan McPherson (2019). shiny: Web Application Framework for R. 
+              R package version 1.3.2. 
+              <a href=\"https://CRAN.R-project.org/package=shiny\">R Shiny package</a>
+              and shinydashboard: Create Dashboards with 'Shiny'. R package version 0.7.1.
+              <a href=\"https://CRAN.R-project.org/package=shinydashboard\">shinydashboard 
+              package</a>"),
+                                  title = "Citations",
+                                  collapsible = TRUE,
+                                  collapsed = TRUE) # box
+                                  ) #fluidRow
           ) # aboutTab
         ) # tabItems
       ) #dashboardBody
