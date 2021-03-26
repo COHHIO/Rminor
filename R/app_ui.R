@@ -194,7 +194,8 @@ app_ui <- function(request, data_ui) {
                 dateFormat = "MM yyyy",
                 view = "month",
                 value =
-                  lubridate::ymd(lubridate::floor_date(meta_HUDCSV_Export_End, unit = "month") - 
+                  lubridate::ymd(lubridate::floor_date(meta_HUDCSV_Export_End,
+                                                       unit = "month") -
                                    lubridate::days(1)),
                 minView = "months",
                 addon = "none",
@@ -328,7 +329,8 @@ app_ui <- function(request, data_ui) {
           
           shinydashboard::tabItem(
             tabName = "spdat-Tab",
-            shiny::fluidRow(shinydashboard::box(shiny::htmlOutput("headerQPRCommunityNeed"), width = 12)),
+            shiny::fluidRow(shinydashboard::box(
+              shiny::htmlOutput("headerQPRCommunityNeed"), width = 12)),
             shinyWidgets::pickerInput(
               inputId = "regionList",
               choices = choices_regions[choices_regions != "Mahoning County CoC"],
@@ -342,7 +344,8 @@ app_ui <- function(request, data_ui) {
             shinyWidgets::sliderTextInput("spdatSlider",
                                           "",
                                           c(
-                                            unique(zoo::Sys.yearqtr() - 6 / 4:zoo::Sys.yearqtr() + 1 / 4)
+                                            unique(zoo::Sys.yearqtr() - 6 / 4:
+                                                     zoo::Sys.yearqtr() + 1 / 4)
                                           ),
                                           selected = zoo::Sys.yearqtr() - 1 / 4),
             shiny::plotOutput("SPDATScoresByCounty"),
@@ -371,19 +374,23 @@ app_ui <- function(request, data_ui) {
             shiny::fluidRow(
               actionButton("browser", "browser"),
               tags$script("$('#browser').hide();"),
-              shinydashboard::box(htmltools::HTML(
-              "<p>R minor is a free and open source project created and
-              maintained by the HMIS team at Coalition on Homelessness and Housing 
+              shinydashboard::box(
+                htmltools::HTML(
+                  "<p>R minor is a free and open source project created and
+              maintained by the HMIS team at Coalition on Homelessness and Housing
               in Ohio (COHHIO) for the Ohio Balance of State CoC and the Mahoning
               County CoC. Please find the code here:
               <a href=\"https://github.com/COHHIO/Rminor\">R minor code</a>
 
-              <p>R minor contains up-to-date aggregate reporting at the project 
+              <p>R minor contains up-to-date aggregate reporting at the project
               and system level. Its target audience is community planners, agency
               management, funders, and HMIS users who are looking for more system-
-              level reporting."),
-              title = "About R minor",
-              width = 12)),
+              level reporting."
+                ),
+                title = "About R minor",
+                width = 12
+              )
+            ), 
               fluidRow(shinydashboard::box(htmltools::HTML("The Ohio Balance of
               State Continuum of Care (BoSCoC) represents 80 of the 88 counties 
               in Ohio and is the planning body for homeless services in the area. 
@@ -411,50 +418,62 @@ app_ui <- function(request, data_ui) {
                                   htmltools::img(src ="www/MapMahoningCountyCoC.png",
                                                  height = '100%',
                                                  width = '100%'
-                                  )),
-              shinydashboard::box(title = "Ohio Balance of State CoC Homeless Planning Regions",
-              htmltools::HTML("The solid-colored counties are all part of the Ohio
-                       Balance of State CoC. The Ohio Development Services 
+                                  ))),
+            fluidRow(
+              shinydashboard::box(
+                title = "Ohio Balance of State CoC Homeless Planning Regions",
+                htmltools::HTML(
+                  "The solid-colored counties are all part of the Ohio
+                       Balance of State CoC. The Ohio Development Services
                        Agency (ODSA) further divided the counties in the Balance
                        of State into 17 Homeless Planning Regions to make
                        implementation of state-funded programs in the Balance of
                        State more localized.
-                       <p> Throughout R minor, you will notice references to 
-                       Homeless Planning Regions. Please consult this map if you 
-                       are unsure what Region your county is in."),
-              htmltools::img(src ="www/Homeless-Region-Map-for-COHHIO-2017.png",
-                             height = '100%',
-                             width = '100%'
-                                      ),
-                      width = 6,
-              collapsible = TRUE,
-              collapsed = TRUE
+                       <p> Throughout R minor, you will notice references to
+                       Homeless Planning Regions. Please consult this map if you
+                       are unsure what Region your county is in."
+                ),
+                htmltools::img(
+                  src = "www/Homeless-Region-Map-for-COHHIO-2017.png",
+                  height = '100%',
+                  width = '100%'
+                ),
+                width = 6,
+                collapsible = TRUE,
+                collapsed = TRUE
               ),
-              shinydashboard::box(htmltools::HTML("<p>This project would not 
-              exist were it not for the existence of other quality free and open 
-              source products. Following are citations for the products R minor 
+              shinydashboard::box(
+                htmltools::HTML(
+                  "<p>This project would not
+              exist were it not for the existence of other quality free and open
+              source products. Following are citations for the products R minor
               relies on.</p>
-              
-              <p>R Core Team (2019). R: A 
-              language and environment for statistical computing. R Foundation 
+
+              <p>R Core Team (2019). R: A
+              language and environment for statistical computing. R Foundation
               for Statistical Computing, Vienna, Austria.
               <a href=\"https://www.R-project.org/\">R programming language</a>.
-                    
-              <p>Hadley Wickham (2017). tidyverse: Easily Install and Load 
+
+              <p>Hadley Wickham (2017). tidyverse: Easily Install and Load
               the 'Tidyverse'. R package version 1.2.1.
-              <a href=\"https://CRAN.R-project.org/package=tidyverse\">Tidyverse package</a>
-                    
-              <p>Winston Chang, Joe Cheng, JJ Allaire, Yihui Xie and 
-              Jonathan McPherson (2019). shiny: Web Application Framework for R. 
-              R package version 1.3.2. 
+              <a href=\"https://CRAN.R-project.org/package=tidyverse\">Tidyverse 
+              package</a>
+
+              <p>Winston Chang, Joe Cheng, JJ Allaire, Yihui Xie and
+              Jonathan McPherson (2019). shiny: Web Application Framework for R.
+              R package version 1.3.2.
               <a href=\"https://CRAN.R-project.org/package=shiny\">R Shiny package</a>
-              and shinydashboard: Create Dashboards with 'Shiny'. R package version 0.7.1.
-              <a href=\"https://CRAN.R-project.org/package=shinydashboard\">shinydashboard 
-              package</a>"),
-                                  title = "Citations",
-                                  collapsible = TRUE,
-                                  collapsed = TRUE) # box
-                                  ) #fluidRow
+              and shinydashboard: Create Dashboards with 'Shiny'. R package 
+              version 0.7.1.
+              <a href=\"https://CRAN.R-project.org/package=shinydashboard\">
+              shinydashboard
+              package</a>"
+                ),
+                title = "Citations",
+                collapsible = TRUE,
+                collapsed = TRUE
+              ) # box
+            ) #fluidRow
           ) # aboutTab
         ) # tabItems
       ) #dashboardBody
