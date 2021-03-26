@@ -398,12 +398,15 @@ app_ui <- function(request, data_ui) {
                                                  height = '100%',
                                                  width = '100%'
                                   )),
-              shinydashboard::box(htmltools::HTML("The Mahoning County
-              Continuum of Care (MCCoC) is the planning body for homeless services
-              in Mahoning County. The Board of Mahoning County Commissioners is
-              the Collaborative Applicant (submits the annual consolidated CoC 
-              Application) and HMIS Lead (is responsible for the Mahoning County
-              CoC HMIS) while COHHIO serves as HMIS System Administrators."),
+              shinydashboard::box(
+              htmltools::HTML("The Mahoning County Homeless Continuum of Care 
+                              (MCHCoC) is one of nine Continua of Care in the 
+                              State of Ohio and is the planning body for homeless 
+                              services in Mahoning County. The Board of Mahoning 
+                              County Commissioners serves as the Collaborative 
+                              Applicant, HMIS Lead and employs the CoC Coordinator 
+                              for the MCHCoC, while COHHIO serves as HMIS System 
+                              Administrators."),
                                   title = "Mahoning County CoC",
                                   htmltools::img(src ="www/MapMahoningCountyCoC.png",
                                                  height = '100%',
