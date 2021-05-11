@@ -105,7 +105,7 @@ app_ui <- function(request, data_ui) {
           "<br>&emsp;Data last refreshed:&emsp;<br>&emsp;",
           format(meta_HUDCSV_Export_Date, "%m-%d-%Y %I:%M %p")
           ,
-          "<p><p>&emsp;Wear your mask! Be well."
+          "<p><p>&emsp;" # <- add short message here if you want
         ))
       ),
       shinydashboard::dashboardBody(
