@@ -71,83 +71,101 @@ app_server <- function( input, output, session ) {
   output$plotCovid19Status <- shiny::renderPlot(covid19_status_plot)
   output$plotCovid19Priority <- shiny::renderPlot(covid19_priority_plot)
   
-  output$headerCoCCompetitionProjectLevel <- shiny::renderUI({
-    next_thing_due <- dplyr::tribble(
+  output$headerCoCCompetitionProjectLevel <- renderUI({
+    
+    next_thing_due <- tribble(
       ~ DueDate, ~ Event,
-      "7/20/2020", "All HMIS data corrections must be complete by 11:59pm",
-      "7/21/2020", "COHHIO releases preliminary CoC project ranking (renewals only)",
-      "7/31/2020", "Recipients submit appeals of project evaluation results and ranking to ohioboscoc@cohhio.org.",
-      "8/7/2020", "Ohio BoSCoC Steering Committee will communicate decisions about all received appeals",
-      "8/12/2020", "Final CoC project ranking released",
-      "9/30/2020", "Final Ranking posted on cohhio.org"
+      ymd(hc_project_eval_docs_due), "Projects submit program documents to evidence 
+      best practices and CE Prioritization compliance",
+      ymd("20210506"), "All HMIS data corrections must be complete by 11:59pm",
+      ymd("20210507"), "Project Evaluation data is saved as final data for scoring",
+      ymd("20210527"), "CoC staff post online preliminary renewal project ranking",
+      ymd("20210604"), "Recipients submit appeals of project evaluation results and 
+      ranking to ohioboscoc@cohhio.org.",
+      ymd("20210625"), "Final CoC project ranking released"
     ) %>%
-      dplyr::mutate(
-        DueDate = lubridate::mdy(DueDate),
-        ShowStart = dplyr::lag(lubridate::ymd(DueDate), n = 1L, order_by = DueDate),
-        ShowStart = dplyr::if_else(is.na(ShowStart), lubridate::today(), ShowStart + lubridate::days(1)),
-        ShowEnd = lubridate::ymd(DueDate),
-        DateRange = lubridate::interval(ShowStart, ShowEnd)
+      mutate(
+        ShowStart = lag(ymd(DueDate), n = 1L, order_by = DueDate),
+        ShowStart = if_else(is.na(ShowStart), today(), ShowStart + days(1)),
+        ShowEnd = ymd(DueDate),
+        DateRange = interval(ShowStart, ShowEnd)
       ) %>%
-      dplyr::filter(lubridate::today() %within% DateRange) %>%
-      dplyr::select(Event, DueDate)
+      filter(today() %within% DateRange) %>%
+      select(Event, DueDate)
     
     list(
-      shiny::h2("2020 CoC Competition: Project Evaluation"),
-      shiny::h4("Fixed Date Range: January 1, 2019 - December 31, 2019"),
-      shiny::h4(shiny::strong("THE DATA ON THIS TAB DOES NOT SHOW CHANGES MADE ON OR AFTER
-      JULY 21, 2020.")),
-      shiny::h4(input$pe_provider),
-      shiny::hr(),
-      shiny::h5(shiny::strong("Next Due Date:"),
-                format(lubridate::ymd(next_thing_due$DueDate), "%A %b %e, %Y"),
-                "| ",
-                next_thing_due$Event),
-      p("Please consult the",
-        a("CoC Competition Specifications and Timeline",
-          href = "https://cohhio.org/boscoc/coc-program/"),
-        "for complete specifications and timeline.")
+      h2("2021 BoS CoC Competition: Project Evaluation"), 
+      h4(paste("Fixed Date Range:", 
+               format.Date(hc_project_eval_start, "%B %d, %Y"), 
+               "to",
+               format.Date(hc_project_eval_end, "%B %d, %Y"))),
+      h4(strong("THE DATA ON THIS TAB DOES NOT SHOW CHANGES MADE ON OR AFTER
+                5-7-2021.")),
+      h4(input$pe_provider),
+      hr(),
+      h5(strong("Next Due Date:"),
+         format(ymd(next_thing_due$DueDate), "%A %b %e, %Y"),
+         "| ",
+         next_thing_due$Event),
+      p("Please consult the", 
+        a("CoC Program",
+          href = "https://cohhio.org/boscoc/coc-program/", target="_blank"), 
+        "page for complete specifications and timeline.")
     )
   })
   
   output$pe_ProjectSummary <-
     DT::renderDataTable({
       ptc <- summary_pe_final_scoring() %>%
-        dplyr::filter(AltProjectName == input$pe_provider) %>%
-        dplyr::pull(ProjectType)
+        filter(AltProjectName == input$pe_provider) %>%
+        pull(ProjectType)
       
-      #CHANGED Removed substitution of / for division symbol as division symbol is non-ASCII and causes package warnings
+      summary_pe_final_scoring <- summary_pe_final_scoring() %>%
+        mutate(
+          ExitsToPHMath = str_replace(ExitsToPHMath, "/", "÷"),
+          # OwnHousingMath = str_replace(OwnHousingMath, "/", "÷"),
+          # IncreasedIncomeMath = str_replace(IncreasedIncomeMath, "/", "÷"),
+          BenefitsAtExitMath = str_replace(BenefitsAtExitMath, "/", "÷"),
+          AverageLoSMath = str_replace(AverageLoSMath, "/", "÷"),
+          LHResPriorMath = str_replace(LHResPriorMath, "/", "÷"),
+          NoIncomeAtEntryMath = str_replace(NoIncomeAtEntryMath, "/", "÷"),
+          MedianHHIMath = str_replace(MedianHHIMath, "/", "÷"),
+          LongTermHomelessMath = str_replace(LongTermHomelessMath, "/", "÷"),
+          ScoredAtEntryMath = str_replace(ScoredAtEntryMath, "/", "÷"),
+          DQMath = str_replace(DQMath, "/", "÷"),
+          PrioritizationWorkgroupMath = str_replace(PrioritizationWorkgroupMath, "/", "÷"),
+          HousingFirstMath = str_replace(HousingFirstMath, "/", "÷"),
+          ChronicPrioritizationMath = str_replace(ChronicPrioritizationMath, "/", "÷")
+        )
       
-      a <- summary_pe_final_scoring() %>%
-        dplyr::filter(AltProjectName == input$pe_provider) %>%
-        dplyr::select(
+      a <- summary_pe_final_scoring %>%
+        filter(AltProjectName == input$pe_provider) %>%
+        select(
           "Exits to Permanent Housing" = ExitsToPHPoints,
-          "Moved into Own Housing" = OwnHousingPoints,
-          "Increased Income" = IncreasedIncomePoints,
+          # "Moved into Own Housing" = OwnHousingPoints,
+          # "Increased Income" = IncreasedIncomePoints,
           "Benefits & Health Insurance at Exit" = BenefitsAtExitPoints,
           "Average Length of Stay" = AverageLoSPoints,
           "Living Situation at Entry" = LHResPriorPoints,
           "No Income at Entry" = NoIncomeAtEntryPoints,
           "Median Homeless History Index" = MedianHHIPoints,
           "Long Term Homeless" = LongTermHomelessPoints,
-          "VISPDAT Completion at Entry" =
-            ScoredAtEntryPoints,
+          "VISPDAT Completion at Entry" = ScoredAtEntryPoints,
           "Data Quality" = DQPoints,
-          "Cost per Exit" = CostPerExitScore,
+          "Prioritization Workgroup" = PrioritizationWorkgroupScore,
           "Housing First" = HousingFirstScore,
-          "Prioritization of Chronic" = ChronicPrioritizationScore,
-          "Spending On Track" = OnTrackSpendingScoring,
-          "Unspent Funds within Range" = UnspentFundsScoring
+          "Prioritization of Chronic" = ChronicPrioritizationScore
         ) %>%
-        tidyr::pivot_longer(cols = tidyselect::everything(),
-                            names_to = "Measure",
-                            values_to = "Estimated Score")
+        pivot_longer(cols = everything(),
+                     names_to = "Measure",
+                     values_to = "Estimated Score")
       
-      b <- summary_pe_final_scoring() %>%
-        dplyr::filter(AltProjectName == input$pe_provider) %>%
-        dplyr::select(
+      b <- summary_pe_final_scoring %>%
+        filter(AltProjectName == input$pe_provider) %>%
+        select(
           "Exits to Permanent Housing" = ExitsToPHDQ,
-          "Moved into Own Housing" = OwnHousingDQ,
-          "Increased Income" = IncreasedIncomeDQ,
+          # "Moved into Own Housing" = OwnHousingDQ,
+          # "Increased Income" = IncreasedIncomeDQ,
           "Benefits & Health Insurance at Exit" = BenefitsAtExitDQ,
           "Average Length of Stay" = AverageLoSDQ,
           "Living Situation at Entry" = LHResPriorDQ,
@@ -158,16 +176,16 @@ app_server <- function( input, output, session ) {
           "Housing First" = HousingFirstDQ,
           "Prioritization of Chronic" = ChronicPrioritizationDQ
         ) %>%
-        tidyr::pivot_longer(cols = tidyselect::everything(),
-                            names_to = "Measure",
-                            values_to = "DQflag")
+        pivot_longer(cols = everything(),
+                     names_to = "Measure",
+                     values_to = "DQflag")
       
-      c <- summary_pe_final_scoring() %>%
-        dplyr::filter(AltProjectName == input$pe_provider) %>%
-        dplyr::select(
+      c <- summary_pe_final_scoring %>%
+        filter(AltProjectName == input$pe_provider) %>%
+        select(
           "Exits to Permanent Housing" = ExitsToPHPossible,
-          "Moved into Own Housing" = OwnHousingPossible,
-          "Increased Income" = IncreasedIncomePossible,
+          # "Moved into Own Housing" = OwnHousingPossible,
+          # "Increased Income" = IncreasedIncomePossible,
           "Benefits & Health Insurance at Exit" = BenefitsAtExitPossible,
           "Average Length of Stay" = AverageLoSPossible,
           "Living Situation at Entry" = LHResPriorPossible,
@@ -177,46 +195,43 @@ app_server <- function( input, output, session ) {
           "VISPDAT Completion at Entry" =
             ScoredAtEntryPossible,
           "Data Quality" = DQPossible,
-          "Cost per Exit" = CostPerExitPossible,
+          "Prioritization Workgroup" = PrioritizationWorkgroupPossible,
           "Housing First" = HousingFirstPossible,
-          "Prioritization of Chronic" = ChronicPrioritizationPossible,
-          "Spending On Track" = OnTrackSpendingPossible,
-          "Unspent Funds within Range" = UnspentFundsPossible
+          "Prioritization of Chronic" = ChronicPrioritizationPossible
         ) %>%
-        tidyr::pivot_longer(cols = tidyselect::everything(),
-                            names_to = "Measure",
-                            values_to = "Possible Score")
+        pivot_longer(cols = everything(),
+                     names_to = "Measure",
+                     values_to = "Possible Score")
       
-      d <- summary_pe_final_scoring() %>%
-        dplyr::filter(AltProjectName == input$pe_provider) %>%
-        dplyr::select(
+      d <- summary_pe_final_scoring %>%
+        filter(AltProjectName == input$pe_provider) %>%
+        select(
           "Exits to Permanent Housing" = ExitsToPHMath,
-          "Moved into Own Housing" = OwnHousingMath,
-          "Increased Income" = IncreasedIncomeMath,
+          # "Moved into Own Housing" = OwnHousingMath,
+          # "Increased Income" = IncreasedIncomeMath,
           "Benefits & Health Insurance at Exit" = BenefitsAtExitMath,
           "Average Length of Stay" = AverageLoSMath,
           "Living Situation at Entry" = LHResPriorMath,
           "No Income at Entry" = NoIncomeAtEntryMath,
           "Median Homeless History Index" = MedianHHIMath,
           "Long Term Homeless" = LongTermHomelessMath,
-          "VISPDAT Completion at Entry" = ScoredAtEntryMath,
+          "VISPDAT Completion at Entry" =
+            ScoredAtEntryMath,
           "Data Quality" = DQMath,
-          "Cost per Exit" = CostPerExitMath,
+          "Prioritization Workgroup" = PrioritizationWorkgroupMath,
           "Housing First" = HousingFirstMath,
-          "Prioritization of Chronic" = ChronicPrioritizationMath,
-          "Spending On Track" = OnTrackSpendingMath,
-          "Unspent Funds within Range" = UnspentFundsMath
+          "Prioritization of Chronic" = ChronicPrioritizationMath
         ) %>%
-        tidyr::pivot_longer(cols = tidyselect::everything(),
-                            names_to = "Measure",
-                            values_to = "Calculation")
+        pivot_longer(cols = everything(),
+                     names_to = "Measure",
+                     values_to = "Calculation")
       
-      psh <- a %>% dplyr::left_join(b, by = "Measure") %>%
-        dplyr::ungroup() %>%
-        dplyr::left_join(c, by = "Measure") %>%
-        dplyr::left_join(d, by = "Measure") %>%
-        dplyr::mutate(
-          DQ = dplyr::case_when(
+      psh <- a %>% left_join(b, by = "Measure") %>%
+        ungroup() %>%
+        left_join(c, by = "Measure") %>%
+        left_join(d, by = "Measure") %>%
+        mutate(
+          DQ = case_when(
             DQflag == 0 ~ "Data Quality passes",
             DQflag == 1 ~ "Please correct your Data Quality issues so this item
             can be scored",
@@ -226,17 +241,16 @@ app_server <- function( input, output, session ) {
             DQflag == 5 ~ "" # "Docs received past the due date"
           )
         ) %>%
-        dplyr::filter(!Measure %in% c("Moved into Own Housing",
-                                      "Average Length of Stay"),
-                      Calculation != "NOT SCORED in 2020 due to COVID-19.") %>%
-        dplyr::select(1, Calculation, 2, "Possible Score" = 4, "Data Quality" = DQ)
+        filter(!Measure %in% c("Moved into Own Housing",
+                               "Average Length of Stay")) %>%
+        select(1, Calculation, 2, "Possible Score" = 4, "Data Quality" = DQ)
       
-      rrh <- a %>% dplyr::left_join(b, by = "Measure") %>%
-        dplyr::ungroup() %>%
-        dplyr::left_join(c, by = "Measure") %>%
-        dplyr::left_join(d, by = "Measure") %>%
-        dplyr::mutate(
-          DQ = dplyr::case_when(
+      rrh <- a %>% left_join(b, by = "Measure") %>%
+        ungroup() %>%
+        left_join(c, by = "Measure") %>%
+        left_join(d, by = "Measure") %>%
+        mutate(
+          DQ = case_when(
             DQflag == 0 ~ "Data Quality passes",
             DQflag == 1 ~ "Please correct your Data Quality issues so this item
             can be scored",
@@ -246,18 +260,18 @@ app_server <- function( input, output, session ) {
             DQflag == 5 ~ "" # "Docs received past the due date"
           )
         ) %>%
-        dplyr::filter(!Measure %in%
-                        c("Long Term Homeless",
-                          "Prioritization of Chronic"),
-                      Calculation != "NOT SCORED in 2020 due to COVID-19.") %>%
-        dplyr::select(1, Calculation, 2, "Possible Score" = 4, "Data Quality" = DQ)
+        filter(!Measure %in%
+                 c("Long Term Homeless",
+                   "Prioritization of Chronic",
+                   "Prioritization Workgroup")) %>%
+        select(1, Calculation, 2, "Possible Score" = 4, "Data Quality" = DQ)
       
-      th <- a %>% dplyr::left_join(b, by = "Measure") %>%
-        dplyr::ungroup() %>%
-        dplyr::left_join(c, by = "Measure") %>%
-        dplyr::left_join(d, by = "Measure") %>%
-        dplyr::mutate(
-          DQ = dplyr::case_when(
+      th <- a %>% left_join(b, by = "Measure") %>%
+        ungroup() %>%
+        left_join(c, by = "Measure") %>%
+        left_join(d, by = "Measure") %>%
+        mutate(
+          DQ = case_when(
             DQflag == 1 ~ "Please correct your Data Quality issues so this item
             can be scored",
             DQflag == 0 ~ "Data Quality passes",
@@ -267,45 +281,20 @@ app_server <- function( input, output, session ) {
             DQflag == 5 ~ "" # "Docs received past the due date"
           )
         ) %>%
-        dplyr::filter(!Measure %in% c(
+        filter(!Measure %in% c(
           "Long Term Homeless",
-          "Prioritization of Chronic"
-        ),
-        Calculation != "NOT SCORED in 2020 due to COVID-19.") %>%
-        dplyr::select(1, Calculation, 2, "Possible Score" = 4, "Data Quality" = DQ)
+          "Prioritization of Chronic",
+          "Prioritization Workgroup"
+        )) %>%
+        select(1, Calculation, 2, "Possible Score" = 4, "Data Quality" = DQ)
       
-      sh <- a %>% dplyr::left_join(b, by = "Measure") %>%
-        dplyr::ungroup() %>%
-        dplyr::left_join(c, by = "Measure") %>%
-        dplyr::left_join(d, by = "Measure") %>%
-        dplyr::mutate(
-          DQ = dplyr::case_when(
-            DQflag == 0 ~ "Data Quality passes",
-            DQflag == 1 ~ "Please correct your Data Quality issues so this item
-            can be scored",
-            DQflag == 2 ~ "", # "Documents not yet received",
-            DQflag == 3 ~ "", # "Docs received, not yet scored",
-            DQflag == 4 ~ "", # "CoC Error",
-            DQflag == 5 ~ "" # "Docs received past the due date"
-          )
-        ) %>%
-        dplyr::filter(!Measure %in% c(
-          "Long Term Homeless",
-          "VISPDAT Completion at Entry",
-          "Prioritization of Chronic"
-        ),
-        Calculation != "NOT SCORED in 2020 due to COVID-19.") %>%
-        dplyr::select(1, Calculation, 2, "Possible Score" = 4, "Data Quality" = DQ)
-      
-      DT::datatable(
+      datatable(
         if (ptc == 3) {
           psh
         } else if (ptc == 13) {
           rrh
         } else if(ptc == 2) {
           th
-        } else {
-          sh
         },
         rownames = FALSE,
         options = list(dom = 't',
