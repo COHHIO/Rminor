@@ -68,8 +68,8 @@ app_ui <- function(request, data_ui) {
           # to be generated programmatically
           shinydashboard::menuItem("Provider Dashboard",
                                    tabName = "providerDashboard-Tab"),
-          # menuItem("BoS CoC Competition",
-          #          tabName = "cocCompetitionTab"),
+          menuItem("BoS CoC Competition",
+                   tabName = "cocCompetitionTab"),
           shinydashboard::menuItem("Coordinated Entry Access Points",
                                    tabName = "ceAPs-Tab"),
           shinydashboard::menuItem("Covid-19 Analysis",
