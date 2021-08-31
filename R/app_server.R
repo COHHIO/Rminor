@@ -369,10 +369,10 @@ app_server <- function( input, output, session ) {
     output$headerSPMs <- shiny::renderUI({
 
       ReportStart <- format.Date(lubridate::ymd(spm_current_start_date), "%B %d, %Y")
-      ReportEnd <- format.Date(lubridate::ymd(spm_current_end_date) - days(1), "%B %d, %Y")
+      ReportEnd <- format.Date(lubridate::ymd(spm_current_end_date), "%B %d, %Y")
       
       PriorReportStart <- format.Date(lubridate::ymd(spm_prior_start_date), "%B %d, %Y")
-      PriorReportEnd <- format.Date(lubridate::ymd(spm_prior_end_date) - days(1), "%B %d, %Y")
+      PriorReportEnd <- format.Date(lubridate::ymd(spm_prior_end_date), "%B %d, %Y")
       
       list(
         shiny::h2("HUD System Performance Measures"),
