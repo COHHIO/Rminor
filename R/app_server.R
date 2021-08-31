@@ -59,7 +59,7 @@ app_server <- function( input, output, session ) {
   
   output$headerCovid19 <- shiny::renderUI({
     
-    ReportStart <- format.Date(hc_began_collecting_covid_data, "%B %d, %Y")
+    ReportStart <- format.Date(hc$began_collecting_covid_data, "%B %d, %Y")
     ReportEnd <- format.Date(lubridate::ymd(meta_HUDCSV_Export_End), "%B %d, %Y")
     
     list(
@@ -75,7 +75,7 @@ app_server <- function( input, output, session ) {
     
     next_thing_due <- tribble(
       ~ DueDate, ~ Event,
-      ymd(hc_project_eval_docs_due), "Projects submit program documents to evidence 
+      ymd(hc$project_eval_docs_due), "Projects submit program documents to evidence 
       best practices and CE Prioritization compliance",
       ymd("20210506"), "All HMIS data corrections must be complete by 11:59pm",
       ymd("20210507"), "Project Evaluation data is saved as final data for scoring",
@@ -96,9 +96,9 @@ app_server <- function( input, output, session ) {
     list(
       h2("2021 BoS CoC Competition: Project Evaluation"), 
       h4(paste("Fixed Date Range:", 
-               format.Date(hc_project_eval_start, "%B %d, %Y"), 
+               format.Date(hc$project_eval_start, "%B %d, %Y"), 
                "to",
-               format.Date(hc_project_eval_end, "%B %d, %Y"))),
+               format.Date(hc$project_eval_end, "%B %d, %Y"))),
       # h4(strong("THE DATA ON THIS TAB DOES NOT SHOW CHANGES MADE ON OR AFTER
       #           5-7-2021.")),
       h4(input$pe_provider),
