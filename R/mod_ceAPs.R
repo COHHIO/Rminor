@@ -101,7 +101,7 @@ mod_ceAPs_server <- function(id) {
     output$headerAPs <- shiny::renderUI({
       list(htmltools::h2("Ohio Balance of State CoC Coordinated Entry Access Points"),
            htmltools::h4("As of",
-                         format.Date(meta_HUDCSV_Export_End, "%B %d, %Y"))
+                         format.Date(meta_HUDCSV$Export_End, "%B %d, %Y"))
       )
     })    
     

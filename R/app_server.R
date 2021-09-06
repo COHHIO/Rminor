@@ -60,7 +60,7 @@ app_server <- function( input, output, session ) {
   output$headerCovid19 <- shiny::renderUI({
     
     ReportStart <- format.Date(hc$began_collecting_covid_data, "%B %d, %Y")
-    ReportEnd <- format.Date(lubridate::ymd(meta_HUDCSV_Export_End), "%B %d, %Y")
+    ReportEnd <- format.Date(lubridate::ymd(meta_HUDCSV$Export_End), "%B %d, %Y")
     
     list(
       shiny::h2("Ohio Balance of State CoC Covid-19 Data Analysis"),
@@ -499,7 +499,7 @@ app_server <- function( input, output, session ) {
             dplyr::filter(ProjectName == input$providerList &
                             is.na(MoveInDateAdjust) &
                             is.na(ExitDate)) %>%
-            dplyr::mutate(Waiting = as.numeric(lubridate::ymd(meta_HUDCSV_Export_End) - lubridate::ymd(EntryDate))) %>%
+            dplyr::mutate(Waiting = as.numeric(lubridate::ymd(meta_HUDCSV$Export_End) - lubridate::ymd(EntryDate))) %>%
             dplyr::group_by(ProjectID) %>%
             dplyr::summarise(avgWait = as.integer(mean(Waiting)))
           
@@ -616,7 +616,7 @@ app_server <- function( input, output, session ) {
         shinydashboard::renderInfoBox({
           shinydashboard::infoBox(
             title = paste("Client Exits to Rapid Rehousing in", 
-                          lubridate::year(lubridate::ymd(meta_HUDCSV_Export_End))),
+                          lubridate::year(lubridate::ymd(meta_HUDCSV$Export_End))),
             subtitle = "Destination: Rental by client, with RRH...",
             color = "light-blue",
             icon = shiny::icon("door-open"),
@@ -624,7 +624,7 @@ app_server <- function( input, output, session ) {
               validation() %>%
                 dplyr::filter(
                   ProjectName == input$providerList &
-                    HMIS::exited_between(., ReportStart, ymd(meta_HUDCSV_Export_End)) &
+                    HMIS::exited_between(., ReportStart, ymd(meta_HUDCSV$Export_End)) &
                     Destination == 31
                 )
             )
