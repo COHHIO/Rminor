@@ -59,8 +59,8 @@ app_server <- function( input, output, session ) {
   
   output$headerCovid19 <- shiny::renderUI({
     
-    ReportStart <- format.Date(hc$began_collecting_covid_data, "%B %d, %Y")
-    ReportEnd <- format.Date(lubridate::ymd(meta_HUDCSV$Export_End), "%B %d, %Y")
+    ReportStart <- format.Date(rm_dates$hc$began_collecting_covid_data, "%B %d, %Y")
+    ReportEnd <- format.Date(lubridate::ymd(rm_dates$meta_HUDCSV$Export_End), "%B %d, %Y")
     
     list(
       shiny::h2("Ohio Balance of State CoC Covid-19 Data Analysis"),
@@ -75,7 +75,7 @@ app_server <- function( input, output, session ) {
     
     next_thing_due <- tribble(
       ~ DueDate, ~ Event,
-      ymd(hc$project_eval_docs_due), "Projects submit program documents to evidence 
+      ymd(rm_dates$hc$project_eval_docs_due), "Projects submit program documents to evidence 
       best practices and CE Prioritization compliance",
       ymd("20210506"), "All HMIS data corrections must be complete by 11:59pm",
       ymd("20210507"), "Project Evaluation data is saved as final data for scoring",
@@ -96,9 +96,9 @@ app_server <- function( input, output, session ) {
     list(
       h2("2021 BoS CoC Competition: Project Evaluation"), 
       h4(paste("Fixed Date Range:", 
-               format.Date(hc$project_eval_start, "%B %d, %Y"), 
+               format.Date(rm_dates$hc$project_eval_start, "%B %d, %Y"), 
                "to",
-               format.Date(hc$project_eval_end, "%B %d, %Y"))),
+               format.Date(rm_dates$hc$project_eval_end, "%B %d, %Y"))),
       # h4(strong("THE DATA ON THIS TAB DOES NOT SHOW CHANGES MADE ON OR AFTER
       #           5-7-2021.")),
       h4(input$pe_provider),
@@ -499,7 +499,7 @@ app_server <- function( input, output, session ) {
             dplyr::filter(ProjectName == input$providerList &
                             is.na(MoveInDateAdjust) &
                             is.na(ExitDate)) %>%
-            dplyr::mutate(Waiting = as.numeric(lubridate::ymd(meta_HUDCSV$Export_End) - lubridate::ymd(EntryDate))) %>%
+            dplyr::mutate(Waiting = as.numeric(lubridate::ymd(rm_dates$meta_HUDCSV$Export_End) - lubridate::ymd(EntryDate))) %>%
             dplyr::group_by(ProjectID) %>%
             dplyr::summarise(avgWait = as.integer(mean(Waiting)))
           
@@ -616,7 +616,7 @@ app_server <- function( input, output, session ) {
         shinydashboard::renderInfoBox({
           shinydashboard::infoBox(
             title = paste("Client Exits to Rapid Rehousing in", 
-                          lubridate::year(lubridate::ymd(meta_HUDCSV$Export_End))),
+                          lubridate::year(lubridate::ymd(rm_dates$meta_HUDCSV$Export_End))),
             subtitle = "Destination: Rental by client, with RRH...",
             color = "light-blue",
             icon = shiny::icon("door-open"),
@@ -624,7 +624,7 @@ app_server <- function( input, output, session ) {
               validation() %>%
                 dplyr::filter(
                   ProjectName == input$providerList &
-                    HMIS::exited_between(., ReportStart, ymd(meta_HUDCSV$Export_End)) &
+                    HMIS::exited_between(., ReportStart, ymd(rm_dates$meta_HUDCSV$Export_End)) &
                     Destination == 31
                 )
             )
