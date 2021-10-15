@@ -4,3 +4,5 @@
 #' @export
 
 qpr_expr <- list()
+
+qpr_dependencies <- list()
