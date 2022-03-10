@@ -1,3 +1,7 @@
+qpr_dependencies$RRH <- c(
+  "qpr_rrh_enterers",
+  "goals"
+)
 qpr_expr$RRH <- list()
 qpr_expr$RRH$expr <- rlang::expr({
   ReportStart <- Report()$Start

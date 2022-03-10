@@ -11,19 +11,18 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU Affero General Public License for more details at
 # <https://www.gnu.org/licenses/>. 
+# loading the image files from the data/ folder
+#' @include golem_utils_server.R
 
+# Create accessor functions
+maleta::create_accessors("data")
 if (golem::app_prod() || 
     testthat::is_testing() || 
     Sys.getenv("R_CONFIG_ACTIVE") == "shinyapps") {
   
   # Run only if in production mode or testing
   
-  # loading the image files from the data/ folder
-  if (!exists("validation")) {
-    env <- environment()
-    list2env(readRDS(find_path("Rminor.rds")), env)
-    message("Data Loaded")
-  }
+  
   # creating various lists needed in the app
   
   choices_month <-
@@ -33,30 +32,24 @@ if (golem::app_prod() ||
       length.out = 24
     ), "%b %Y")
   
-  choices_service_areas <- sort(unique(APs()$ProjectAreaServed)) 
+  choices_service_areas <- sort(unique(APs()$ProjectCountyServed)) 
   
-  choices_regions <- unique(regions()$RegionName)
+  choices_regions <- unique(Regions()$RegionName)
   
-  providers <- validation() %>%
-    dplyr::select(ProjectName, ProjectType) %>%
-    unique() %>%
-    dplyr::filter(stringr::str_detect(ProjectName, "zz", negate = TRUE) == TRUE &
-             ProjectType %in% c(1, 2, 3, 8, 12, 13))
+  programs <- validation() |> 
+    {\(x) {rlang::set_names(unique(x$ProjectID), unique(x$ProjectName))[order(unique(x$ProjectName))]}}()
   
   # the sample() function was pulling in a zz'd provider in the Provider Dashboard
-  # so I'm filtering out the zz'd providers because why would they ever need to
+  # so I'm filtering out the zz'd programs because why would they ever need to
   # check their Provider Dashboard? they wouldn't. Also we don't want to see APs.
   
-  provider_dash_choices <-
-    sort(providers$ProjectName) %>%
-    unique()
+    
   
-  provider_dash_selected <- providers %>%
-    dplyr::left_join(validation(), by = c("ProjectName", "ProjectType")) %>%
-    dplyr::filter(is.na(ExitDate)) %>%
-    dplyr::select(ProjectName) %>%
-    unique() %>%
-    dplyr::arrange(ProjectName)
+  # provider_dash_selected <- programs %>%
+  #   dplyr::filter(is.na(ExitDate)) %>%
+  #   dplyr::select(ProjectName) %>%
+  #   unique() %>%
+  #   dplyr::arrange(ProjectName)
 
 # CHANGED Add names (which will be visible to users) and numeric values (for 
   # filtering data). Eliminates the need for mutating the data to human readable 
@@ -119,5 +112,11 @@ tab_choices <-
       "Street Outreach"
     )
   )
+data_ui <- list(choices_month = choices_month,
+                choices_service_areas = choices_service_areas,
+                choices_regions = choices_regions,
+                provider_dash_choices = programs,
+                choices_project_type = choices_project_type,
+                tab_choices = tab_choices)
 }
 

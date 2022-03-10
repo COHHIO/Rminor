@@ -14,3 +14,6 @@ profvis
 .here
 *.log
 *.jpg
+.httr-oauth
+
+inst/vault/

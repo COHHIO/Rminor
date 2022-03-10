@@ -1,3 +1,7 @@
+qpr_dependencies$RRHspending <- c(
+  "qpr_spending",
+  "goals"
+)
 qpr_expr$RRHspending <- list()
 qpr_expr$RRHspending$expr <- rlang::expr({
   ReportStart <- Report()$Start

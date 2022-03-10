@@ -1,0 +1,144 @@
+/*-- scss:(imports) --*/
+@import 'inst/app/www/css/_bootstrap-variables.scss';
+
+/*-- scss:(rules) --*/
+#box_scenario_chooser.collapsed-card {
+  width: 60px;
+  opacity: .7;
+  &:hover {
+    opacity: 1;
+  }
+}
+
+// Datatables need darker link so it's visible when row is selected
+.dataTables_wrapper a {
+    color: blue;
+}
+// Align the vet_active_list download button
+#body-body_vet_active_list-download {
+  margin-top: 31px;
+}
+
+// Data tables
+.dt-buttons.btn-group {
+  float:left;
+}
+div.dataTables_wrapper div.dataTables_length label {
+  margin-left: 10px;
+}
+#body-body_dq_system_summary-summary {
+  & .col-md-6 {
+    padding-left: 1px;
+    padding-right: 1px;
+  }
+  & .card-body {
+    padding: .5rem;
+  }
+}
+
+// bs4Dash progress bar 
+@mixin hf {
+  height: 3rem;font-size: 1.5rem;
+}
+
+.progress {
+  @include hf
+  & .progress-bar {
+    @include hf
+  }
+}
+
+// Fix the alignment of sidebar text & hide it when minimized
+@mixin sidebar {
+  & .badge {
+      display: block;
+    }
+  & #logOut, #data_refresh {
+    display: inherit;
+    width: fit-content;
+  }
+  & .nav-sidebar {
+    & .nav-item {
+      width: 100%;
+      &.has-treeview.menu-is-opening.menu-open {
+        & .nav-link {
+          width: 100%;
+        }
+        & ul.nav.nav-treeview {
+          display: inline-flex !important; 
+          flex-direction: row;
+          width: 100%;
+          & .nav-item {
+            display: inline-flex;
+          }
+        }
+      } 
+    } 
+  }
+}
+  
+.sidebar-mini.sidebar-collapse .main-sidebar {
+  &:hover {
+    @include sidebar  
+  }
+  &:not(:hover) .badge, #logOut, #data_refresh {
+      display: none;
+  }
+  
+}
+
+
+.layout-fixed .main-sidebar {
+  @include sidebar  
+}
+/*
+.sidebar-mini {
+  & .nav-sidebar {
+    white-space: inherit;
+    & .nav-link {
+    width: 100%;
+    white-space: inherit;
+    word-wrap: break-word;
+    display: inline-flex;
+    align-items: center;
+  }
+  &.sidebar-collapse .main-sidebar {
+    .nav-sidebar {
+       & span, #logOut, #dataRefresh {
+        display: none;
+      }
+    }
+    &:hover .nav-sidebar {
+      & span, #logOut, #dataRefresh {
+        display: inline-block;
+        white-space: normal;
+        word-wrap: break-word;
+      }
+      & .nav-link p {
+        width: auto;
+      }
+    }
+  }
+  }
+  
+}
+*/
+.info-box-icon {
+  font-size: 12px;
+}
+
+.info-box .info-box-text, .info-box .progress-description {
+  white-space: normal;
+}
+.card {
+  height: 100% !important;
+}
+.card-title {
+  font-size: 1.6rem;
+  font-weight: 500;
+  
+}
+.ui_row_box {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}

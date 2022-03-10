@@ -1,3 +1,8 @@
+qpr_dependencies$PH <- c(
+  "qpr_leavers",
+  "goals"
+)
+
 qpr_expr$PH <- list()
 qpr_expr$PH$expr <- rlang::expr({
   ReportStart <- Report()$Start

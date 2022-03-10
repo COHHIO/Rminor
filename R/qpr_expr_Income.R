@@ -1,4 +1,6 @@
-
+qpr_dependencies$Income <- c(
+  "qpr_income"
+)
 qpr_expr$Income <- list()
 
 qpr_expr$Income$expr <- rlang::expr({

@@ -1,4 +1,6 @@
-
+qpr_dependencies$NCB <- c(
+  "qpr_benefits"
+)
 qpr_expr$NCB <- list()
 qpr_expr$NCB$expr <- rlang::expr({
   .PT_nm <- names(ProjectType()) 

@@ -1,4 +1,5 @@
 
+
 #' @title qstart_date
 #' @description Transform quarter slider text input to start date for filtering
 #' @param . \code{(character)} The input to transform

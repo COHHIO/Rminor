@@ -1,12 +1,6 @@
 
-setwd("../..")
 
-# Run only if in production mode or testing
-env <- environment()
 
-# loading the image files from the data/ folder
-list2env(readRDS(find_path("Rminor.rds")), env)
-message("Data Loaded")
 
 # creating various lists needed in the app
 data_ui <- list()
@@ -19,28 +13,22 @@ data_ui$choices_month <-
 
 data_ui$choices_service_areas <- sort(unique(APs()$ProjectAreaServed)) 
 
-data_ui$choices_regions <- unique(regions()$RegionName[regions()$County != "Mahoning"])
+data_ui$choices_regions <- unique(Regions()$RegionName[Regions()$County != "Mahoning"])
 
-providers <- validation() %>%
+programs <- validation() %>%
   dplyr::select(ProjectName, ProjectType) %>%
   unique() %>%
   dplyr::filter(stringr::str_detect(ProjectName, "zz", negate = TRUE) == TRUE &
                   ProjectType %in% c(1, 2, 3, 8, 12, 13))
 
 # the sample() function was pulling in a zz'd provider in the Provider Dashboard
-# so I'm filtering out the zz'd providers because why would they ever need to
+# so I'm filtering out the zz'd programs because why would they ever need to
 # check their Provider Dashboard? they wouldn't. Also we don't want to see APs.
 
 data_ui$provider_dash_choices <-
-  sort(providers$ProjectName) %>%
-  unique()
+  programs
 
-data_ui$provider_dash_selected <- providers %>%
-  dplyr::left_join(validation(), by = c("ProjectName", "ProjectType")) %>%
-  dplyr::filter(is.na(ExitDate)) %>%
-  dplyr::select(ProjectName) %>%
-  unique() %>%
-  dplyr::arrange(ProjectName)
+data_ui$provider_dash_selected <- NULL
 
 # CHANGED Add names (which will be visible to users) and numeric values (for filtering data). Eliminates the need for mutating the data to human readable names
 # NOTE entries have been alphabetized.

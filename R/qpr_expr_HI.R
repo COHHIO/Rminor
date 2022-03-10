@@ -1,4 +1,6 @@
-
+qpr_dependencies$HI <- c(
+  "qpr_benefits"
+)
 qpr_expr$HI <- list()
 
 qpr_expr$HI$expr <- rlang::expr({
