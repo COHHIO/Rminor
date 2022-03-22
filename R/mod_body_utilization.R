@@ -29,7 +29,7 @@ mod_body_utilization_ui <- function(id){
             "What is Unit Utilization?",
             "Methodology"
           ),
-          ~ bs4Dash::bs4AccordionItem(title = .y, tags$p(.x))
+          ~ bs4Dash::bs4AccordionItem(title = .y, HTML(.x))
         )
       )
     )
