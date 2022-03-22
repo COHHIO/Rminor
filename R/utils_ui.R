@@ -32,7 +32,11 @@ ui_picker_program <- function(
   )
 }
 
+
 prev_quarter <- function() lubridate::floor_date(lubridate::floor_date(Sys.Date(), "quarter") - 1, "quarter")
+
+prev_month <- function() lubridate::floor_date(lubridate::floor_date(Sys.Date(), "month") - 1, "month
+                                               ")
 
 #' @title The UI Header output
 #'
@@ -62,7 +66,7 @@ ui_header_row <-
 ui_date_range <- function(
   inputId = rlang::caller_env()$ns("date_range"),
   label = "Date Range",
-  start = Sys.Date() - lubridate::days(7),
+  start = prev_month(),
   end = Sys.Date(),
   min = rm_dates()$meta_HUDCSV$Export_Start,
   width = 300,
