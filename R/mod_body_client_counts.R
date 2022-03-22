@@ -75,12 +75,12 @@ mod_body_client_counts_server <- function(id){
             !ProjectType %in% c(3, 13) &
               !is.na(ExitDate) ~ "Exited program",
           ),
+          Status_factor = factor(),
           sort = lubridate::today() - EntryDate
-        ) |>
+        ) |> 
         dplyr::arrange(dplyr::desc(sort), HouseholdID) |>
         dplyr::select(
           "County" = CountyServed,
-          "UniqueID" = UniqueID,
           "Relationship to Head of Household" = RelationshipToHoH,
           "Entry Date" = EntryDate,
           "Move In Date (RRH/PSH Only)" = MoveInDateAdjust,
