@@ -7,7 +7,7 @@
 ui_date_range(
   inputId = rlang::caller_env()$ns("date_range"),
   label = "Date Range",
-  start = Sys.Date() - lubridate::days(7),
+  start = prev_month(),
   end = Sys.Date(),
   min = rm_dates()$meta_HUDCSV$Export_Start,
   width = 300,
