@@ -23,9 +23,6 @@ supported styles).}
 
 \item{...}{Arguments passed to the \verb{<i>} tag of \link[htmltools:builder]{htmltools::tags}.}
 }
-\value{
-
-}
 \description{
 Iterative generation of icons
 }

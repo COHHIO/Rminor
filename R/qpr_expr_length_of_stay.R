@@ -1,9 +1,9 @@
-qpr_dependencies$LoS <- c(
+qpr_dependencies$length_of_stay <- c(
   "goals",
   "qpr_leavers"
 )
-qpr_expr$LoS <- list()
-qpr_expr$LoS$expr <- rlang::expr({
+qpr_expr$length_of_stay <- list()
+qpr_expr$length_of_stay$expr <- rlang::expr({
   ReportStart <- Report()$Start
   ReportEnd <- Report()$End
   
@@ -72,7 +72,7 @@ qpr_expr$LoS$expr <- rlang::expr({
   attr(LoSSummary, "title") <- title
   LoSSummary
 })
-qpr_expr$LoS$plot <- rlang::expr({
+qpr_expr$length_of_stay$plot <- rlang::expr({
   qpr_plotly(
     data_env(),
     y = ~ Days,

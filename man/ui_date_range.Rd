@@ -31,7 +31,7 @@ date in the client's time zone.}
 \code{yyyy-mm-dd} format.}
 
 \item{width}{The width of the input, e.g. \code{'400px'}, or \code{'100\%'};
-see \code{\link[shiny:reexports]{validateCssUnit()}}.}
+see \code{\link[shiny:validateCssUnit]{validateCssUnit()}}.}
 
 \item{...}{
   Arguments passed on to \code{\link[shiny:dateRangeInput]{shiny::dateRangeInput}}

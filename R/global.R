@@ -16,8 +16,8 @@
 
 # Create accessor functions
 maleta::create_accessors("data")
-if (golem::app_prod() || 
-    testthat::is_testing() || 
+if (golem::app_prod() ||
+    testthat::is_testing() ||
     Sys.getenv("R_CONFIG_ACTIVE") == "shinyapps") {
   
   # Run only if in production mode or testing
@@ -32,24 +32,27 @@ if (golem::app_prod() ||
       length.out = 24
     ), "%b %Y")
   
-  choices_service_areas <- sort(unique(APs()$ProjectCountyServed)) 
-  
+  choices_service_areas <- sort(unique(APs()$ProjectCountyServed))
+
   choices_regions <- unique(Regions()$RegionName)
   
-  programs <- validation() |> 
-    {\(x) {rlang::set_names(unique(x$ProjectID), unique(x$ProjectName))[order(unique(x$ProjectName))]}}()
-  
+  counties <- sort(Regions()$County)
+
+  programs <- validation() |>
+    dplyr::distinct(ProjectID, ProjectName) |>
+    dplyr::arrange(ProjectName) |> 
+      {\(x) {rlang::set_names(x$ProjectID, x$ProjectName)}}()
   # the sample() function was pulling in a zz'd provider in the Provider Dashboard
   # so I'm filtering out the zz'd programs because why would they ever need to
   # check their Provider Dashboard? they wouldn't. Also we don't want to see APs.
   
-    
-  
-  # provider_dash_selected <- programs %>%
-  #   dplyr::filter(is.na(ExitDate)) %>%
-  #   dplyr::select(ProjectName) %>%
-  #   unique() %>%
-  #   dplyr::arrange(ProjectName)
+  provider_dash_selected <- validation() |>
+          dplyr::distinct(ProjectID, ProjectName) |>
+          dplyr::arrange(ProjectName) |>
+          dplyr::select(ProjectName) |> 
+          unique() |> 
+          dplyr::arrange(ProjectName)
+
 
 # CHANGED Add names (which will be visible to users) and numeric values (for 
   # filtering data). Eliminates the need for mutating the data to human readable 
@@ -57,13 +60,13 @@ if (golem::app_prod() ||
 # NOTE entries have been alphabetized.
 choices_project_type <- list(
   `Coordinated Entry` = 14,
-  `Emergency Shelters` = 1, 
-  `Prevention` = 12, 
+  `Emergency Shelters` = 1,
+  `Prevention` = 12,
   `Permanent Supportive Housing` = c(3, 9),
   `Rapid Rehousing` = 13,
-  `Safe Haven` = 8, 
+  `Safe Haven` = 8,
   `Services Only` = 6,
-  `Street Outreach` = 4, 
+  `Street Outreach` = 4,
   `Transitional Housing` = 2
 )
 
@@ -103,18 +106,20 @@ tab_choices <-
       "Street Outreach"
     ),
     Income = c(
-      "Emergency Shelters", 
+      "Emergency Shelters",
       "Transitional Housing",
-      "Safe Haven", 
-      "Prevention", 
+      "Safe Haven",
+      "Prevention",
       "Rapid Rehousing",
-      "Permanent Supportive Housing", 
+      "Permanent Supportive Housing",
       "Street Outreach"
     )
   )
+
 data_ui <- list(choices_month = choices_month,
                 choices_service_areas = choices_service_areas,
                 choices_regions = choices_regions,
+                counties = counties,
                 provider_dash_choices = programs,
                 choices_project_type = choices_project_type,
                 tab_choices = tab_choices)

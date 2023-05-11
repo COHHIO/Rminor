@@ -10,7 +10,7 @@
 mod_navbar_ui <- function(id){
   ns <- NS(id)
     bs4Dash::bs4DashNavbar(
-      shiny::tags$h2("R minor"),
+      shiny::tags$h2("Coming Soon: R minor is undergoing maintenance"),
       status = "white",
       border = TRUE,
       sidebarIcon = shiny::icon("bars"),

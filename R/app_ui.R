@@ -19,6 +19,7 @@
 #' @param request Internal parameter for `{shiny}`. 
 #'     DO NOT REMOVE.
 #' @param data_ui \code{(list)} List with variables passed to UI objects.
+#' @import shiny
 #' @noRd
 #' 
 app_ui <- function(request, data_ui) {

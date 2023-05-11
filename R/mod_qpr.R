@@ -16,7 +16,7 @@
 #' @importFrom rlang parse_expr
 
 
-mod_QPR_tabItem_ui <- function(id,
+mod_qpr_ui <- function(id,
                                project_choices,
                                region_choices,
                                radio_mean = FALSE) {
@@ -102,7 +102,7 @@ mod_QPR_tabItem_ui <- function(id,
 #' @export
 
 
-mod_QPR_server <- function(id, header, input, output, session) {
+mod_qpr_server <- function(id, header, input, output, session) {
   if (missing(header)) {
     rlang::abort("Must provide header for mod_QPR_server(", id, ")")
   }

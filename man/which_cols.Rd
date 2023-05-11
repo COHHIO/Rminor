@@ -9,9 +9,6 @@ which_cols(x, .data)
 \arguments{
 \item{x}{\code{(character/numeric)} Column numbers or names}
 }
-\value{
-
-}
 \description{
 Give DT ready column numbers from names or numbers
 }

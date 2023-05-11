@@ -11,7 +11,7 @@ data_ui$choices_month <-
     length.out = 24
   ), "%b %Y")
 
-data_ui$choices_service_areas <- sort(unique(APs()$ProjectAreaServed)) 
+data_ui$choices_service_areas <- sort(unique(APs()$ProjectAreaServed))
 
 data_ui$choices_regions <- unique(Regions()$RegionName[Regions()$County != "Mahoning"])
 
@@ -34,13 +34,13 @@ data_ui$provider_dash_selected <- NULL
 # NOTE entries have been alphabetized.
 data_ui$choices_project_type <- choices_project_type <- list(
   `Coordinated Entry` = 14,
-  `Emergency Shelters` = 1, 
-  `Prevention` = 12, 
+  `Emergency Shelters` = 1,
+  `Prevention` = 12,
   `Permanent Supportive Housing` = c(3, 9),
   `Rapid Rehousing` = 13,
-  `Safe Haven` = 8, 
+  `Safe Haven` = 8,
   `Services Only` = 6,
-  `Street Outreach` = 4, 
+  `Street Outreach` = 4,
   `Transitional Housing` = 2
 )
 

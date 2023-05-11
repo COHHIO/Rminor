@@ -7,8 +7,8 @@
 datatable_default(
   data,
   rownames = FALSE,
-  options = list(dom = "Blfrtip", buttons = list("copy", "excel", "csvHtml5",
-    list(extend = "csvHtml5", text = "Full CSV", filename = "data_full", exportOptions =
+  options = list(dom = "Blfrtip", buttons = list("copy", "excel", "csvHtml5", list(extend
+    = "csvHtml5", text = "Full CSV", filename = "data_full", exportOptions =
     list(modifier = list(page = "all")))), responsive = TRUE, lengthMenu = c(10, 25, 50,
     75, 100), lengthChange = TRUE, pageLength = 10),
   filter = list(position = "top", clear = TRUE, plain = FALSE),
@@ -46,10 +46,7 @@ this argument of the form \code{list(position = 'top', clear = TRUE, plain
 in the input boxes, and \code{plain} means if you want to use Bootstrap
 form styles or plain text input styles for the text input boxes}
 
-\item{width}{Width/Height in pixels (optional, defaults to automatic
-sizing)}
-
-\item{height}{Width/Height in pixels (optional, defaults to automatic
+\item{width, height}{Width/Height in pixels (optional, defaults to automatic
 sizing)}
 
 \item{extensions}{a character vector of the names of the DataTables
@@ -101,6 +98,8 @@ indicate which columns to escape, e.g. \code{1:5} (the first 5 columns),
 third), or \code{c('Species', 'Sepal.Length')}; since the row names take
 the first column to display, you should add the numeric column indices by
 one when using \code{rownames}}
+    \item{\code{width,height}}{Width/Height in pixels (optional, defaults to automatic
+sizing)}
     \item{\code{fillContainer}}{\code{TRUE} to configure the table to automatically fill
 it's containing element. If the table can't fit fully into it's container
 then vertical and/or horizontal scrolling of the table cells will occur.}

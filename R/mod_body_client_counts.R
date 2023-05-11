@@ -75,7 +75,6 @@ mod_body_client_counts_server <- function(id){
             !ProjectType %in% c(3, 13) &
               !is.na(ExitDate) ~ "Exited program",
           ),
-          Status_factor = factor(),
           sort = lubridate::today() - EntryDate
         ) |> 
         dplyr::arrange(dplyr::desc(sort), HouseholdID) |>
