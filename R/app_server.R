@@ -18,5 +18,6 @@ app_server <- function( input, output, session ) {
   mod_navbar_server("navbar")
   mod_sidebar_server("sidebar")
   mod_body_server("body")
+  mod_theme_server("color_theme")
   
 }

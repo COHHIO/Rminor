@@ -1,3 +1,7 @@
+.qbegin <- lubridate::floor_date(Sys.Date(), "quarter")
+strip_id <- function(id) {
+  stringr::str_remove(id, "^(?:body\\-)?body\\_qpr\\_")
+}
 #' @family QPR
 #' @title QPR_tabItem UI Function
 #' @description A shiny Module to generate the QPR tabitems.
@@ -11,149 +15,112 @@
 #QUESTION Should there be defaults for options?
 #' @param radio_mean \code{(logical)} whether to show the Mean/Median based
 #'   average radio UI
-#' @export
-#' @importFrom shiny NS tagList
-#' @importFrom rlang parse_expr
 
 
-mod_qpr_ui <- function(id,
-                               project_choices,
-                               region_choices,
-                               radio_mean = FALSE) {
-  ns <- NS(id)
-
-  shinydashboard::tabItem(
-    tabName = ns("Tab"),
-    shiny::fluidRow(shinydashboard::box(shiny::htmlOutput(ns(
-      "header"
-    )),
-    width = 12)),
-    shiny::fluidRow(
-      shinydashboard::box(
-        shinyWidgets::chooseSliderSkin("Round"),
-        shinyWidgets::setSliderColor("#56B4E9", 1),
-        shinyWidgets::sliderTextInput(
-          ns("slider"),
-          "",
-          unique(zoo::Sys.yearqtr() - 6 /
-                   4:zoo::Sys.yearqtr() + 1 / 4)
-          ,
-          selected = zoo::Sys.yearqtr() - 1 / 4,
-          width = '50%'
-        ),
-        if (!missing(project_choices)) {
-          shinyWidgets::prettyRadioButtons(
-            inputId = ns("ProjectType"),
-            label = "Program Type",
-            thick = TRUE,
-            animation = "pulse",
-            status = "info",
-            choices = project_choices,
-            selected = NULL
-          )
-        },
-        if (!missing(region_choices)) {
-          shinyWidgets::pickerInput(
-            inputId = ns("Region"),
-            "Select Region(s)",
-            choices = region_choices,
-            options = shinyWidgets::pickerOptions(
-              dropupAuto = FALSE,
-              actionsBox = TRUE,
-              liveSearch = TRUE,
-              liveSearchStyle = 'contains'
-            ),
-            multiple = TRUE,
-            selected = NULL,
-            width = '50%'
-          )
-        },
-        width = 12
-      )
+mod_qpr_ui <- function(id, choices = NULL, date_choices = NULL,
+                       ns = rlang::caller_env()$ns) {
+  force(ns)
+  .id <- strip_id(id)
+  .defaults <- purrr::compact(list(
+    Dates = if (!isFALSE(date_choices)) list(
+      inputId = ns("date_range"),
+      start = lubridate::floor_date(lubridate::as_date(.qbegin - lubridate::dmonths(4)), "quarter"),
+      end = .qbegin
     ),
-    shiny::fluidRow(shinydashboard::box(
-      if (radio_mean) {
-        shinyWidgets::prettyRadioButtons(
-          inputId = ns("radio_mean"),
-          label = "",
-          thick = TRUE,
-          animation = "pulse",
-          status = "info",
-          choices = c("Average Days", "Median Days"),
-          selected = "Average Days"
-        )
-      },
-      # verbatimTextOutput("res"),
-      plotly::plotlyOutput(ns("plot")),
-      width = 12
-    ))
+    Regions = if (!isFALSE(choices))
+      list(
+        inputId = ns("region"),
+        choices = qpr_tab_choices[[.id]]$choices,
+        multiple = FALSE
+      )
+  ))
+  .user <- purrr::compact(list(
+    Dates = date_choices,
+    Regions = choices
+  ))
+  if (UU::is_legit(.user)) {
+    # if there are 
+    .defaults[names(.user)] <- purrr::map2(.defaults[names(.user)], .user, ~{
+      # replace default params with those supplied by user on a param by param 
+      # basis, retaining defaults.
+      purrr::list_modify(.x, !!!.y)
+    })
+  }
+  # tabItem Output ----
+  shiny::tagList(
+    ui_header_row(ns("header")),
+    ui_row(
+      if (shiny::isTruthy(.defaults$Dates))
+        do.call(ui_date_range, .defaults$Dates)
+      ,
+      if (shiny::isTruthy(.defaults$Regions))
+        do.call(ui_picker_program, .defaults$Regions)
+    )
+    ,
+    ui_row(
+      iterate(qpr_expr[[.id]]$infobox, bs4Dash::infoBoxOutput, "ib_summary", width = 12)
+      ,
+      iterate(qpr_expr[[.id]]$datatable, DT::DTOutput, "dt_detail")
+    )
   )
+  
 }
 
 #' @family QPR
 #' @title QPR Server Functions
-#' @description A shiny server Module to generate the header, slider, pickers
-#'   and plot for each tabitem.
+#' @description A shiny server Module to generate the header, slider, pickers 
+#' and plot for each tabitem.
 #' @param id,input,output,session Internal parameters for {shiny}.
-#' @param header \code{(character)} The human legible name for the tabitem header.
-#' @importFrom shiny NS tagList
-#' @importFrom rlang parse_expr eval_bare
-#' @importFrom purrr keep
-#' @export
+#' @param header \code{(character)} The header text passed to the initial 
+#' \link[shiny]{h2} tag in the header.
+#' @param ... Additional \code{(list/shiny.tag.list/shiny.tag)}s  to be appended 
+#' to the header after the \link[shiny]{h2} tag with `header`. Defaults to
+#'  \code{list(h4(input$region), h4(paste(ReportStart, "to", ReportEnd)))} if 
+#'  unspecified. 
 
 
-mod_qpr_server <- function(id, header, input, output, session) {
-  if (missing(header)) {
-    rlang::abort("Must provide header for mod_QPR_server(", id, ")")
-  }
-  moduleServer(id, function(input, output, session) {
+
+mod_qpr_server <- function(id, header, ...) {
+  .id <- strip_id(id)
+  if (missing(header))
+    rlang::abort("Must provide header for mod_QPR_server(",id,")")
+  function(input, output, session){
     ns <- session$ns
-    # Process Slider Inputs
-    Report <- eventReactive(input$slider, {
-      list(Start = qstart_date(input$slider),
-           End = qend_date(input$slider))
-    })
-    ProjectType <- eventReactive(req(input$ProjectType), {
-      # The RadioPicker input returns a character regardless of the type of
-      # objects passed to the UI element. If the object returned is meant to be
-      # a list or vector, ie  Permanent Supportive Housing = c(3,9), it
-      # returns a character "list(`3` = 3, `9` = 9)". This must then be parsed
-      # into an actual list.
-      .pt <- unlist(eval(rlang::parse_expr(input$ProjectType)))
-      # message(paste("ProjectType-class:",class(.pt)))
-      # message(paste("ProjectType:",.pt))
-      #browser(expr = is.na(.pt))
-      # Get the selected project type
-      ProjectType <-
-        purrr::keep(choices_project_type, ~ {
-          any(unlist(.x) %in% .pt)
-        })
-      message(paste0(
-        names(ProjectType),
-        ":",
-        paste0(ProjectType, collapse = ",")
-      ))
-      ProjectType
-    })
+    
     # Header
     output$header <- shiny::renderUI({
-      list(
-        shiny::h2("Quarterly Performance Report"),
-        shiny::h3(paste(input$radio_mean, header)),
-        shiny::h4(
-          format.Date(Report()$Start, "%m-%d-%Y"),
-          "-",
-          format.Date(Report()$End, "%m-%d-%Y")
-        )
-      )
+      req(input$date_range)
+      server_header(header, date_range = input$date_range, ...)
     })
     
     # Process Data
-    data_env <- reactive(qpr_expr[[id]]$expr, quoted = TRUE)
+    data_env <- shiny::reactive(qpr_expr[[.id]]$expr, quoted = TRUE)
+    if (UU::is_legit(qpr_expr[[.id]]$infobox)) {
+      if (rlang::is_list(qpr_expr[[.id]]$infobox))
+        x <- qpr_expr[[.id]]$infobox
+      else
+        x <- list(qpr_expr[[.id]]$infobox)
+      for (i in seq_along(x)) {
+        output[[paste0("ib_summary",i)]] <- bs4Dash::renderbs4InfoBox(x[[i]], quoted = TRUE)
+      }  
+    }
+    # output$ib_summary1 <- bs4Dash::renderbs4InfoBox(qpr_expr[[.id]]$infobox, 
+    #                                                  quoted = TRUE)
     
-    output$plot <- plotly::renderPlotly({
-      shiny::req(input$Region)
-      rlang::eval_bare(qpr_expr[[id]]$plot)
-    })
-  })
+    
+    if (rlang::is_list(qpr_expr[[.id]]$datatable)) {
+      for (i in seq_along(qpr_expr[[.id]]$datatable)) {
+        output[[paste0("dt_detail",i)]] <- DT::renderDT(server = FALSE, qpr_expr[[.id]]$datatable[[i]], quoted = TRUE)
+      }
+    } else {
+      output$dt_detail1 <- DT::renderDT(server = FALSE, qpr_expr[[.id]]$datatable, quoted = TRUE)
+    }
+    
+  }
+    
+    # output$plot <- plotly::renderPlotly({
+    #   shiny::req(input$Region)
+    #   rlang::eval_bare(qpr_expr[[id]]$plot)
+    # })
+
 }

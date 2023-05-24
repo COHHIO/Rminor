@@ -4,16 +4,22 @@
 \alias{mod_qpr_server}
 \title{QPR Server Functions}
 \usage{
-mod_qpr_server(id, header, input, output, session)
+mod_qpr_server(id, header, ...)
 }
 \arguments{
 \item{id, input, output, session}{Internal parameters for {shiny}.}
 
-\item{header}{\code{(character)} The human legible name for the tabitem header.}
+\item{header}{\code{(character)} The header text passed to the initial 
+\link[shiny]{h2} tag in the header.}
+
+\item{...}{Additional \code{(list/shiny.tag.list/shiny.tag)}s  to be appended 
+to the header after the \link[shiny]{h2} tag with `header`. Defaults to
+ \code{list(h4(input$region), h4(paste(ReportStart, "to", ReportEnd)))} if 
+ unspecified.}
 }
 \description{
-A shiny server Module to generate the header, slider, pickers
-  and plot for each tabitem.
+A shiny server Module to generate the header, slider, pickers 
+and plot for each tabitem.
 }
 \seealso{
 Other QPR: 

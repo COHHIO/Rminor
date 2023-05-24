@@ -4,88 +4,61 @@ qpr_dependencies$length_of_stay <- c(
 )
 qpr_expr$length_of_stay <- list()
 qpr_expr$length_of_stay$expr <- rlang::expr({
-  ReportStart <- Report()$Start
-  ReportEnd <- Report()$End
-  
-  LoSGoals <- goals() %>%
-    dplyr::select(-Measure) %>%
-    dplyr::filter(SummaryMeasure == "Length of Stay" &
-                    ProjectType %in% unlist(ProjectType())) %>%
-    unique()
-  
-  LoSDetail <- qpr_leavers() %>%
+  req(input$date_range, input$region)
+  qpr_leavers() |> 
+    HMIS::exited_between(input$date_range[1], input$date_range[2]) |> 
     dplyr::filter(((
-      !is.na(MoveInDateAdjust) &
-        ProjectType == 13
+      !is.na(MoveInDateAdjust) & ProjectType == 13
     ) |
       (
-        ProjectType %in% c(1, 2, 8) &
-          !is.na(ExitDate)
+        !is.na(ExitDate) & ProjectType %in% c(1, 2, 8)
       )) &
-      HMIS::exited_between(., ReportStart, ReportEnd)) %>%
-    dplyr::filter(
-      ProjectRegion %in% c(input$Region) &
-        ProjectType %in% unlist(ProjectType())
-    ) # this filter needs
-  # to be here so the selection text matches the mutated data
-  TotalLeavers <- LoSDetail %>%
-    dplyr::group_by(FriendlyProjectName) %>%
-    dplyr::summarise(Leavers = dplyr::n())
-  
-  title <-
-    paste0(
-      "Length of Stay (",
-      input$radio_mean,
-      ")\n",
-      names(ProjectType()),
-      "\n",
-      Report()$Start,
-      " to ",
-      Report()$End
-    )
-  
-  LoSSummary <- LoSDetail %>%
-    dplyr::group_by(FriendlyProjectName,
-                    ProjectRegion,
-                    ProjectCounty,
-                    ProjectType) %>%
-    dplyr::summarise(
-      Days = dplyr::case_when(
-        input$radio_mean == "Average Days" ~
-          as.numeric(mean(DaysinProject)),
-        input$radio_mean == "Median Days" ~
-          as.numeric(stats::median(DaysinProject))
-      )
-    ) %>%
-    dplyr::left_join(LoSGoals, by = "ProjectType") %>%
-    dplyr::left_join(TotalLeavers, by = ("FriendlyProjectName")) %>%
-    dplyr::mutate(
-      hover = paste0(
-        FriendlyProjectName,
-        "\nTotal Leavers: ",
-        Leavers,
-        "\nDays: ",
-        Days,
-        sep = "\n"
-      )
-    )
-  attr(LoSSummary, "title") <- title
-  LoSSummary
+      ProjectName == input$region
+    ) 
 })
-qpr_expr$length_of_stay$plot <- rlang::expr({
-  qpr_plotly(
-    data_env(),
-    y = ~ Days,
-    title = attr(data_env(), "title"),
-    xaxis = list(
-      title = "",
-      rangemode = "tozero",
-      showgrid = TRUE
-    ),
-    yaxis = list(
-      title = "Days",
-      rangemode = "tozero",
-      showgrid = TRUE
+
+qpr_expr$length_of_stay$infobox <- rlang::expr({
+  data_env() |> 
+    dplyr::group_by(ProjectName) |>
+    dplyr::summarise(Average = round(mean(DaysinProject), 1),
+                     Median = median(DaysinProject), .groups = "drop_last") |> 
+    qpr_infobox(icon = "clock",
+                value = paste("Average", 
+                              .data$Average, 
+                              "/ Median", 
+                              .data$Median,
+                              "days"),
+                title = "Average and Median Length of Stay",
+                subtitle = "Length of Stay in Program's Housing"
     )
-  )
 })
+
+qpr_expr$length_of_stay$datatable <- rlang::expr({
+  data_env() |>
+    dplyr::arrange(dplyr::desc(DaysinProject)) |>
+    dplyr::select(
+      UniqueID,
+      "Bed Start" = EntryAdjust,
+      ExitDate,
+      "Days in Program" = DaysinProject
+    ) |> 
+    datatable_default(escape = FALSE)
+})
+
+# qpr_expr$length_of_stay$plot <- rlang::expr({
+#   qpr_plotly(
+#     data_env(),
+#     y = ~ Days,
+#     title = attr(data_env(), "title"),
+#     xaxis = list(
+#       title = "",
+#       rangemode = "tozero",
+#       showgrid = TRUE
+#     ),
+#     yaxis = list(
+#       title = "Days",
+#       rangemode = "tozero",
+#       showgrid = TRUE
+#     )
+#   )
+# })

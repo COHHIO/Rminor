@@ -326,7 +326,6 @@ iterate <- function(x, fn, outputId, env = rlang::caller_env(), output, ..., rc 
     }
   }
   
-  
   if (is_ui)
     do.call(tagList, out)
   else

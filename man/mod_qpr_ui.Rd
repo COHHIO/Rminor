@@ -4,7 +4,12 @@
 \alias{mod_qpr_ui}
 \title{QPR_tabItem UI Function}
 \usage{
-mod_qpr_ui(id, project_choices, region_choices, radio_mean = FALSE)
+mod_qpr_ui(
+  id,
+  choices = NULL,
+  date_choices = NULL,
+  ns = rlang::caller_env()$ns
+)
 }
 \arguments{
 \item{id}{Internal parameters for {shiny}.}
