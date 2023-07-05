@@ -10,7 +10,7 @@
 mod_body_client_counts_ui <- function(id){
   ns <- shiny::NS(id)
   shiny::tagList(
-    ui_header_row(),
+    ui_header_row("Program Dashboard"),
     ui_row(
       tags$p(tags$em("Note:"), " if a program is absent from this list, it did not serve any clients since ", rm_dates()$calc$data_goes_back_to),
       ui_picker_program(),
