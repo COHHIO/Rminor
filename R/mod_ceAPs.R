@@ -47,7 +47,6 @@ mod_body_ceaps_server <- function(id) {
       )
     })
 
-    
     output$AP_list <- DT::renderDT(server = FALSE, {
       req(APs())
       APs() |>

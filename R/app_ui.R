@@ -22,14 +22,12 @@
 #' @import shiny
 #' @noRd
 #' 
-app_ui <- function(request, data_ui) {
-  if (!missing(data_ui)) {
-    list2env(data_ui, environment())
-  }
+app_ui <- function(request) {
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
     includeScript("inst/js/new_tab_badges.js"),
+    includeScript("inst/js/myscript.js"),
     # Your application UI logic
     bs4Dash::dashboardPage(
       header = mod_navbar_ui("navbar"),

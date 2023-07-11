@@ -14,6 +14,7 @@ app_server <- function( input, output, session ) {
     active$tab <- input$active_tab
     active$dark_mode <- input$dark_mode
   })
+
   # Top-level Modules
   mod_navbar_server("navbar")
   mod_sidebar_server("sidebar")

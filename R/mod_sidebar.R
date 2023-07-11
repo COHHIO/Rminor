@@ -14,6 +14,7 @@ mod_sidebar_ui <- function(id){
    bs4Dash::bs4DashSidebar(
      title = HTML("<small>Rminor</small>"),
      status = "white",
+     id = "sidebar",
      skin = "light",
      elevation = 4,
      collapsed = TRUE,

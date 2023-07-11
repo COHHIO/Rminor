@@ -37,6 +37,31 @@ list_to_li <- function(list, class = NULL){
   
 }
 
+.go_tos <- ls(rlang::ns_env("golem"), all.names = T) |>
+  stringr::str_extract("(?<=^go_to_)[\\w\\_]+") |> na.omit()
+go_to <- function(file = c("css", "js", .go_tos), wd = golem::get_golem_wd()) {
+  path <- purrr::when(file,
+                      . == "css" ~ file.path("inst", "app", "www", "css", "custom.scss"),
+                      . == "js" ~ file.path("inst", "js", "new_tab_badges.js"),
+                      . == "app_server" ~ "R/app_server.R",
+                      . == "app_server" ~ "R/app_ui.R",
+                      . == "deploy" ~ "dev/03_deploy.R",
+                      . == "dev" ~ "dev/02_dev.R",
+                      . == "run_app" ~ "R/run_app.R",
+                      . == "run_dev" ~ "dev/run_dev.R", 
+                      ~ "guess")
+  
+  if (path == "guess")
+    path <- UU::list.files2(wd, recursive = TRUE) |> 
+      stringr::str_subset(file)
+  if (file.exists(path[1]) && rstudioapi::hasFun("navigateToFile"))
+    rstudioapi::navigateToFile(path[1])
+  else if (!file.exists(file)) {
+    message(file, " not found.")
+  } else if (!rstudioapi::hasFun("navigateToFile"))
+    message("Your version of RStudio does not support `navigateToFile`")
+}
+
 #' @importFrom htmltools tags tagAppendAttributes tagList
 list_to_p <- function(list, class = NULL){
   if (is.null(class)){

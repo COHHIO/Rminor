@@ -41,6 +41,7 @@ mod_body_client_counts_server <- function(id){
         title = "Bed & Unit Utilization"
       )
     })
+
     program <- reactive(input$program) |> debounce(millis = 1500)
     validation_range <- eventReactive(c(input$date_range, input$program), {
       req(input$program, program(), input$date_range)
