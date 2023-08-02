@@ -55,10 +55,11 @@ mod_sidebar_ui <- function(id){
        ),
        bs4Dash::bs4SidebarMenuItem(
          text = "Quarterly Performance Report",
+         tabName = "qpr", # quarterly performance tab
          icon = shiny::icon("file-medical-alt"),
          bs4Dash::bs4SidebarMenuSubItem(
            text = "System Performance Measures",
-           tabName = "qpr_spm"# SPM-Tab
+           tabName = "spm"# SPM-Tab
          ),
          bs4Dash::bs4SidebarMenuSubItem(
            text = "Community Need (by County)",
