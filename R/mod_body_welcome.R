@@ -17,21 +17,13 @@ mod_body_welcome_ui <- function(id){
       bs4Dash::bs4Accordion(
         id = "about",
         bs4Dash::bs4AccordionItem(
-          title = "R Minor Maintenance",
-          tags$h1("Coming Soon", icon("tools")),
-          tags$p(
-            "R minor is undergoing maintenance for improvements."
-          ),
-          collapsed = FALSE
-        ),
-        bs4Dash::bs4AccordionItem(
           title = "About R Minor",
           tags$p(
             "R minor is a free and open source project created and maintained by the HMIS team at Coalition on Homelessness and Housing in Ohio (COHHIO) for the Ohio Balance of State CoC and the Mahoning County CoC. Please find the code ",
             tags$a(href = "https://github.com/COHHIO/Rminor", "here.", target = "_blank"),
             " R minor contains up-to-date aggregate reporting at the project and system level. Its target audience is community planners, agency management, funders, and HMIS users who are looking for more system- level reporting."
           ),
-          collapsed = TRUE
+          collapsed = FALSE
         ),
         bs4Dash::bs4AccordionItem(
           title = "Ohio Balance of State CoC",

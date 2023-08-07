@@ -38,7 +38,7 @@ mod_body_client_counts_server <- function(id){
     
     output$header <- shiny::renderUI({
       server_header(
-        title = "Bed & Unit Utilization"
+        title = "Program Dashboard"
       )
     })
 

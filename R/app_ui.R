@@ -29,6 +29,7 @@ app_ui <- function(request) {
     includeScript("inst/js/new_tab_badges.js"),
     # Your application UI logic
     bs4Dash::dashboardPage(
+      help = NULL,
       header = mod_navbar_ui("navbar"),
       sidebar = mod_sidebar_ui("sidebar"),
       body = mod_body_ui("body")

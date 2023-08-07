@@ -65,31 +65,31 @@ mod_sidebar_ui <- function(id){
            text = "Community Need (by County)",
            tabName = "qpr_community_need" #spdat-Tab
          ),
-         bs4Dash::bs4SidebarMenuItem(
+         bs4Dash::bs4SidebarMenuSubItem(
            text = "Length of Stay",
            tabName = "qpr_length_of_stay" # LoS-Tab
          ),
-         bs4Dash::bs4SidebarMenuItem(
+         bs4Dash::bs4SidebarMenuSubItem(
            text = "Exits to Permanent Housing",
            tabName = "qpr_permanent_housing" # PHTab
          ),
-         bs4Dash::bs4SidebarMenuItem(
+         bs4Dash::bs4SidebarMenuSubItem(
            text = "Non-Cash Benefits at Exit",
            tabName = "qpr_noncash_benefits" # NCB-Tab
          ),
-         bs4Dash::bs4SidebarMenuItem(
+         bs4Dash::bs4SidebarMenuSubItem(
            text = "Health Insurance at Exit",
            tabName = "qpr_health_insurance" # HI-Tab
          ),
-         bs4Dash::bs4SidebarMenuItem(
+         bs4Dash::bs4SidebarMenuSubItem(
            text = "Income Growth",
            tabName = "qpr_income_growth" # Income-Tab
          ),
-         bs4Dash::bs4SidebarMenuItem(
+         bs4Dash::bs4SidebarMenuSubItem(
            text = "Rapid Placement for RRH",
            tabName = "qpr_rrh_placement" # RRH-Tab
          ),
-         bs4Dash::bs4SidebarMenuItem(
+         bs4Dash::bs4SidebarMenuSubItem(
            text = "RRH v HP Spending",
            tabName = "qpr_rrh_spending" # RRHspending-Tab
          )
@@ -99,12 +99,12 @@ mod_sidebar_ui <- function(id){
          tabName = "about",
          icon = shiny::icon("info-circle")
        ),
-       actionButton(
-         inputId = "logOut",
-         label = "Log Out",
-         onclick =
-           "window.open(window.location.href + '__logout__/', '_self')"
-       ),
+       # actionButton(
+       #   inputId = "logOut",
+       #   label = "Log Out",
+       #   onclick =
+       #     "window.open(window.location.href + '__logout__/', '_self')"
+       # ),
        bs4Alert(
          tags$strong("Data refreshed: ",tags$br(), refreshed),
          id = "data_refresh",
