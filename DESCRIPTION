@@ -8,11 +8,36 @@ Authors@R: c(person('Stephen', 'Holsenbeck', email =
 Description: HMIS Data Analysis for the Ohio Balance of State
        and Youngstown CoCs
 License: AGPL-3
-Imports: bs4Dash, config, dplyr, DT, glue, golem, HMIS,
-       htmltools, htmlwidgets, lubridate, magrittr, maleta,
-       plotly, purrr, rlang, sass, scales, shiny,
-       shinydashboard, shinyWidgets, stats, stringr, testthat,
-       tibble, tidyr, UU, zoo
+Imports: 
+    arrow,
+    bs4Dash,
+    config,
+    dplyr,
+    DT,
+    feather,
+    glue,
+    golem,
+    HMIS,
+    htmltools,
+    htmlwidgets,
+    lubridate,
+    magrittr,
+    maleta,
+    plotly,
+    purrr,
+    rlang,
+    sass,
+    scales,
+    shiny,
+    shinydashboard,
+    shinyWidgets,
+    stats,
+    stringr,
+    testthat,
+    tibble,
+    tidyr,
+    UU,
+    zoo
 Remotes: yogat3ch/maleta, yogat3ch/rdrop2, yogat3ch/UU, COHHIO/HMIS
 Encoding: UTF-8
 LazyData: true
@@ -24,6 +49,7 @@ Suggests: testthat, callr
 Collate: 
     '0_utils-pipe.R'
     '0_utils_helpers.R'
+    '_disable_autoload.R'
     'aaa_imports.R'
     'app_config.R'
     'app_server.R'

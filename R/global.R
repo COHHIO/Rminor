@@ -15,10 +15,12 @@
 #' @include golem_utils_server.R
 
 # Create accessor functions
-maleta::create_accessors("data")
-if (golem::app_prod() ||
-    testthat::is_testing() ||
-    Sys.getenv("R_CONFIG_ACTIVE") == "shinyapps") {
+Sys.setenv(TZ = "America/New_York")
+
+.time <- system.time({
+  maleta::create_accessors("data")
+})
+
   
   # Run only if in production mode or testing
   
@@ -164,5 +166,4 @@ data_ui <- list(choices_month = choices_month,
                 provider_dash_choices = programs,
                 choices_project_type = choices_project_type,
                 tab_choices = tab_choices)
-}
 

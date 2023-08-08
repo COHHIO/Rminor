@@ -157,6 +157,28 @@
       ],
       "Hash": "74a64813f17b492da9c6afda6b128e3d"
     },
+    "arrow": {
+      "Package": "arrow",
+      "Version": "12.0.1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "R6",
+        "assertthat",
+        "bit64",
+        "cpp11",
+        "glue",
+        "methods",
+        "purrr",
+        "rlang",
+        "stats",
+        "tidyselect",
+        "utils",
+        "vctrs"
+      ],
+      "Hash": "9ff9955a1766e0bc3493f06d8f43c97e"
+    },
     "askpass": {
       "Package": "askpass",
       "Version": "1.1",
@@ -375,6 +397,16 @@
         "stats"
       ],
       "Hash": "c4837a5ed530b4327914b54a2644990e"
+    },
+    "assertthat": {
+      "Package": "assertthat",
+      "Version": "0.2.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "tools"
+      ],
+      "Hash": "50c838a310445e954bc13f26f26a6ecf"
     },
     "attempt": {
       "Package": "attempt",
@@ -789,6 +821,18 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "f7736a18de97dea803bde0a2daaafb27"
+    },
+    "feather": {
+      "Package": "feather",
+      "Version": "0.3.5",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "Rcpp",
+        "hms",
+        "tibble"
+      ],
+      "Hash": "76de23891bdba419517e855ed611ad29"
     },
     "fontawesome": {
       "Package": "fontawesome",
