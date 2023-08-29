@@ -54,18 +54,21 @@ qpr_expr$permanent_housing$expr <- rlang::expr({
 
 qpr_expr$permanent_housing$infobox <- rlang::expr({
   req(data_env())
+  
   qpr_infobox(
     data_env(),
     title = "Successfully Placed",
     color = "info",
+    value = scales::percent(nrow(.data$SuccessfullyPlaced) / nrow(.data$TotalHHsSuccessfulPlacement)),
     icon = shiny::icon("key"),
-    value = paste(
+    subtitle = paste(
       nrow(.data$SuccessfullyPlaced),
       "/",
       nrow(.data$TotalHHsSuccessfulPlacement),
       "households"
     )
   )
+  
 })
 
 qpr_expr$permanent_housing$datatable <- 

@@ -88,10 +88,6 @@ mod_sidebar_ui <- function(id){
          bs4Dash::bs4SidebarMenuSubItem(
            text = "Rapid Placement for RRH",
            tabName = "qpr_rrh_placement" # RRH-Tab
-         ),
-         bs4Dash::bs4SidebarMenuSubItem(
-           text = "RRH v HP Spending",
-           tabName = "qpr_rrh_spending" # RRHspending-Tab
          )
        ),
        bs4Dash::bs4SidebarMenuItem(

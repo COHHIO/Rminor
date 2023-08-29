@@ -57,7 +57,8 @@ mod_body_spm_server <- function(id){
     ns <- session$ns
     output$header <- renderUI({
       server_header(
-        "System Performance Measures"
+        "System Performance Measures",
+        shiny::p("The System Performance Measures (SPMs) show how the Ohio BoSCoC as a whole is performing on key federal performance metrics. Please note, Measure 6 has been intentionally omitted.")
       )
     })
       
@@ -226,8 +227,8 @@ mod_body_spm_server <- function(id){
                         PctPHExit = scales::percent(PctPHExit)) |> 
           dplyr::rename("Fiscal Year" = FiscalYear,
                         "Successful Street Outreach" = PctSOExit,
-                        "Successful Exits from ES, SH, TH, and RRH" = PctESSHTHRRHExit,
-                        "Successful Exits from PH" = PctPHExit) |>
+                        "Successful Exits from ES, SH, TH, and RRH to Permanent Housing" = PctESSHTHRRHExit,
+                        "Successful Exits from PH or Retention of PH" = PctPHExit) |>
           datatable_default()
       })
   })

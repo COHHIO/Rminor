@@ -13,6 +13,7 @@ mod_body_ceaps_ui <- function(id) {
     ui_header_row(),
     ui_row(
         title = "Coordinated Entry Access Points",
+        htmltools::HTML("Coordinated Entry Access Points (CE APs) serve as the entry point to the Ohio BoSCoC homeless response system. If a CE AP provider notices that the posted information is not correct, please contact the CoC team at <a href='mailto:ohioboscoc@cohhio.org' target='_blank'>ohioboscoc@cohhio.org</a> to notify them of needed corrections."),
         DT::dataTableOutput(ns("AP_list")),
         width = 12
     ),
@@ -21,11 +22,13 @@ mod_body_ceaps_ui <- function(id) {
       htmltools::HTML("The solid-colored counties are all part of the Ohio Balance
                       of State CoC. The Ohio Development Services Agency (ODSA)
                       further divided the counties in the Balance of State into
-                      17 Homeless Planning Regions to make implementatin of 
+                      17 Homeless Planning Regions to make implementation of 
                       state-funded programs in the Balance of State more localized."
-                      ),
-      img(src = "www/Homeless-Region-Map-for-COHHIO-2017.png",
-          style = 'max.width: 100%; height: auto')
+                      )
+    ),
+    ui_row(
+      htmltools::img(src = "www/BoS-Region-Map-2023.png",
+                     width = '50%')
     )
   )
 }

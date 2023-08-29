@@ -65,7 +65,13 @@ mod_body_qpr_community_need_server <- function(id){
                          by = "CountyServed") %>%
         dplyr::arrange(CountyServed) %>%
         dplyr::left_join(., Regions(), by = c("CountyServed" = "County")) %>%
-        dplyr::filter(RegionName == input$region)
+        dplyr::filter(RegionName == input$region) |>
+        dplyr::rename("County Served" = CountyServed,
+                      "Average Score" = AverageScore,
+                      "Heads of Household Served and Scored in County" = HHsLHinCounty,
+                      "Housed Average Score" = HousedAverageScore,
+                      "Heads of Household Housed in County" = HHsHousedInCounty,
+                      "Region Name" = RegionName) 
     }) |> 
       debounce(1500)
   

@@ -28,12 +28,18 @@ mod_body_welcome_ui <- function(id){
         bs4Dash::bs4AccordionItem(
           title = "Ohio Balance of State CoC",
           tags$p(
-            "The Ohio Balance of State Continuum of Care (BoSCoC) represents 80 of the 88 counties  in Ohio and is the planning body for homeless services in the area.  The Ohio Development Services Agency (ODSA) and the Coalition on  Homelessness and Housing in Ohio (COHHIO) serve as the lead staffing agencies and co-chairs of the Steering Committee for the Ohio BoSCoC. ODSA serves as the Ohio BoSCoC Collaborative Applicant (submits the annual consolidated CoC Application) while COHHIO serves as the HMIS Lead Agency."
+            "The Ohio Balance of State Continuum of Care (BoSCoC) is the homeless 
+            response system that is comprised of 80 of Ohio's 88 counties. The 
+            Ohio Department of Development (ODOD) and the Coalition on  Homelessness
+            and Housing in Ohio (COHHIO) provide system leadership and staff support
+            to the CoC. ODOD serves as the Ohio BoSCoC Collaborative Applicant,
+            while COHHIO serves as the HMIS Lead Agency and provides primary support
+            to the CoC."
           ),
           htmltools::img(
             src = "www/MapBoS.png",
-            height = '100%',
-            width = '100%'
+            height = '25%',
+            width = '25%'
           )
         ),
         bs4Dash::bs4AccordionItem(
@@ -43,19 +49,22 @@ mod_body_welcome_ui <- function(id){
           ),
           htmltools::img(
             src = "www/MapMahoningCountyCoC.png",
-            height = '100%',
-            width = '100%'
+            height = '25%',
+            width = '25%'
           )
         ),
         bs4Dash::bs4AccordionItem(
           title = "Ohio Balance of State CoC Homeless Planning Regions",
           tags$p(
-            "The solid-colored counties are all part of the Ohio Balance of State CoC. The Ohio Development Services Agency (ODSA) further divided the counties in the Balance of State into 17 Homeless Planning Regions to make implementation of state-funded programs in the Balance of State more localized. Throughout R minor, you will notice references to Homeless Planning Regions. Please consult this map if you are unsure what Region your county is in."
+            "To facilitate funding distribution and support system coordination
+            efforts, the Ohio BoSCoC is divided into 17 Homeless Planning Regions.
+            Throughout R minor, you will notice references to Homeless Planning Regions. 
+            Please consult this map if you are unsure what Region your county is in."
           ),
           htmltools::img(
-            src = "www/Homeless-Region-Map-for-COHHIO-2017.png",
-            height = '100%',
-            width = '100%'
+            src = "www/BoS-Region-Map-2023.png",
+            height = '50%',
+            width = '50%'
           )
         ),
         bs4Dash::bs4AccordionItem(
