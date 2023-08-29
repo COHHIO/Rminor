@@ -1,0 +1,42 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# Rminor
+
+<!-- badges: start -->
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://www.tidyverse.org/lifecycle/#stable)
+[![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+<!-- badges: end -->
+
+An open-source HMIS custom reporting Shiny app created by Genelle Denzin at Coalition on Homelessness and Housing in Ohio (COHHIO).
+
+### About
+
+This is an open source project released under the GNU AGPLv3 license. See LICENSE for more details or visit the official GNU page at http://www.gnu.org/licenses/agpl-3.0.html.
+
+All the code in this repository is written using R and RStudio. Please consult the book [R for Data Science](https://r4ds.had.co.nz/) for help getting started with R and RStudio.
+
+### Data Source
+
+This app takes the .Rdata files from the COHHIO_HMIS project (see that repo for details). This way, the data shaping happens once, somewhere else, and not so much in the app.
+
+### Security
+
+No HMIS data is ever included in this repository. To make this code work, you will need to supply your own HMIS data. You are responsible for securing your HUD CSV export on your computer and ensuring that it is not compromised using whatever security measures you use for that locally.
+
+### Code of Conduct
+
+Please note that the Rminor project is released with a [Contributor Code of Conduct](https://contributor-covenant.org/version/2/0/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms.
+

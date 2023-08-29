@@ -1,0 +1,20 @@
+{
+  "bioconductor.version": [],
+  "external.libraries": [],
+  "ignored.packages": [
+    "sinew",
+    "sos"
+  ],
+  "package.dependency.fields": [
+    "Imports",
+    "Depends",
+    "LinkingTo"
+  ],
+  "r.version": [],
+  "snapshot.type": "explicit",
+  "use.cache": true,
+  "vcs.ignore.cellar": true,
+  "vcs.ignore.library": true,
+  "vcs.ignore.local": true,
+  "vcs.manage.ignores": true
+}
