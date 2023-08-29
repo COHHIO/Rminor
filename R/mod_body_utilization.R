@@ -99,7 +99,7 @@ mod_body_utilization_server <- function(id){
                             hoverinfo = 'y') |>
           plotly::layout(yaxis = list(
             title = "Utilization",
-            tickformat = "%",
+            tickformat = ".0%",
             range = c(0, 2)
           ),
           margin = list(
