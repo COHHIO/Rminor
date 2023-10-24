@@ -61,7 +61,7 @@ Sys.setenv(TZ = "America/New_York")
 # NOTE entries have been alphabetized.
 choices_project_type <- list(
   `Coordinated Entry` = 14,
-  `Emergency Shelters` = 1,
+  `Emergency Shelters` = c(0, 1),
   `Prevention` = 12,
   `Permanent Supportive Housing` = c(3, 9),
   `Rapid Rehousing` = 13,
