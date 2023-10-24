@@ -19,11 +19,7 @@ mod_body_ceaps_ui <- function(id) {
     ),
     ui_row(
       title = "Ohio Balance of State CoC Homeless Planning Regions",
-      htmltools::HTML("The solid-colored counties are all part of the Ohio Balance
-                      of State CoC. The Ohio Development Services Agency (ODSA)
-                      further divided the counties in the Balance of State into
-                      17 Homeless Planning Regions to make implementation of 
-                      state-funded programs in the Balance of State more localized."
+      htmltools::HTML("To facilitate funding distribution and support system coordination efforts, the Ohio BoSCoC is divided into 17 Homeless Planning Regions. Throughout R minor, you will notice references to Homeless Planning Regions. Please consult this map if you are unsure what Region your county is in."
                       )
     ),
     ui_row(

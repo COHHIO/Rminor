@@ -131,10 +131,10 @@ if (exists("Regions")) {
         choices = x
       ),
       length_of_stay = list(
-        choices = unique(qpr_leavers()$ProjectName[qpr_leavers()$ProjectType %in% c(1, 2, 8, 13)])
+        choices = unique(qpr_leavers()$ProjectName[qpr_leavers()$ProjectType %in% c(0, 1, 2, 8, 13)])
       ),
       permanent_housing = list(
-        choices = unique(qpr_leavers()$ProjectName[qpr_leavers()$ProjectType %in% c(1:4, 8:9, 12:13)])
+        choices = unique(qpr_leavers()$ProjectName[qpr_leavers()$ProjectType %in% c(0:4, 8:9, 12:13)])
       ),
       noncash_benefits = list(
         choices = unique(qpr_benefits()$ProjectName)

@@ -11,7 +11,7 @@ qpr_expr$length_of_stay$expr <- rlang::expr({
       !is.na(MoveInDateAdjust) & ProjectType == 13
     ) |
       (
-        !is.na(ExitDate) & ProjectType %in% c(1, 2, 8)
+        !is.na(ExitDate) & ProjectType %in% c(0, 1, 2, 8)
       )) &
       ProjectName == input$region
     ) 

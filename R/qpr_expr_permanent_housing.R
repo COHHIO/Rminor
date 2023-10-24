@@ -19,12 +19,12 @@ qpr_expr$permanent_housing$expr <- rlang::expr({
   
   
   .psh_hp <- .by_region$ProjectType %in% c(3, 9, 12)
-  .es_th_sh_out_rrh <- .by_region$ProjectType %in% c(1, 2, 4, 8, 13)
+  .es_th_sh_out_rrh <- .by_region$ProjectType %in% c(0, 1, 2, 4, 8, 13)
   
   SuccessfullyPlaced <- dplyr::filter(.by_region,
                                       ((ProjectType %in% c(3, 9, 13) &
                                           !is.na(MoveInDateAdjust)) |
-                                         ProjectType %in% c(1, 2, 4, 8, 12)
+                                         ProjectType %in% c(0, 1, 2, 4, 8, 12)
                                       ) &
                                         # excluding non-mover-inners
                                         (((DestinationGroup == "Permanent" |
