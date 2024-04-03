@@ -2,6 +2,7 @@ qpr_dependencies$RRH <- c(
   "qpr_rrh_enterers",
   "goals"
 )
+
 qpr_expr$rrh_placement <- list()
 qpr_expr$rrh_placement$expr <- rlang::expr({
   qpr_rrh_enterers() |>

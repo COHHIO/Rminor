@@ -11,6 +11,7 @@ mod_body_qpr_income_growth_ui <- function(id){
   ns <- NS(id)
   mod_qpr_ui(id)
 }
+
     
 #' body_qpr_income_growth Server Functions
 #'

@@ -45,7 +45,7 @@ qpr_expr$noncash_benefits$infobox <- rlang::expr({
 qpr_expr$noncash_benefits$datatable <- rlang::expr({
   data_env() |>
     dplyr::mutate(
-      BenefitsFromAnySource = HMIS::hud_translations$`1.8 No_Yes_Reasons for Missing Data`(BenefitsFromAnySource)
+      BenefitsFromAnySource = HMIS::hud_translations$`1.8 NoYesReasons for Missing Data`(BenefitsFromAnySource)
     ) |>
     dplyr::select(
       UniqueID,

@@ -48,7 +48,7 @@ qpr_expr$health_insurance$infobox <- rlang::expr({
 qpr_expr$health_insurance$datatable <- rlang::expr({
   data_env() |>
     dplyr::mutate(
-      InsuranceFromAnySource = HMIS::hud_translations$`1.8 No_Yes_Reasons for Missing Data`(InsuranceFromAnySource)) |>
+      InsuranceFromAnySource = HMIS::hud_translations$`1.8 NoYesReasons for Missing Data`(InsuranceFromAnySource)) |>
     dplyr::select(
       UniqueID,
       EntryDate,

@@ -46,6 +46,8 @@ mod_qpr_ui <- function(id, choices = NULL, date_choices = NULL,
       purrr::list_modify(.x, !!!.y)
     })
   }
+
+ do.call(ui_date_range, .defaults$Dates)
   # tabItem Output ----
   shiny::tagList(
     ui_header_row(ns("header")),
