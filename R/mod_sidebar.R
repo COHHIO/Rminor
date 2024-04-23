@@ -54,7 +54,7 @@ mod_sidebar_ui <- function(id){
          icon = shiny::icon("bed")
        ),
        bs4Dash::bs4SidebarMenuItem(
-         text = "Quarterly Performance Report",
+         text = "Ohio BoS Performance",
          tabName = "qpr", # quarterly performance tab
          icon = shiny::icon("file-medical-alt"),
          bs4Dash::bs4SidebarMenuSubItem(

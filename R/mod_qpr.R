@@ -51,6 +51,7 @@ mod_qpr_ui <- function(id, choices = NULL, date_choices = NULL,
   # tabItem Output ----
   shiny::tagList(
     ui_header_row(ns("header")),
+    ui_row(a("Ohio BoS 2024 Performance Managment Plan", href = "https://cohhio.org/wp-content/uploads/2024/04/Ohio-BoSCoC-2024-PMP_Final.pdf")),
     ui_row(
       if (shiny::isTruthy(.defaults$Dates))
         do.call(ui_date_range, .defaults$Dates)
