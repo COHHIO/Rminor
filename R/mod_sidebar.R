@@ -70,6 +70,10 @@ mod_sidebar_ui <- function(id){
            tabName = "qpr_permanent_housing" # PHTab
          ),
          bs4Dash::bs4SidebarMenuSubItem(
+           text = "Exits to Temp or Permanent Housing",
+           tabName = "qpr_temp_permanent_housing" # PHTab
+         ),
+         bs4Dash::bs4SidebarMenuSubItem(
            text = "Non-Cash Benefits at Exit",
            tabName = "qpr_noncash_benefits" # NCB-Tab
          ),
