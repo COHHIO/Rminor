@@ -62,10 +62,6 @@ mod_sidebar_ui <- function(id){
            tabName = "spm"# SPM-Tab
          ),
          bs4Dash::bs4SidebarMenuSubItem(
-           text = "Community Need (by County)",
-           tabName = "qpr_community_need" #spdat-Tab
-         ),
-         bs4Dash::bs4SidebarMenuSubItem(
            text = "Length of Stay",
            tabName = "qpr_length_of_stay" # LoS-Tab
          ),
