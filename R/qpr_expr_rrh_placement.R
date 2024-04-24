@@ -70,18 +70,12 @@ qpr_expr$rrh_placement$datatable <- rlang::expr({
 #   attr(summaryDays, "title") <- title
 #   summaryDays
 # })
-# 
-# qpr_expr$RRH$plot <- rlang::expr({
-#   qpr_plotly(
-#     data_env(),
-#     title = attr(data_env(), "title"),
-#     y = ~ AvgDays,
-#     xaxis = list(title = ~ FriendlyProjectName),
-#     yaxis = list(title = "Average Days to House"),
-#     shapes = list(
-#       y0 = ~ Goal[1],
-#       y1 = 0
-#     )  
-#   )
-#   
-# })
+
+qpr_expr$rrh_placement$details <- rlang::expr({
+  tibble::tibble(
+    ProjectType = c("Rapid Re-housing"),
+    Goal = c("RRH projects will place households into permanent housing within 21 days of project entry"),
+    HowCalculated = c("Average number of days between leavers' RRH entry date and Housing Move-in Date")
+    ) |> 
+    DT::datatable(escape = FALSE)
+})

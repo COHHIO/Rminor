@@ -124,9 +124,17 @@ qpr_expr$income_growth$datatable <- rlang::expr({
     datatable_default(escape = FALSE)
 })
 
-qpr_expr$income_growth$plot <- rlang::expr({
-  qpr_plotly(
-    data_env(),
-    title = attr(data_env(), "title")
-  )
+qpr_expr$income_growth$details <- rlang::expr({
+  tibble::tibble(
+    ProjectType = c("Emergency Shelter", "Transitional Housing", "Rapid Re-housing", "Permanent Supportive Housing"),
+    Goal = c("At least 18% of households in ES projects will gain or increase employment or non-employment cash income during the reporting period or at exit",
+             "At least 28% of households in TH projects will gain or increase employment or non-employment cash income during the reporting period or at exit",
+             "At least 18% of households in RRH projects will gain or increase employment or non-employment cash income during the reporting period or at exit",
+             "At least 30% of households in PSH projects will gain or increase employment or non-employment cash income during the reporting period or at exit"),
+    HowCalculated = c("Number of households who either gained or increased earned income or who gained or increased non-employment cash income / number of households served by the project",
+                      "Number of households who either gained or increased earned income or who gained or increased non-employment cash income / number of households served by the project",
+                      "Number of households who either gained or increased earned income or who gained or increased non-employment cash income / number of households who entered an project",
+                      "Number of households who either gained or increased earned income or who gained or increased non-employment cash income / number of households who entered a PSH project")
+  ) |> 
+    DT::datatable(escape = FALSE)
 })

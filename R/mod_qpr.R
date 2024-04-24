@@ -51,7 +51,22 @@ mod_qpr_ui <- function(id, choices = NULL, date_choices = NULL,
   # tabItem Output ----
   shiny::tagList(
     ui_header_row(ns("header")),
-    ui_row(a("Ohio BoS 2024 Performance Managment Plan", href = "https://cohhio.org/wp-content/uploads/2024/04/Ohio-BoSCoC-2024-PMP_Final.pdf")),
+    ui_row(
+      title = "Report Details",
+      bs4Dash::bs4Accordion(
+        id = "about",
+        bs4Dash::bs4AccordionItem(
+          title = "Ohio BoS Performance Management Plan",
+          tags$p(a("Ohio BoS 2024 Performance Managment Plan", href = "https://cohhio.org/wp-content/uploads/2024/04/Ohio-BoSCoC-2024-PMP_Final.pdf")),
+          collapsed = TRUE
+        ),
+        bs4Dash::bs4AccordionItem(
+          title = "Performance Goals / How Measures Calculated",
+          iterate(qpr_expr[[.id]]$details, DT::DTOutput, "dt_measures"),
+          collapsed = TRUE
+        )
+        )
+      ),
     ui_row(
       if (shiny::isTruthy(.defaults$Dates))
         do.call(ui_date_range, .defaults$Dates)
@@ -119,11 +134,17 @@ mod_qpr_server <- function(id, header, ...) {
       output$dt_detail1 <- DT::renderDT(server = FALSE, qpr_expr[[.id]]$datatable, quoted = TRUE)
     }
     
+    if (rlang::is_list(qpr_expr[[.id]]$details)) {
+      for (i in seq_along(qpr_expr[[.id]]$details)) {
+        output[[paste0("dt_measures",i)]] <- DT::renderDT(server = FALSE, qpr_expr[[.id]]$details[[i]], quoted = TRUE)
+      }
+    } else {
+      output$dt_measures1 <- DT::renderDT(server = FALSE, qpr_expr[[.id]]$details, quoted = TRUE)
+    }
+    
   }
     
-    # output$plot <- plotly::renderPlotly({
-    #   shiny::req(input$Region)
-    #   rlang::eval_bare(qpr_expr[[id]]$plot)
-    # })
+    
+
 
 }

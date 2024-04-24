@@ -105,3 +105,17 @@ qpr_expr$permanent_housing$datatable <-
       datatable_default(escape = FALSE)
   })
 
+qpr_expr$permanent_housing$details <- rlang::expr({
+  tibble::tibble(
+    ProjectType = c("Street Outreach", "Emergency Shelter", "Transitional Housing", "Rapid Re-housing"),
+    Goal = c("At least 30% of households in Outreach projects will move into permanent housing at exit",
+             "At least 40% of households in ES projects will move into permanent housing at exit",
+             "At least 83% of households in TH projects will move into permanent housing at exit",
+             "At least 83% of households in RRH projects will move into permanent housing at exit"),
+    HowCalculated = c("Number of households who moved to PH upon exit / number of participants who exited project",
+                      "Number of households who moved to PH upon exit / number of participants who exited ES project",
+                      "Number of households who moved to PH upon exit / number of participants who exited TH project",
+                      "Number of households who moved to PH upon exit / number of participants who exited RRH project")
+  ) |> 
+    DT::datatable(escape = FALSE)
+})

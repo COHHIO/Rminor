@@ -45,20 +45,17 @@ qpr_expr$length_of_stay$datatable <- rlang::expr({
     datatable_default(escape = FALSE)
 })
 
-# qpr_expr$length_of_stay$plot <- rlang::expr({
-#   qpr_plotly(
-#     data_env(),
-#     y = ~ Days,
-#     title = attr(data_env(), "title"),
-#     xaxis = list(
-#       title = "",
-#       rangemode = "tozero",
-#       showgrid = TRUE
-#     ),
-#     yaxis = list(
-#       title = "Days",
-#       rangemode = "tozero",
-#       showgrid = TRUE
-#     )
-#   )
-# })
+qpr_expr$length_of_stay$details <- rlang::expr({
+  tibble::tibble(
+    ProjectType = c("Emergency Shelter", "Emergency Shelter", "Transitional Housing", "Transitional Housing"),
+    Goal = c("Emergency Shelter (ES) projects will have a household average length of stay of no more than 40 days",
+             "ES projects will have a household median length of stay of no more than 40 days",
+             "Transitional Housing (TH) projects will have a household average length of stay of no more than 240 days",
+             "TH projects will have a household median length of stay of no more than 240 days"),
+    HowCalculated = c("Average length of stay for households who have exited",
+                      "Median length of stay for households who have exited",
+                      "Average length of stay for households who have exited",
+                      "Median length of stay for households who have exited")
+  ) |> 
+    DT::datatable(escape = FALSE)
+})
