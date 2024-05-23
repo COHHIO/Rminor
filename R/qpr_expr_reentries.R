@@ -57,9 +57,9 @@ qpr_expr$reentries$infobox <- rlang::expr({
 
 qpr_expr$reentries$details <- rlang::expr({
   tibble::tibble(
-    ProjectType = c("Rapid Re-housing"),
-    Goal = c("RRH projects will place households into permanent housing within 21 days of project entry"),
-    HowCalculated = c("Average number of days between leavers' RRH entry date and Housing Move-in Date")
+    ProjectType = c("Homelessness Prevention"),
+    Goal = c("HP Projects will have no more than 25% of households who exited to PH enter into the Ohio BoSCoC homeless system within 12 months of HP assistance"),
+    HowCalculated = c("Number of households who returned to ES, SH, TH, or Outreach within 12 months of exit / number of household leavers to permanent housing")
     ) |> 
     DT::datatable(escape = FALSE)
 })
