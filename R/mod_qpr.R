@@ -110,7 +110,7 @@ mod_qpr_server <- function(id, header, ...) {
       req(input$date_range)
       server_header(header, date_range = input$date_range, ...)
     })
-    
+
     # Process Data
     data_env <- shiny::reactive(qpr_expr[[.id]]$expr, quoted = TRUE)
     if (UU::is_legit(qpr_expr[[.id]]$infobox)) {

@@ -153,6 +153,11 @@ if (exists("Regions")) {
           qpr_rrh_enterers()$ProjectName
         ))
       ),
+      reentries = list(
+        choices = unique(sort(
+          qpr_reentries()$ExitingHP
+        ))
+      ),
       rrh_spending = list(
         choices = unique(sort(
           qpr_spending()$OrganizationName
