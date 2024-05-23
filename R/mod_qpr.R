@@ -77,8 +77,6 @@ mod_qpr_ui <- function(id, choices = NULL, date_choices = NULL,
     ,
     ui_row(
       iterate(qpr_expr[[.id]]$infobox, bs4Dash::infoBoxOutput, "ib_summary", width = 12)
-      ,
-      iterate(qpr_expr[[.id]]$datatable, DT::DTOutput, "dt_detail")
     )
   )
   
@@ -122,17 +120,9 @@ mod_qpr_server <- function(id, header, ...) {
         output[[paste0("ib_summary",i)]] <- bs4Dash::renderbs4InfoBox(x[[i]], quoted = TRUE)
       }  
     }
-    # output$ib_summary1 <- bs4Dash::renderbs4InfoBox(qpr_expr[[.id]]$infobox, 
-    #                                                  quoted = TRUE)
     
     
-    if (rlang::is_list(qpr_expr[[.id]]$datatable)) {
-      for (i in seq_along(qpr_expr[[.id]]$datatable)) {
-        output[[paste0("dt_detail",i)]] <- DT::renderDT(server = FALSE, qpr_expr[[.id]]$datatable[[i]], quoted = TRUE)
-      }
-    } else {
-      output$dt_detail1 <- DT::renderDT(server = FALSE, qpr_expr[[.id]]$datatable, quoted = TRUE)
-    }
+
     
     if (rlang::is_list(qpr_expr[[.id]]$details)) {
       for (i in seq_along(qpr_expr[[.id]]$details)) {

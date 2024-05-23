@@ -50,45 +50,45 @@ qpr_expr$temp_permanent_housing$infobox <- rlang::expr({
   
 })
 
-qpr_expr$temp_permanent_housing$datatable <- 
-  rlang::expr({
-    req(data_env())
-    dplyr::left_join(
-      data_env()$TotalHHsSuccessfulPlacement,
-      data_env()$SuccessfullyPlaced,
-      by = c(
-        "EnrollmentID",
-        "ProjectType",
-        "ProjectName",
-        "PersonalID",
-        "UniqueID",
-        "EntryDate",
-        "MoveInDate",
-        "MoveInDateAdjust",
-        "ExitDate",
-        "DestinationGroup",
-        "Destination",
-        "HouseholdID"
-      )
-    ) |>
-      dplyr::mutate(BedStart = dplyr::if_else(ProjectType %in% c(3, 9, 13),
-                                              MoveInDate, EntryDate)) |>
-      dplyr::arrange(DestinationGroup, PersonalID) |>
-      dplyr::select(
-        UniqueID,
-        EntryDate,
-        "Bed Start" = BedStart,
-        ExitDate,
-        "Destination Group" =  DestinationGroup
-      ) |> 
-      datatable_default(escape = FALSE)
-  })
+# qpr_expr$temp_permanent_housing$datatable <- 
+#   rlang::expr({
+#     req(data_env())
+#     dplyr::left_join(
+#       data_env()$TotalHHsSuccessfulPlacement,
+#       data_env()$SuccessfullyPlaced,
+#       by = c(
+#         "EnrollmentID",
+#         "ProjectType",
+#         "ProjectName",
+#         "PersonalID",
+#         "UniqueID",
+#         "EntryDate",
+#         "MoveInDate",
+#         "MoveInDateAdjust",
+#         "ExitDate",
+#         "DestinationGroup",
+#         "Destination",
+#         "HouseholdID"
+#       )
+#     ) |>
+#       dplyr::mutate(BedStart = dplyr::if_else(ProjectType %in% c(3, 9, 13),
+#                                               MoveInDate, EntryDate)) |>
+#       dplyr::arrange(DestinationGroup, PersonalID) |>
+#       dplyr::select(
+#         UniqueID,
+#         EntryDate,
+#         "Bed Start" = BedStart,
+#         ExitDate,
+#         "Destination Group" =  DestinationGroup
+#       ) |> 
+#       datatable_default(escape = FALSE)
+#   })
 
 qpr_expr$temp_permanent_housing$details <- rlang::expr({
   tibble::tibble(
     ProjectType = c("Street Outreach"),
     Goal = c("At least 60% of households in Outreach projects will move from unsheltered locations to temporary or permanent housing at exit"),
     HowCalculated = c("Number of households who moved from unsheltered locations to temporary (ES or TH) or to PH upon exit / number of households who moved from unsheltered locations to any destination at exit")
-  ) |> 
+  ) |>
     DT::datatable(escape = FALSE)
 })

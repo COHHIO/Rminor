@@ -108,21 +108,21 @@ qpr_expr$income_growth$infobox <- rlang::expr({
 #   stagingIncome
 # })
 
-qpr_expr$income_growth$datatable <- rlang::expr({
-  data_env() |>
-    dplyr::mutate(EntryIncome = scales::dollar(EntryIncome, accuracy = .01),
-                  RecentIncome = scales::dollar(RecentIncome, accuracy = .01),
-                  Difference = scales::dollar(Difference, accuracy = .01)) |>
-    dplyr::select(
-      UniqueID,
-      EntryDate,
-      ExitDate,
-      "Income at Entry" = EntryIncome,
-      "Most Recent Income" = RecentIncome,
-      "Income Difference" = Difference
-    ) |> 
-    datatable_default(escape = FALSE)
-})
+# qpr_expr$income_growth$datatable <- rlang::expr({
+#   data_env() |>
+#     dplyr::mutate(EntryIncome = scales::dollar(EntryIncome, accuracy = .01),
+#                   RecentIncome = scales::dollar(RecentIncome, accuracy = .01),
+#                   Difference = scales::dollar(Difference, accuracy = .01)) |>
+#     dplyr::select(
+#       UniqueID,
+#       EntryDate,
+#       ExitDate,
+#       "Income at Entry" = EntryIncome,
+#       "Most Recent Income" = RecentIncome,
+#       "Income Difference" = Difference
+#     ) |> 
+#     datatable_default(escape = FALSE)
+# })
 
 qpr_expr$income_growth$details <- rlang::expr({
   tibble::tibble(

@@ -22,17 +22,17 @@ qpr_expr$rrh_placement$infobox <- rlang::expr({
     )
 })
 
-qpr_expr$rrh_placement$datatable <- rlang::expr({
-  data_env() |>
-    dplyr::arrange(dplyr::desc(DaysToHouse)) |>
-    dplyr::select(
-      UniqueID,
-      EntryDate,
-      "Move In Date" = MoveInDate,
-      "Days to House" = DaysToHouse
-    ) |> 
-    datatable_default(escape = FALSE)
-})
+# qpr_expr$rrh_placement$datatable <- rlang::expr({
+#   data_env() |>
+#     dplyr::arrange(dplyr::desc(DaysToHouse)) |>
+#     dplyr::select(
+#       UniqueID,
+#       EntryDate,
+#       "Move In Date" = MoveInDate,
+#       "Days to House" = DaysToHouse
+#     ) |> 
+#     datatable_default(escape = FALSE)
+# })
 
 # qpr_expr$RRH$expr <- rlang::expr({
 #   ReportStart <- Report()$Start
@@ -76,6 +76,6 @@ qpr_expr$rrh_placement$details <- rlang::expr({
     ProjectType = c("Rapid Re-housing"),
     Goal = c("RRH projects will place households into permanent housing within 21 days of project entry"),
     HowCalculated = c("Average number of days between leavers' RRH entry date and Housing Move-in Date")
-    ) |> 
+    ) |>
     DT::datatable(escape = FALSE)
 })

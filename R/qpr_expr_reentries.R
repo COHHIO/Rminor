@@ -42,17 +42,17 @@ qpr_expr$reentries$infobox <- rlang::expr({
   )
 })
 
-qpr_expr$reentries$datatable <- rlang::expr({
-  data_env()$Reentries |>
-    # dplyr::arrange(dplyr::desc(DaysToHouse)) |>
-    # dplyr::select(
-    #   UniqueID,
-    #   EntryDate,
-    #   "Move In Date" = MoveInDate,
-    #   "Days to House" = DaysToHouse
-    # ) |> 
-    datatable_default(escape = FALSE)
-})
+# qpr_expr$reentries$datatable <- rlang::expr({
+#   data_env()$Reentries |>
+#     # dplyr::arrange(dplyr::desc(DaysToHouse)) |>
+#     # dplyr::select(
+#     #   UniqueID,
+#     #   EntryDate,
+#     #   "Move In Date" = MoveInDate,
+#     #   "Days to House" = DaysToHouse
+#     # ) |> 
+#     datatable_default(escape = FALSE)
+# })
 
 
 qpr_expr$reentries$details <- rlang::expr({

@@ -33,17 +33,17 @@ qpr_expr$length_of_stay$infobox <- rlang::expr({
     )
 })
 
-qpr_expr$length_of_stay$datatable <- rlang::expr({
-  data_env() |>
-    dplyr::arrange(dplyr::desc(DaysinProject)) |>
-    dplyr::select(
-      UniqueID,
-      "Bed Start" = EntryAdjust,
-      ExitDate,
-      "Days in Program" = DaysinProject
-    ) |> 
-    datatable_default(escape = FALSE)
-})
+# qpr_expr$length_of_stay$datatable <- rlang::expr({
+#   data_env() |>
+#     dplyr::arrange(dplyr::desc(DaysinProject)) |>
+#     dplyr::select(
+#       UniqueID,
+#       "Bed Start" = EntryAdjust,
+#       ExitDate,
+#       "Days in Program" = DaysinProject
+#     ) |> 
+#     datatable_default(escape = FALSE)
+# })
 
 qpr_expr$length_of_stay$details <- rlang::expr({
   tibble::tibble(

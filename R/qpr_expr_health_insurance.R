@@ -45,18 +45,18 @@ qpr_expr$health_insurance$infobox <- rlang::expr({
   do.call(qpr_infobox, .args)
 })
 
-qpr_expr$health_insurance$datatable <- rlang::expr({
-  data_env() |>
-    dplyr::mutate(
-      InsuranceFromAnySource = HMIS::hud_translations$`1.8 NoYesReasons for Missing Data`(InsuranceFromAnySource)) |>
-    dplyr::select(
-      UniqueID,
-      EntryDate,
-      ExitDate,
-      "Health Insurance from Any Source (at Exit)" = InsuranceFromAnySource
-    ) |> 
-    datatable_default(escape = FALSE)
-})
+# qpr_expr$health_insurance$datatable <- rlang::expr({
+#   data_env() |>
+#     dplyr::mutate(
+#       InsuranceFromAnySource = HMIS::hud_translations$`1.8 NoYesReasons for Missing Data`(InsuranceFromAnySource)) |>
+#     dplyr::select(
+#       UniqueID,
+#       EntryDate,
+#       ExitDate,
+#       "Health Insurance from Any Source (at Exit)" = InsuranceFromAnySource
+#     ) |> 
+#     datatable_default(escape = FALSE)
+# })
 
 qpr_expr$health_insurance$details <- rlang::expr({
   tibble::tibble(

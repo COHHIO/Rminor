@@ -42,19 +42,19 @@ qpr_expr$noncash_benefits$infobox <- rlang::expr({
   do.call(qpr_infobox, .args)
 })
 
-qpr_expr$noncash_benefits$datatable <- rlang::expr({
-  data_env() |>
-    dplyr::mutate(
-      BenefitsFromAnySource = HMIS::hud_translations$`1.8 NoYesReasons for Missing Data`(BenefitsFromAnySource)
-    ) |>
-    dplyr::select(
-      UniqueID,
-      EntryDate,
-      ExitDate,
-      "Benefits from Any Source (at Exit)" = BenefitsFromAnySource
-    ) |> 
-    datatable_default(escape = FALSE)
-})
+# qpr_expr$noncash_benefits$datatable <- rlang::expr({
+#   data_env() |>
+#     dplyr::mutate(
+#       BenefitsFromAnySource = HMIS::hud_translations$`1.8 NoYesReasons for Missing Data`(BenefitsFromAnySource)
+#     ) |>
+#     dplyr::select(
+#       UniqueID,
+#       EntryDate,
+#       ExitDate,
+#       "Benefits from Any Source (at Exit)" = BenefitsFromAnySource
+#     ) |> 
+#     datatable_default(escape = FALSE)
+# })
 # qpr_expr$noncash_benefits$expr <- rlang::expr({
 #   .PT_nm <- names(ProjectType()) 
 #   meeting_objective <- qpr_benefits() %>%
@@ -135,6 +135,6 @@ qpr_expr$noncash_benefits$details <- rlang::expr({
                       "Number of households who either gained or increased earned income or who gained or increased non-employment cash income / number of households served by the project",
                       "Number of households who either gained or increased earned income or who gained or increased non-employment cash income / number of households who entered an project",
                       "Number of households who either gained or increased earned income or who gained or increased non-employment cash income / number of households who entered a PSH project")
-  ) |> 
+  ) |>
     DT::datatable(escape = FALSE)
 })

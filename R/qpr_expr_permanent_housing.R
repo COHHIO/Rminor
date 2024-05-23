@@ -71,39 +71,39 @@ qpr_expr$permanent_housing$infobox <- rlang::expr({
   
 })
 
-qpr_expr$permanent_housing$datatable <- 
-  rlang::expr({
-    req(data_env())
-    dplyr::left_join(
-      data_env()$TotalHHsSuccessfulPlacement,
-      data_env()$SuccessfullyPlaced,
-      by = c(
-        "EnrollmentID",
-        "ProjectType",
-        "ProjectName",
-        "PersonalID",
-        "UniqueID",
-        "EntryDate",
-        "MoveInDate",
-        "MoveInDateAdjust",
-        "ExitDate",
-        "DestinationGroup",
-        "Destination",
-        "HouseholdID"
-      )
-    ) |>
-      dplyr::mutate(BedStart = dplyr::if_else(ProjectType %in% c(3, 9, 13),
-                                              MoveInDate, EntryDate)) |>
-      dplyr::arrange(DestinationGroup, PersonalID) |>
-      dplyr::select(
-        UniqueID,
-        EntryDate,
-        "Bed Start" = BedStart,
-        ExitDate,
-        "Destination Group" =  DestinationGroup
-      ) |> 
-      datatable_default(escape = FALSE)
-  })
+# qpr_expr$permanent_housing$datatable <- 
+#   rlang::expr({
+#     req(data_env())
+#     dplyr::left_join(
+#       data_env()$TotalHHsSuccessfulPlacement,
+#       data_env()$SuccessfullyPlaced,
+#       by = c(
+#         "EnrollmentID",
+#         "ProjectType",
+#         "ProjectName",
+#         "PersonalID",
+#         "UniqueID",
+#         "EntryDate",
+#         "MoveInDate",
+#         "MoveInDateAdjust",
+#         "ExitDate",
+#         "DestinationGroup",
+#         "Destination",
+#         "HouseholdID"
+#       )
+#     ) |>
+#       dplyr::mutate(BedStart = dplyr::if_else(ProjectType %in% c(3, 9, 13),
+#                                               MoveInDate, EntryDate)) |>
+#       dplyr::arrange(DestinationGroup, PersonalID) |>
+#       dplyr::select(
+#         UniqueID,
+#         EntryDate,
+#         "Bed Start" = BedStart,
+#         ExitDate,
+#         "Destination Group" =  DestinationGroup
+#       ) |> 
+#       datatable_default(escape = FALSE)
+#   })
 
 qpr_expr$permanent_housing$details <- rlang::expr({
   tibble::tibble(
