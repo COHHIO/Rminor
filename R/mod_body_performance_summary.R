@@ -6,16 +6,32 @@
 #'
 #' @noRd 
 #'
-#' @importFrom shiny NS tagList 
+#' @importFrom shiny NS tagList
+
 mod_body_performance_summary_ui <- function(id){
   ns <- NS(id)
-  tagList(
-    ui_header_row(),
-    ui_row(
-        DT::dataTableOutput(ns("ps_1")),
-        title = "Measure 1: Length of Stay"
-    )
+  bs4Dash::tabBox(width = 12,
+             tabPanel("Length of Stay",
+                      h3("Length of Stay Summary"),
+                      tagList(
+                        ui_header_row(),
+                        plotly::plotlyOutput(ns("ps_plot_1")),
+                        ui_row(
+                          DT::dataTableOutput(ns("ps_table_1")),
+                          title = "Measure 1: Length of Stay"
+                        )
+                      )
+             ),
+             tabPanel("Tab 2",
+                      h3("Content for Tab 2"),
+                      p("This is where the content for Tab 2 goes.")
+             ),
+             tabPanel("Tab 3",
+                      h3("Content for Tab 3"),
+                      p("This is where the content for Tab 3 goes.")
+             )
   )
+
 
 
 }
@@ -32,8 +48,55 @@ mod_body_performance_summary_server <- function(id){
       )
     })
       
+    output$ps_plot_1 <-
+      plotly::renderPlotly({
+        length_of_stay <- qpr_leavers() |> 
+          HMIS::exited_between(as.Date("2023-01-01"), as.Date("2023-12-31")) |> 
+          dplyr::filter(((
+            !is.na(MoveInDateAdjust) & ProjectType == 13
+          ) |
+            (
+              !is.na(ExitDate) & ProjectType %in% c(0, 1, 2, 8)
+            ))) |> 
+          dplyr::group_by(ProjectName) |>
+          dplyr::summarise(Average = round(mean(DaysinProject), 1),
+                           Median = median(DaysinProject), clients = dplyr::n(), .groups = "drop_last")
+        qpr_plotly(length_of_stay, "Length of Stay", hover = hover)
+  })
+    
+    
+      output$ps_table_1 <- DT::renderDT(server = FALSE, {
+        qpr_leavers() |> 
+          HMIS::exited_between(as.Date("2023-01-01"), as.Date("2023-12-31")) |> 
+          dplyr::filter(((
+            !is.na(MoveInDateAdjust) & ProjectType == 13
+          ) |
+            (
+              !is.na(ExitDate) & ProjectType %in% c(0, 1, 2, 8)
+            ))) |> dplyr::group_by(ProjectName) |>
+          dplyr::summarise(Average = round(mean(DaysinProject), 1),
+                           Median = median(DaysinProject), clients = dplyr::n(), .groups = "drop_last") |> 
+          datatable_default()
+      })
       
-      output$ps_1 <- DT::renderDT(server = FALSE, {
+      output$ps_plot_1 <-
+        plotly::renderPlotly({
+          length_of_stay <- qpr_leavers() |> 
+            HMIS::exited_between(as.Date("2023-01-01"), as.Date("2023-12-31")) |> 
+            dplyr::filter(((
+              !is.na(MoveInDateAdjust) & ProjectType == 13
+            ) |
+              (
+                !is.na(ExitDate) & ProjectType %in% c(0, 1, 2, 8)
+              ))) |> 
+            dplyr::group_by(ProjectName) |>
+            dplyr::summarise(Average = round(mean(DaysinProject), 1),
+                             Median = median(DaysinProject), clients = dplyr::n(), .groups = "drop_last")
+          qpr_plotly(length_of_stay, "Length of Stay", hover = hover)
+        })
+      
+      
+      output$ps_table_1 <- DT::renderDT(server = FALSE, {
         qpr_leavers() |> 
           HMIS::exited_between(as.Date("2023-01-01"), as.Date("2023-12-31")) |> 
           dplyr::filter(((
