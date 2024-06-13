@@ -114,7 +114,7 @@ mod_body_performance_summary_server <- function(id) {
     
     #### Measure 1: Length of Stay
     length_of_stay <- eventReactive({
-      list(input$project_type, input$date_range)
+      list(input$project_type_1, input$date_range_1)
     }, {
       req(input$project_type_1, input$date_range_1)
       # Debugging: Print input to ensure it is available
@@ -147,8 +147,16 @@ mod_body_performance_summary_server <- function(id) {
       cat("Plot data:\n")
       print(measure_1)
       
+      # Define goals for different project types
+      goals <- list(
+        "Emergency Shelter – Entry Exit" = 40,
+        "Transitional Housing" = 240
+        # Add other project types and their respective goals here
+      )
+      
       qpr_plotly(measure_1, title = "Length of Stay", xaxis_title = "Number of Clients",
-                 yaxis_title = "Average Length of Stay")
+                 yaxis_title = "Average Length of Stay", project_type = input$project_type_1,
+                 goals = goals)
     })
     
     output$ps_table_1 <- DT::renderDT(server = FALSE, {
@@ -228,9 +236,19 @@ mod_body_performance_summary_server <- function(id) {
     output$ps_plot_2 <-
       plotly::renderPlotly({
         measure_2 <- exits()
+        
+        # Define goals for different project types
+        goals <- list(
+            "Emergency Shelter – Entry Exit" = 0.40,
+            "PH – Rapid Re-Housing" = 0.83,
+            "Transitional Housing" = 0.83,
+            "Street Outreach" = 0.30
+        )
+        
         qpr_plotly(measure_2, title = "Exits to Permanent Housing", 
                    xaxis_title = "Number of Clients", yaxis_title = "Percent to Permanent Housing",
-                   y_label = "Percent Exiting to Permanent Housing")
+                   project_type = input$project_type_2,
+                   goals = goals, rect_above_line = FALSE)
       })
     
     
@@ -289,9 +307,16 @@ mod_body_performance_summary_server <- function(id) {
     output$ps_plot_3 <-
       plotly::renderPlotly({
         measure_3 <- exits_temp()
+        
+        # Define goals for different project types
+        goals <- list(
+          "Street Outreach" = 0.6
+        )
+        
         qpr_plotly(measure_3, title = "Exits to Temporary or Permanent Housing", 
                    xaxis_title = "Number of Clients", yaxis_title = "Percent to Housing",
-                   y_label = "Percent to Temp or Permanent Housing")
+                   project_type = input$project_type_3,
+                   goals = goals, rect_above_line = FALSE)
       })
     
     
@@ -335,10 +360,20 @@ mod_body_performance_summary_server <- function(id) {
     output$ps_plot_4 <-
       plotly::renderPlotly({
         measure_4 <- benefits_at_exit()
+        
+        # Define goals for different project types
+        goals <- list(
+          "Emergency Shelter – Entry Exit" = 0.18,
+          "PH – Rapid Re-Housing" = 0.18,
+          "Transitional Housing" = 0.28,
+          "PH – Permanent Supportive Housing" = 0.30
+        )
+        
         qpr_plotly(measure_4, title = "Non-Cash Benefits at Exit",
                    x_col = "TotalHHs", y_col = "Percent",
                    xaxis_title = "Number of Clients Exiting", yaxis_title = "Percent of Clients with Benefits",
-                   y_label = "Percent with Benefits at Exit")
+                   project_type = input$project_type_4,
+                   goals = goals, rect_above_line = FALSE)
       })
     
     
