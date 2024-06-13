@@ -2,6 +2,10 @@
 mod_body_performance_summary_ui <- function(id) {
   ns <- NS(id)
   
+  # Calculate the start and end dates for the previous calendar year
+  start_date <- lubridate::floor_date(Sys.Date(), "year") - lubridate::years(1)
+  end_date <- lubridate::floor_date(Sys.Date(), "year") - lubridate::days(1)
+  
   bs4Dash::tabBox(width = 12,
                   tabPanel("Length of Stay",
                            h3("Length of Stay Summary"),
@@ -13,6 +17,11 @@ mod_body_performance_summary_ui <- function(id) {
                                            "Transitional Housing"),
                                selected = "Emergency Shelter – Entry Exit",
                                multiple = FALSE
+                             ),
+                             dateRangeInput(inputId = ns("date_range_1"),
+                                            label = "Date Range",
+                                            start = start_date,
+                                            end = end_date
                              ),
                              plotly::plotlyOutput(ns("ps_plot_1")),
                              DT::dataTableOutput(ns("ps_table_1"))
@@ -31,6 +40,11 @@ mod_body_performance_summary_ui <- function(id) {
                                selected = "Emergency Shelter – Entry Exit",
                                multiple = FALSE
                              ),
+                             dateRangeInput(inputId = ns("date_range_2"),
+                                            label = "Date Range",
+                                            start = start_date,
+                                            end = end_date
+                             ),
                              plotly::plotlyOutput(ns("ps_plot_2")),
                              ui_row(
                                DT::dataTableOutput(ns("ps_table_2")),
@@ -47,6 +61,11 @@ mod_body_performance_summary_ui <- function(id) {
                                choices = "Street Outreach",
                                selected = "Street Outreach",
                                multiple = FALSE
+                             ),
+                             dateRangeInput(inputId = ns("date_range_3"),
+                                            label = "Date Range",
+                                            start = start_date,
+                                            end = end_date
                              ),
                              plotly::plotlyOutput(ns("ps_plot_3")),
                              ui_row(
@@ -69,13 +88,19 @@ mod_body_performance_summary_server <- function(id) {
     })
     
     #### Measure 1: Length of Stay
-    length_of_stay <- eventReactive(input$project_type_1, {
-      req(input$project_type)
+    length_of_stay <- eventReactive({
+      list(input$project_type, input$date_range)
+    }, {
+      req(input$project_type_1, input$date_range_1)
       # Debugging: Print input to ensure it is available
-      cat("Selected project type in eventReactive:", input$project_type, "\n")
+      cat("Selected project type in eventReactive:", input$project_type_1, "\n")
+      cat("Selected date range in eventReactive:", input$date_range_1, "\n")
+      
+      start_date <- as.Date(input$date_range_1[1])
+      end_date <- as.Date(input$date_range_1[2])
       
       data <- qpr_leavers() |> 
-        HMIS::exited_between(as.Date("2023-01-01"), as.Date("2023-12-31")) |> 
+        HMIS::exited_between(start_date, end_date) |> 
         dplyr::filter(((!is.na(MoveInDateAdjust) & ProjectType == 13) |
                          (!is.na(ExitDate) & ProjectType %in% c(0, 1, 2, 8)))) |> 
         dplyr::group_by(ProjectName, ProjectType) |>
@@ -111,12 +136,17 @@ mod_body_performance_summary_server <- function(id) {
     })
     
     #### Measure 2: Exits to Permanent Housing
-    exits <- eventReactive(input$project_type_2, {
+    exits <- eventReactive({
+      list(input$project_type_2, input$date_range_2)
+    },{
+      start_date <- as.Date(input$date_range_2[1])
+      end_date <- as.Date(input$date_range_2[2])
+      
       qpr_leavers <- qpr_leavers()
       .exited <- qpr_leavers |> 
-        HMIS::exited_between(as.Date("2023-01-01"), as.Date("2023-12-31"), lgl = TRUE)
+        HMIS::exited_between(start_date, end_date, lgl = TRUE)
       .served <- qpr_leavers |> 
-        HMIS::served_between(as.Date("2023-01-01"), as.Date("2023-12-31"), lgl = TRUE)
+        HMIS::served_between(start_date, end_date, lgl = TRUE)
       
       .psh_hp <- qpr_leavers$ProjectType %in% c(3, 9, 12)
       .es_th_sh_out_rrh <- qpr_leavers$ProjectType %in% c(0, 1, 2, 4, 8, 13)
