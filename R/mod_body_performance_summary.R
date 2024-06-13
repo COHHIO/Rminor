@@ -98,6 +98,31 @@ mod_body_performance_summary_ui <- function(id) {
                                title = "Measure 4: Non-Cash Benefits at Exit"
                              )
                            )
+                  ),
+                  tabPanel("Health Insurance at Exit",
+                           h3("Benefits Summary"),
+                           tagList(
+                             selectInput(
+                               inputId = ns("project_type_5"),
+                               label = "Select your Project Type",
+                               choices = c("Emergency Shelter – Entry Exit",
+                                           "PH – Rapid Re-Housing",
+                                           "Transitional Housing",
+                                           "PH – Permanent Supportive Housing"),
+                               selected = "Emergency Shelter – Entry Exit",
+                               multiple = FALSE
+                             ),
+                             dateRangeInput(inputId = ns("date_range_5"),
+                                            label = "Date Range",
+                                            start = start_date,
+                                            end = end_date
+                             ),
+                             plotly::plotlyOutput(ns("ps_plot_5")),
+                             ui_row(
+                               DT::dataTableOutput(ns("ps_table_5")),
+                               title = "Measure 5: Health Insurance at Exit"
+                             )
+                           )
                   )
   )
 }
@@ -380,6 +405,62 @@ mod_body_performance_summary_server <- function(id) {
     output$ps_table_4 <- DT::renderDT(server = FALSE, {
       measure_4 <- benefits_at_exit()
       measure_4 |> 
+        datatable_default()
+    })
+    
+    #### Measure 5: Health Insurance at Exit
+    health_at_exit <- eventReactive({
+      list(input$project_type_5, input$date_range_5)
+      }, {
+      start_date <- as.Date(input$date_range_5[1])
+      end_date <- as.Date(input$date_range_5[2])
+      
+      qpr_benefits <- qpr_benefits() |>
+        HMIS::exited_between(start_date, end_date)
+      
+      data <- dplyr::left_join(
+        # all_hhs
+        qpr_benefits |> 
+          dplyr::group_by(ProjectName, ProjectType) |>
+          dplyr::summarise(TotalHHs = dplyr::n(), .groups = "drop_last"),
+        # meeting_objective
+        qpr_benefits |> 
+          dplyr::filter(InsuranceFromAnySource == 1) |> 
+          dplyr::group_by(ProjectName, ProjectType) |>
+          dplyr::summarise(InsuranceAtExit = dplyr::n(), .groups = "drop_last"),
+        by = c("ProjectName", "ProjectType")
+      ) |> 
+        dplyr::mutate(dplyr::across(where(is.numeric), tidyr::replace_na, 0)) |>
+        dplyr::filter(ProjectType == input$project_type_5) |> 
+        dplyr::mutate(Percent = InsuranceAtExit / TotalHHs)
+      
+      data
+    })
+    
+    output$ps_plot_5 <-
+      plotly::renderPlotly({
+        measure_5 <- health_at_exit()
+        
+        # Define goals for different project types
+        goals <- list(
+          "Emergency Shelter – Entry Exit" = 0.18,
+          "PH – Rapid Re-Housing" = 0.18,
+          "Transitional Housing" = 0.28,
+          "PH – Permanent Supportive Housing" = 0.30
+        )
+        
+        qpr_plotly(measure_5, title = "Health Insurance at Exit",
+                   x_col = "TotalHHs", y_col = "Percent",
+                   xaxis_title = "Number of Clients Exiting", yaxis_title = "Percent of Clients with Benefits",
+                   project_type = input$project_type_5,
+                   goals = goals, rect_above_line = FALSE)
+      })
+    
+    
+    output$ps_table_5 <- DT::renderDT(server = FALSE, {
+      measure_5 <- health_at_exit()
+      
+      measure_5 |> 
         datatable_default()
     })
   })

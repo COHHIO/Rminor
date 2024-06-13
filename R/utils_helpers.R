@@ -150,7 +150,7 @@ qpr_plotly <- function(.d,
         list(
           type = "rect",
           x0 = 0,
-          x1 = max(.d[[x_col]]),
+          x1 = max(.d[[x_col]]) * 1.1,
           y0 = y1,
           y1 = max(.d[[y_col]]) * 1.1,
           fillcolor = color,
