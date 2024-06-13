@@ -77,5 +77,94 @@ qpr_infobox <- function(.data,
   rlang::exec(bs4Dash::bs4InfoBox, !!!.ib_opts)
 }
 
+#' @title qpr_plotly
+#' @description A boilerplate plot_ly layout for QPR tab bar graphs with arguments for values that change across tabs.
+#' @param .d \code{(data.frame)} Input data
+#' @param title \code{(character/list)} 
+#' @param x \code{(formula)} Formula for variable on x-axis in plotly tilde format
+#' @param xaxis \code{(list)} of x-axis label parameters
+#' @param y \code{(formula)} Formula for variable on y-axis in plotly tilde format
+#' @param yaxis \code{(list)} of y-axis label parameters
+#' @param ... \code{(named lists)} of arguments passed on to \link[plotly]{layout}. These will take the place of boilerplate values, preserving unspecified boilerplate parameters. If boilerplate parameters should be replaced entirely with specified values, set `.sub = FALSE`. For boilerplate layout parameters, see examples.
+#' @param .sub \code{(logical)} flag to specify whether boilerplate parameters should be switched out for those specified to `...` or replaced entirely.
+#' @return \code{(plotly)} graph object to be passed to \link[plotly]{renderPlotly}
+#' @importFrom purrr map2 list_modify
+#' @importFrom rlang dots_list
+#' @export
+qpr_plotly <- function(.d,
+                       title,
+                       x_col = "clients",
+                       xaxis_title = "",
+                       y_col = "Average",
+                       yaxis_title = "Measure",
+                       y_label = "Average Length of Stay",
+                       hover_text = NULL,
+                       mode = 'markers',
+                       ...) {
+  # If no data return no graph
+  if (nrow(.d) < 1) return(NULL)
+  
+  # Generate hover text if not provided
+  if (is.null(hover_text)) {
+    hover_text <- paste0('Program: ', .d$ProjectName, 
+                         '<br>', y_label, ': ', .d[[y_col]], 
+                         '<br>Clients: ', .d[[x_col]])
+  }
+  
+  .p <- plotly::plot_ly(
+    .d, 
+    x = ~ .d[[x_col]], 
+    y = ~ .d[[y_col]], 
+    type = 'scatter', 
+    mode = mode,
+    text = hover_text,
+    hoverinfo = 'text',
+    ...
+  )
 
+    # Customize the layout
+    .p <- .p %>% plotly::layout(
+      title = title,
+      xaxis = list(title = xaxis_title),
+      yaxis = list(title = yaxis_title)
+    )
+  
+  return(.p)
+}
+
+#' @title qpr_plotly
+#' @description A boilerplate plot_ly layout for QPR tab bar graphs with arguments for values that change across tabs.
+#' @param .d \code{(data.frame)} Input data
+#' @param title \code{(character/list)} 
+#' @param x \code{(formula)} Formula for variable on x-axis in plotly tilde format
+#' @param xaxis \code{(list)} of x-axis label parameters
+#' @param y \code{(formula)} Formula for variable on y-axis in plotly tilde format
+#' @param yaxis \code{(list)} of y-axis label parameters
+#' @param ... \code{(named lists)} of arguments passed on to \link[plotly]{layout}. These will take the place of boilerplate values, preserving unspecified boilerplate parameters. If boilerplate parameters should be replaced entirely with specified values, set `.sub = FALSE`. For boilerplate layout parameters, see examples.
+#' @param .sub \code{(logical)} flag to specify whether boilerplate parameters should be switched out for those specified to `...` or replaced entirely.
+#' @return \code{(plotly)} graph object to be passed to \link[plotly]{renderPlotly}
+#' @importFrom purrr map2 list_modify
+#' @importFrom rlang dots_list
+#' @export
+qpr_pct_plotly <- function(.d,
+                       title,
+                       x = ~ clients,
+                       xaxis = list(title = ""),
+                       y = ~ Average,
+                       yaxis = list(title = "Measure"),
+                       ...,
+                       .sub = TRUE) {
+  # If no data return no graph
+  if (nrow(.d) < 1) return(NULL)
+  .p <- plotly::plot_ly(.d, 
+                        x = x, 
+                        y = y, 
+                        type = 'scatter', 
+                        mode = 'markers',
+                        text = ~ paste0('Program:', .d$ProjectName, 
+                                        '<br>Average Length of Stay:', .d$Average, 
+                                        '<br>Clients:', .d$clients),
+                        hoverinfo = 'text'
+  )
+}
 
