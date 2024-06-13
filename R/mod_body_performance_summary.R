@@ -73,6 +73,31 @@ mod_body_performance_summary_ui <- function(id) {
                                title = "Measure 3: Exits to Temporary or Permanent Houusing"
                              )
                            )
+                  ),
+                  tabPanel("Non-Cash Benefits at Exit",
+                           h3("Benefits Summary"),
+                           tagList(
+                             selectInput(
+                               inputId = ns("project_type_4"),
+                               label = "Select your Project Type",
+                               choices = c("Emergency Shelter – Entry Exit",
+                                           "PH – Rapid Re-Housing",
+                                           "Transitional Housing",
+                                           "PH – Permanent Supportive Housing"),
+                               selected = "Emergency Shelter – Entry Exit",
+                               multiple = FALSE
+                             ),
+                             dateRangeInput(inputId = ns("date_range_4"),
+                                            label = "Date Range",
+                                            start = start_date,
+                                            end = end_date
+                             ),
+                             plotly::plotlyOutput(ns("ps_plot_4")),
+                             ui_row(
+                               DT::dataTableOutput(ns("ps_table_4")),
+                               title = "Measure 4: Non-Cash Benefits at Exit"
+                             )
+                           )
                   )
   )
 }
@@ -215,13 +240,18 @@ mod_body_performance_summary_server <- function(id) {
         datatable_default()
     })
     
-    #### Exits to Temp or Permanent Housing
-    exits_temp <- eventReactive(input$project_type_3, {
+    #### Measure 3: Exits to Temp or Permanent Housing
+    exits_temp <- eventReactive({
+      list(input$project_type_3, input$date_range_3)
+    },{
+      start_date <- as.Date(input$date_range_3[1])
+      end_date <- as.Date(input$date_range_3[2])
+      
       qpr_leavers <- qpr_leavers()
       
       .so <- qpr_leavers$ProjectType %in% c(4)
       .exited <- qpr_leavers |> 
-        HMIS::exited_between(as.Date("2023-01-01"), as.Date("2023-12-31"), lgl = TRUE)
+        HMIS::exited_between(start_date, end_date, lgl = TRUE)
       
       SuccessfullyPlacedTemp <- dplyr::filter(qpr_leavers,
                                               ((DestinationGroup == "Permanent" | DestinationGroup == "Temporary") &
@@ -268,6 +298,53 @@ mod_body_performance_summary_server <- function(id) {
     output$ps_table_3 <- DT::renderDT(server = FALSE, {
       measure_3 <- exits_temp()
       measure_3 |> 
+        datatable_default()
+    })
+    
+    #### Measure 4: Non-cash Benefits at Exit
+    benefits_at_exit <- eventReactive({
+      list(input$project_type_4, input$date_range_4)
+    }, {
+      start_date <- as.Date(input$date_range_4[1])
+      end_date <- as.Date(input$date_range_4[2])
+      
+      qpr_benefits <- qpr_benefits() |>
+        HMIS::exited_between(start_date, end_date)
+      
+      data <- dplyr::left_join(
+        # all_hhs
+        qpr_benefits |> 
+          dplyr::group_by(ProjectName, ProjectType) |>
+          dplyr::summarise(TotalHHs = dplyr::n(), .groups = "drop_last"),
+        # meeting_objective
+        qpr_benefits |> 
+          dplyr::filter(BenefitsFromAnySource == 1) |> 
+          dplyr::group_by(ProjectName, ProjectType) |>
+          dplyr::summarise(BenefitsAtExit = dplyr::n(), .groups = "drop_last"),
+        by = c("ProjectName","ProjectType")
+      ) |> 
+        dplyr::mutate(dplyr::across(where(is.numeric), tidyr::replace_na, 0)) |>
+        dplyr::filter(ProjectType == input$project_type_4) |> 
+        dplyr::mutate(Percent = BenefitsAtExit / TotalHHs)
+      
+      data
+    })
+    
+    
+    
+    output$ps_plot_4 <-
+      plotly::renderPlotly({
+        measure_4 <- benefits_at_exit()
+        qpr_plotly(measure_4, title = "Non-Cash Benefits at Exit",
+                   x_col = "TotalHHs", y_col = "Percent",
+                   xaxis_title = "Number of Clients Exiting", yaxis_title = "Percent of Clients with Benefits",
+                   y_label = "Percent with Benefits at Exit")
+      })
+    
+    
+    output$ps_table_4 <- DT::renderDT(server = FALSE, {
+      measure_4 <- benefits_at_exit()
+      measure_4 |> 
         datatable_default()
     })
   })
