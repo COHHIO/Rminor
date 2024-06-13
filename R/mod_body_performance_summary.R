@@ -123,6 +123,53 @@ mod_body_performance_summary_ui <- function(id) {
                                title = "Measure 5: Health Insurance at Exit"
                              )
                            )
+                  ),
+                  tabPanel("Income Growth",
+                           h3("Households Increasing Their Income"),
+                           tagList(
+                             selectInput(
+                               inputId = ns("project_type_6"),
+                               label = "Select your Project Type",
+                               choices = c("Emergency Shelter – Entry Exit",
+                                           "PH – Rapid Re-Housing",
+                                           "Transitional Housing",
+                                           "PH – Permanent Supportive Housing"),
+                               selected = "Emergency Shelter – Entry Exit",
+                               multiple = FALSE
+                             ),
+                             dateRangeInput(inputId = ns("date_range_6"),
+                                            label = "Date Range",
+                                            start = start_date,
+                                            end = end_date
+                             ),
+                             plotly::plotlyOutput(ns("ps_plot_6")),
+                             ui_row(
+                               DT::dataTableOutput(ns("ps_table_6")),
+                               title = "Measure 6: Households Increasing Their Income"
+                             )
+                           )
+                  ),
+                  tabPanel("Rapid Replacement for RRH",
+                           h3("Rapid Replacement Summary"),
+                           tagList(
+                             selectInput(
+                               inputId = ns("project_type_6"),
+                               label = "Select your Project Type",
+                               choices = "PH – Rapid Re-Housing",
+                               selected = "PH – Rapid Re-Housing",
+                               multiple = FALSE
+                             ),
+                             dateRangeInput(inputId = ns("date_range_7"),
+                                            label = "Date Range",
+                                            start = start_date,
+                                            end = end_date
+                             ),
+                             plotly::plotlyOutput(ns("ps_plot_7")),
+                             ui_row(
+                               DT::dataTableOutput(ns("ps_table_7")),
+                               title = "Measure 7: Rapid Replacement for RRH"
+                             )
+                           )
                   )
   )
 }
@@ -131,11 +178,6 @@ mod_body_performance_summary_ui <- function(id) {
 mod_body_performance_summary_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
-    
-    # Debugging: Check if input$project_type is correctly bound
-    observe({
-      cat("Observer - project_type:", input$project_type, "\n")
-    })
     
     #### Measure 1: Length of Stay
     length_of_stay <- eventReactive({
@@ -159,18 +201,11 @@ mod_body_performance_summary_server <- function(id) {
         dplyr::mutate(ProjectType = HMIS::hud_translations$`2.02.6 ProjectType`(ProjectType)) |> 
         dplyr::filter(ProjectType == input$project_type_1)
       
-      # Debugging: Print the resulting data
-      cat("Filtered data:\n")
-      print(data)
-      
       data
     })
     
     output$ps_plot_1 <- plotly::renderPlotly({
       measure_1 <- length_of_stay()
-      # Debugging: Print data to ensure it's correct before plotting
-      cat("Plot data:\n")
-      print(measure_1)
       
       # Define goals for different project types
       goals <- list(
@@ -186,9 +221,6 @@ mod_body_performance_summary_server <- function(id) {
     
     output$ps_table_1 <- DT::renderDT(server = FALSE, {
       measure_1 <- length_of_stay()
-      # Debugging: Print data to ensure it's correct before rendering table
-      cat("Table data:\n")
-      print(measure_1)
       
       measure_1 |> datatable_default()
     })
@@ -251,10 +283,6 @@ mod_body_performance_summary_server <- function(id) {
         dplyr::mutate(ProjectType = HMIS::hud_translations$`2.02.6 ProjectType`(ProjectType)) |>
         dplyr::filter(ProjectType == input$project_type_2)
       
-      # Debugging: Print the resulting data
-      cat("Filtered data:\n")
-      print(data)
-      
       data
     })
     
@@ -279,8 +307,7 @@ mod_body_performance_summary_server <- function(id) {
     
     output$ps_table_2 <- DT::renderDT(server = FALSE, {
       measure_2 <- exits()
-      measure_2 |> 
-        datatable_default()
+      measure_2 |> datatable_default()
     })
     
     #### Measure 3: Exits to Temp or Permanent Housing
@@ -321,10 +348,6 @@ mod_body_performance_summary_server <- function(id) {
         dplyr::filter(ProjectType == input$project_type_3) |> 
         dplyr::mutate(Average = success_clients/clients)
       
-      # Debugging: Print the resulting data
-      cat("Filtered data:\n")
-      print(data)
-      
       data
     })
     
@@ -347,8 +370,7 @@ mod_body_performance_summary_server <- function(id) {
     
     output$ps_table_3 <- DT::renderDT(server = FALSE, {
       measure_3 <- exits_temp()
-      measure_3 |> 
-        datatable_default()
+      measure_3 |> datatable_default()
     })
     
     #### Measure 4: Non-cash Benefits at Exit
@@ -443,10 +465,10 @@ mod_body_performance_summary_server <- function(id) {
         
         # Define goals for different project types
         goals <- list(
-          "Emergency Shelter – Entry Exit" = 0.18,
-          "PH – Rapid Re-Housing" = 0.18,
-          "Transitional Housing" = 0.28,
-          "PH – Permanent Supportive Housing" = 0.30
+          "Emergency Shelter – Entry Exit" = 0.75,
+          "PH – Rapid Re-Housing" = 0.85,
+          "Transitional Housing" = 0.85,
+          "PH – Permanent Supportive Housing" = 0.85
         )
         
         qpr_plotly(measure_5, title = "Health Insurance at Exit",
@@ -460,8 +482,106 @@ mod_body_performance_summary_server <- function(id) {
     output$ps_table_5 <- DT::renderDT(server = FALSE, {
       measure_5 <- health_at_exit()
       
-      measure_5 |> 
-        datatable_default()
+      measure_5 |> datatable_default()
+    })
+    
+    #### Measure 6: Increase in Income
+    increase_income <- eventReactive({
+      list(input$project_type_6, input$date_range_6)
+    }, {
+      start_date <- as.Date(input$date_range_6[1])
+      end_date <- as.Date(input$date_range_6[2])
+      
+      qpr_income <- qpr_income() |>
+        HMIS::exited_between(start_date, end_date)
+      
+      data <- dplyr::left_join(
+        # all_hhs
+        qpr_income |>
+          dplyr::group_by(ProjectName, ProjectType, ProjectCounty, ProjectRegion) |>
+          dplyr::summarise(TotalHHs = dplyr::n(), .groups = "drop_last"),
+        # meeting_objective
+        qpr_income |>
+          dplyr::filter(Difference > 0) |> 
+          dplyr::group_by(ProjectName, ProjectType, ProjectCounty, ProjectRegion) |>
+          dplyr::summarise(Increased = dplyr::n(), .groups = "drop_last"),
+        by = c("ProjectName", "ProjectType", "ProjectCounty", "ProjectRegion")
+      ) |>
+        dplyr::mutate(dplyr::across(where(is.numeric), tidyr::replace_na, 0)) |>
+        dplyr::filter(ProjectType == input$project_type_6) |>
+        dplyr::mutate(Percent = Increased / TotalHHs)
+      
+      data
+    })
+    
+    
+    
+    output$ps_plot_6 <-
+      plotly::renderPlotly({
+        measure_6 <- increase_income()
+        
+        # Define goals for different project types
+        goals <- list(
+          "Emergency Shelter – Entry Exit" = 0.18,
+          "PH – Rapid Re-Housing" = 0.18,
+          "Transitional Housing" = 0.28,
+          "PH – Permanent Supportive Housing" = 0.30
+        )
+        
+        qpr_plotly(measure_6, title = "Households Increasing Their Income",
+                   x_col = "TotalHHs", y_col = "Percent",
+                   xaxis_title = "Number of Clients Exiting", yaxis_title = "Percent of Clients with Increased Income",
+                   project_type = input$project_type_6,
+                   goals = goals, rect_above_line = FALSE)
+      })
+    
+    
+    output$ps_table_6 <- DT::renderDT(server = FALSE, {
+      measure_6 <- increase_income()
+      
+      measure_6 |> datatable_default()
+    })
+    
+    #### Measure 7: Rapid Placement RRH
+    rrh_enterers <- eventReactive({
+      list(input$date_range_7)
+    }, {
+      start_date <- as.Date(input$date_range_7[1])
+      end_date <- as.Date(input$date_range_7[2])
+      
+      qpr_rrh_enterers <- qpr_rrh_enterers() |>
+        HMIS::entered_between(start_date, end_date) |> 
+        dplyr::filter(!is.na(MoveInDateAdjust))
+      
+        data <- qpr_rrh_enterers |>
+          dplyr::group_by(ProjectName, ProjectType, ProjectCounty, ProjectRegion) |>
+          dplyr::mutate(DaysToHouse = difftime(MoveInDateAdjust, EntryDate, units = "days")) |>
+          dplyr::summarise(AvgDaysToHouse = round(mean(DaysToHouse), 0), .groups = "drop_last",
+                           clients = dplyr::n()) |>
+          dplyr::mutate(ProjectType = HMIS::hud_translations$`2.02.6 ProjectType`(ProjectType))
+      
+      data
+    })
+      
+      
+    output$ps_plot_7 <-
+      plotly::renderPlotly({
+        measure_7 <- rrh_enterers()
+        
+        goals <- list("PH – Rapid Re-Housing" = 21)
+        
+        qpr_plotly(measure_7, title = "RRH Placement",
+                   x_col = "clients", y_col = "AvgDaysToHouse",
+                   xaxis_title = "Number of Clients", yaxis_title = "Average Days to House",
+                   project_type = "PH – Rapid Re-Housing",
+                   goals = goals, rect_above_line = TRUE)
+      })
+    
+    
+    output$ps_table_7 <- DT::renderDT(server = FALSE, {
+      measure_7 <- rrh_enterers()
+      
+      measure_7 |> datatable_default()
     })
   })
 }
