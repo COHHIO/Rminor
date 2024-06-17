@@ -222,7 +222,11 @@ mod_body_performance_summary_server <- function(id) {
     output$ps_table_1 <- DT::renderDT(server = FALSE, {
       measure_1 <- length_of_stay()
       
-      measure_1 |> datatable_default()
+      measure_1 |>
+        dplyr::rename("Project Name" = ProjectName,
+                      "Project Type" = ProjectType,
+                      "Number of Clients" = clients) |> 
+        datatable_default()
     })
     
     #### Measure 2: Exits to Permanent Housing
@@ -307,7 +311,13 @@ mod_body_performance_summary_server <- function(id) {
     
     output$ps_table_2 <- DT::renderDT(server = FALSE, {
       measure_2 <- exits()
-      measure_2 |> datatable_default()
+      measure_2 |> 
+        dplyr::rename("Project Name" = ProjectName,
+                      "Project Type" = ProjectType,
+                      "Clients Exiting to PH" = success_clients,
+                      "Total Clients" = clients,
+                      "Percent to PH" = Average) |> 
+        datatable_default()
     })
     
     #### Measure 3: Exits to Temp or Permanent Housing
@@ -370,7 +380,13 @@ mod_body_performance_summary_server <- function(id) {
     
     output$ps_table_3 <- DT::renderDT(server = FALSE, {
       measure_3 <- exits_temp()
-      measure_3 |> datatable_default()
+      measure_3 |>
+        dplyr::rename("Project Name" = ProjectName,
+                      "Project Type" = ProjectType,
+                      "Clients to Housing" = success_clients,
+                      "Total Clients" = clients,
+                      "Percent to Housing" = Average) |> 
+        datatable_default()
     })
     
     #### Measure 4: Non-cash Benefits at Exit
@@ -426,7 +442,14 @@ mod_body_performance_summary_server <- function(id) {
     
     output$ps_table_4 <- DT::renderDT(server = FALSE, {
       measure_4 <- benefits_at_exit()
-      measure_4 |> 
+      measure_4 |>
+        dplyr::rename(
+          "Project Name" = ProjectName,
+          "Project Type" = ProjectType,
+          "Clients with Benefits" = BenefitsAtExit,
+          "Total Clients" = TotalHHs,
+          "Percent with Benefits" = Percent
+        ) |> 
         datatable_default()
     })
     
@@ -482,7 +505,15 @@ mod_body_performance_summary_server <- function(id) {
     output$ps_table_5 <- DT::renderDT(server = FALSE, {
       measure_5 <- health_at_exit()
       
-      measure_5 |> datatable_default()
+      measure_5 |> 
+        dplyr::rename(
+          "Project Name" = ProjectName,
+          "Project Type" = ProjectType,
+          "Clients with Insurance" = InsuranceAtExit,
+          "Total Clients" = TotalHHs,
+          "Percent with Insurance" = Percent
+        ) |>
+        datatable_default()
     })
     
     #### Measure 6: Increase in Income
@@ -539,7 +570,17 @@ mod_body_performance_summary_server <- function(id) {
     output$ps_table_6 <- DT::renderDT(server = FALSE, {
       measure_6 <- increase_income()
       
-      measure_6 |> datatable_default()
+      measure_6 |> 
+        dplyr::rename(
+          "Project Name" = ProjectName,
+          "Project Type" = ProjectType,
+          "Project County" = ProjectCounty,
+          "Project Region" = ProjectRegion,
+          "Total Clients" = TotalHHs,
+          "Total that Increased Income" = Increased,
+          "Percent that Increased Income" = Percent
+        ) |>
+        datatable_default()
     })
     
     #### Measure 7: Rapid Placement RRH
@@ -581,7 +622,16 @@ mod_body_performance_summary_server <- function(id) {
     output$ps_table_7 <- DT::renderDT(server = FALSE, {
       measure_7 <- rrh_enterers()
       
-      measure_7 |> datatable_default()
+      measure_7 |> 
+        dplyr::rename(
+          "Project Name" = ProjectName,
+          "Project Type" = ProjectType,
+          "Project County" = ProjectCounty,
+          "Project Region" = ProjectRegion,
+          "Average Days to House" = AvgDaysToHouse,
+          "Total Clients" = clients
+        ) |>
+        datatable_default()
     })
   })
 }
