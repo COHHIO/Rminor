@@ -23,7 +23,8 @@ mod_body_performance_summary_ui <- function(id) {
                                             start = start_date,
                                             end = end_date
                              ),
-                             plotly::plotlyOutput(ns("ps_plot_1")),
+                             plotly::plotlyOutput(ns("ps_plot_1a")),
+                             plotly::plotlyOutput(ns("ps_plot_1b")),
                              DT::dataTableOutput(ns("ps_table_1"))
                            )
                   ),
@@ -204,7 +205,7 @@ mod_body_performance_summary_server <- function(id) {
       data
     })
     
-    output$ps_plot_1 <- plotly::renderPlotly({
+    output$ps_plot_1a <- plotly::renderPlotly({
       measure_1 <- length_of_stay()
       
       # Define goals for different project types
@@ -214,8 +215,24 @@ mod_body_performance_summary_server <- function(id) {
         # Add other project types and their respective goals here
       )
       
-      qpr_plotly(measure_1, title = "Length of Stay", xaxis_title = "Number of Clients",
+      qpr_plotly(measure_1, title = "Average Length of Stay", xaxis_title = "",
                  yaxis_title = "Average Length of Stay", project_type = input$project_type_1,
+                 goals = goals)
+    })
+    
+    output$ps_plot_1b <- plotly::renderPlotly({
+      measure_1 <- length_of_stay()
+      
+      # Define goals for different project types
+      goals <- list(
+        "Emergency Shelter – Entry Exit" = 40,
+        "Transitional Housing" = 240
+        # Add other project types and their respective goals here
+      )
+      
+      qpr_plotly(measure_1, title = "Median Length of Stay", xaxis_title = "Number of Clients",
+                 y_col = "Median", yaxis_title = "Median Length of Stay", 
+                 project_type = input$project_type_1,
                  goals = goals)
     })
     
