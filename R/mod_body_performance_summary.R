@@ -70,7 +70,7 @@ mod_body_performance_summary_ui <- function(id) {
                              plotly::plotlyOutput(ns("ps_plot_3")),
                              ui_row(
                                DT::dataTableOutput(ns("ps_table_3")),
-                               title = "Measure 3: Exits to Temporary or Permanent Houusing"
+                               title = "Measure 3: Exits to Temporary or Permanent Housing"
                              )
                            )
                   ),
