@@ -283,13 +283,13 @@ mod_body_performance_summary_server <- function(id) {
       data <- TotalCount |> 
         dplyr::left_join(SuccessCount, by = c("ProjectName","ProjectType")) |>
         {\(.) {replace(.,is.na(.),0)}}() |>
-        dplyr::mutate(Average = success_clients/clients) |> 
+        dplyr::mutate(Percent = success_clients/clients) |> 
         dplyr::mutate(ProjectType = HMIS::hud_translations$`2.02.6 ProjectType`(ProjectType)) |>
         dplyr::filter(ProjectType == input$project_type_2)
       
       data
     })
-    
+
     output$ps_plot_2 <-
       plotly::renderPlotly({
         measure_2 <- exits()
@@ -302,10 +302,12 @@ mod_body_performance_summary_server <- function(id) {
             "Street Outreach" = 0.30
         )
         
-        qpr_plotly(measure_2, title = "Exits to Permanent Housing", 
-                   xaxis_title = "Number of Clients", yaxis_title = "Percent to Permanent Housing",
+        qpr_plotly(measure_2, title = "Exits to Permanent Housing", x_col = "clients",
+                   xaxis_title = "Number of Clients", 
+                   y_col = "Percent", yaxis_title = "Percent to Permanent Housing",
+                   y_label = "Percent to PH",
                    project_type = input$project_type_2,
-                   goals = goals, rect_above_line = FALSE)
+                   goals = goals, rect_above_line = FALSE, percent_format = TRUE)
       })
     
     
@@ -316,8 +318,9 @@ mod_body_performance_summary_server <- function(id) {
                       "Project Type" = ProjectType,
                       "Clients Exiting to PH" = success_clients,
                       "Total Clients" = clients,
-                      "Percent to PH" = Average) |> 
-        datatable_default()
+                      "Percent to PH" = Percent) |> 
+        datatable_default() |> 
+        DT::formatPercentage('Percent to PH', 1)
     })
     
     #### Measure 3: Exits to Temp or Permanent Housing
@@ -374,7 +377,7 @@ mod_body_performance_summary_server <- function(id) {
         qpr_plotly(measure_3, title = "Exits to Temporary or Permanent Housing", 
                    xaxis_title = "Number of Clients", yaxis_title = "Percent to Housing",
                    project_type = input$project_type_3,
-                   goals = goals, rect_above_line = FALSE)
+                   goals = goals, rect_above_line = FALSE, percent_format = TRUE)
       })
     
     
@@ -386,7 +389,8 @@ mod_body_performance_summary_server <- function(id) {
                       "Clients to Housing" = success_clients,
                       "Total Clients" = clients,
                       "Percent to Housing" = Average) |> 
-        datatable_default()
+        datatable_default() |> 
+        DT::formatPercentage('Percent to Housing', 1)
     })
     
     #### Measure 4: Non-cash Benefits at Exit
@@ -436,7 +440,7 @@ mod_body_performance_summary_server <- function(id) {
                    x_col = "TotalHHs", y_col = "Percent",
                    xaxis_title = "Number of Clients Exiting", yaxis_title = "Percent of Clients with Benefits",
                    project_type = input$project_type_4,
-                   goals = goals, rect_above_line = FALSE)
+                   goals = goals, rect_above_line = FALSE, percent_format = TRUE)
       })
     
     
@@ -450,7 +454,8 @@ mod_body_performance_summary_server <- function(id) {
           "Total Clients" = TotalHHs,
           "Percent with Benefits" = Percent
         ) |> 
-        datatable_default()
+        datatable_default() |> 
+        DT::formatPercentage('Percent with Benefits', 1)
     })
     
     #### Measure 5: Health Insurance at Exit
@@ -498,7 +503,7 @@ mod_body_performance_summary_server <- function(id) {
                    x_col = "TotalHHs", y_col = "Percent",
                    xaxis_title = "Number of Clients Exiting", yaxis_title = "Percent of Clients with Benefits",
                    project_type = input$project_type_5,
-                   goals = goals, rect_above_line = FALSE)
+                   goals = goals, rect_above_line = FALSE, percent_format = TRUE)
       })
     
     
@@ -513,7 +518,8 @@ mod_body_performance_summary_server <- function(id) {
           "Total Clients" = TotalHHs,
           "Percent with Insurance" = Percent
         ) |>
-        datatable_default()
+        datatable_default() |> 
+        DT::formatPercentage('Percent with Insurance', 1)
     })
     
     #### Measure 6: Increase in Income
@@ -563,7 +569,7 @@ mod_body_performance_summary_server <- function(id) {
                    x_col = "TotalHHs", y_col = "Percent",
                    xaxis_title = "Number of Clients Exiting", yaxis_title = "Percent of Clients with Increased Income",
                    project_type = input$project_type_6,
-                   goals = goals, rect_above_line = FALSE)
+                   goals = goals, rect_above_line = FALSE, percent_format = TRUE)
       })
     
     
@@ -580,7 +586,8 @@ mod_body_performance_summary_server <- function(id) {
           "Total that Increased Income" = Increased,
           "Percent that Increased Income" = Percent
         ) |>
-        datatable_default()
+        datatable_default() |> 
+        DT::formatPercentage('Percent that Increased Income', 1)
     })
     
     #### Measure 7: Rapid Placement RRH

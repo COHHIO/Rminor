@@ -102,6 +102,7 @@ qpr_plotly <- function(.d,
                        mode = 'markers',
                        project_type = NULL,
                        rect_above_line = TRUE,
+                       percent_format = FALSE,
                        goals = list(),
                        ...) {
   # If no data return no graph
@@ -114,9 +115,15 @@ qpr_plotly <- function(.d,
   
   # Generate hover text if not provided
   if (is.null(hover_text)) {
-    hover_text <- paste0('Program: ', .d$ProjectName, 
-                         '<br>', y_label, ': ', .d[[y_col]], 
-                         '<br>Clients: ', .d[[x_col]])
+    if (percent_format) {
+      hover_text <- paste0('Program: ', .d$ProjectName, 
+                           '<br>', y_label, ': ', scales::percent(.d[[y_col]], accuracy = 0.1), 
+                           '<br>Clients: ', .d[[x_col]])
+    } else {
+      hover_text <- paste0('Program: ', .d$ProjectName, 
+                           '<br>', y_label, ': ', .d[[y_col]], 
+                           '<br>Clients: ', .d[[x_col]])
+    }
   }
   
   # Create the plot
@@ -178,7 +185,7 @@ qpr_plotly <- function(.d,
       .p <- .p %>% plotly::layout(
         title = title,
         xaxis = list(title = xaxis_title),
-        yaxis = list(title = yaxis_title),
+        yaxis = list(title = yaxis_title, tickformat = if (percent_format) '.0%' else NULL),
         shapes = list(hline(y = goal), 
                       rect(y1 = goal, rect_above_line = rect_above_line))
       )
