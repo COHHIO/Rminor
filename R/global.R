@@ -133,25 +133,62 @@ if (exists("Regions")) {
       length_of_stay = list(
         choices = unique(qpr_leavers()$ProjectName[qpr_leavers()$ProjectType %in% c(0, 1, 2, 8, 13)])
       ),
+      length_of_stay_youth = list(
+        choices = qpr_leavers() |> 
+          dplyr::filter(stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp") & ProjectType %in% c(0, 1, 2, 8, 13)) |> 
+          dplyr::pull(ProjectName) |> unique()
+      ),
       permanent_housing = list(
         choices = unique(qpr_leavers()$ProjectName[qpr_leavers()$ProjectType %in% c(0:4, 8:9, 12:13)])
+      ),
+      permanent_housing_youth = list(
+        choices = qpr_leavers() |> 
+          dplyr::filter(stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp") &
+                          ProjectType %in% c(0:4, 8:9, 12:13)) |> 
+          dplyr::pull(ProjectName) |> unique()
       ),
       temp_permanent_housing = list(
         choices = unique(qpr_leavers()$ProjectName[qpr_leavers()$ProjectType %in% c(4)])
       ),
+      temp_permanent_housing_youth = list(
+        choices = qpr_leavers() |> 
+          dplyr::filter(stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp") &
+                    ProjectType == 4) |>
+          dplyr::pull(ProjectName) |> unique()
+      ),
       noncash_benefits = list(
         choices = unique(qpr_benefits()$ProjectName)
       ),
+      noncash_benefits_youth = list(
+        choices = qpr_benefits() |> 
+          dplyr::filter(stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp")) |>
+                          dplyr::pull(ProjectName) |> unique()
+          ),
       health_insurance = list(
         choices = unique(qpr_benefits()$ProjectName)
       ),
+      health_insurance_youth = list(
+        choices = qpr_benefits() |> 
+          dplyr::filter(stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp")) |>
+          dplyr::pull(ProjectName) |> unique()
+      ),
       income_growth = list(
         choices = unique(qpr_income()$ProjectName)
+      ),
+      income_growth_youth = list(
+        choices = qpr_income() |> 
+          dplyr::filter(stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp")) |>
+          dplyr::pull(ProjectName) |> unique()
       ),
       rrh_placement = list(
         choices = unique(sort(
           qpr_rrh_enterers()$ProjectName
         ))
+      ),
+      rrh_placement_youth = list(
+        choices = qpr_rrh_enterers() |> 
+          dplyr::filter(stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp")) |>
+          dplyr::pull(ProjectName) |> unique()
       ),
       reentries = list(
         choices = unique(sort(

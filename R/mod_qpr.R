@@ -96,22 +96,29 @@ mod_qpr_ui <- function(id, choices = NULL, date_choices = NULL,
 
 
 
-mod_qpr_server <- function(id, header, ...) {
+mod_qpr_server <- function(id, header, is_youth = FALSE, ...) {
   .id <- strip_id(id)
   if (missing(header))
     rlang::abort("Must provide header for mod_QPR_server(",id,")")
   function(input, output, session){
     ns <- session$ns
     
+    message("mod_qpr_server called for id: ", .id)
+    
+    # Choose the correct expression list based on whether it's a youth measure
+    expr_list <- if (is_youth) qpr_expr_youth else qpr_expr
+
     # Header
     output$header <- shiny::renderUI({
       req(input$date_range)
+      message("Rendering header for id: ", .id)
       server_header(header, date_range = input$date_range, ...)
     })
 
     # Process Data
     data_env <- shiny::reactive(qpr_expr[[.id]]$expr, quoted = TRUE)
     if (UU::is_legit(qpr_expr[[.id]]$infobox)) {
+      message("Infobox found for id: ", .id)
       if (rlang::is_list(qpr_expr[[.id]]$infobox))
         x <- qpr_expr[[.id]]$infobox
       else
@@ -125,6 +132,7 @@ mod_qpr_server <- function(id, header, ...) {
 
     
     if (rlang::is_list(qpr_expr[[.id]]$details)) {
+      message("Details found for id: ", .id)
       for (i in seq_along(qpr_expr[[.id]]$details)) {
         output[[paste0("dt_measures",i)]] <- DT::renderDT(server = FALSE, qpr_expr[[.id]]$details[[i]], quoted = TRUE)
       }

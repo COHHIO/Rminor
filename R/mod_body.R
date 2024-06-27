@@ -17,7 +17,7 @@ mod_body_ui <- function(id){
 #' body Server Functions
 #'
 #' @noRd 
-mod_body_server <- function(id){
+mod_body_server <- function(id, is_youth){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
   
