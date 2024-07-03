@@ -207,14 +207,14 @@ if (exists("Regions")) {
       reentries = list(
         choices = unique(sort(
           qpr_reentries() |> 
-            dplyr::filter(!stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp")) |> 
-            dplyr::pull(ExitingAP) |> unique()
+            dplyr::filter(!stringr::str_detect(tolower(ExitingHP), "odh|youth|yhdp")) |> 
+            dplyr::pull(ExitingHP) |> unique()
         ))
       ),
       rrh_spending = list(
         choices = unique(sort(
           qpr_spending() |> 
-            dplyr::filter(!stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp")) |> 
+            dplyr::filter(!stringr::str_detect(tolower(OrganizationName), "odh|youth|yhdp")) |> 
             dplyr::pull(OrganizationName) |> unique()
         ))
       )
