@@ -16,7 +16,7 @@ mod_body_qpr_rrh_placement_youth_ui <- function(id){
 #'
 #' @noRd 
 mod_body_qpr_rrh_placement_youth_server <- function(id){
-  moduleServer( id, mod_qpr_server(id, header = "Rapid Replacement for RRH", 
+  moduleServer( id, mod_qpr_server(id, header = "Rapid Placement for RRH", 
                                    subtitle = shiny::h5("Average days to house")))
 }
     

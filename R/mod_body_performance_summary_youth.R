@@ -150,8 +150,8 @@ mod_body_performance_summary_youth_ui <- function(id) {
                              )
                            )
                   ),
-                  tabPanel("Rapid Replacement for RRH",
-                           h3("Rapid Replacement Summary"),
+                  tabPanel("Rapid Placement for RRH",
+                           h3("Rapid Placement Summary"),
                            tagList(
                              selectInput(
                                inputId = ns("project_type_6"),
@@ -168,7 +168,7 @@ mod_body_performance_summary_youth_ui <- function(id) {
                              plotly::plotlyOutput(ns("ps_plot_7")),
                              ui_row(
                                DT::dataTableOutput(ns("ps_table_7")),
-                               title = "Measure 7: Rapid Replacement for RRH"
+                               title = "Measure 7: Rapid Placement for RRH"
                              )
                            )
                   )
