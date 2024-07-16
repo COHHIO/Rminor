@@ -14,6 +14,7 @@ mod_body_performance_summary_ui <- function(id) {
                                inputId = ns("project_type_1"),
                                label = "Select your Project Type",
                                choices = c("Emergency Shelter – Entry Exit",
+                                           "PH – Rapid Re-Housing",
                                            "Transitional Housing"),
                                selected = "Emergency Shelter – Entry Exit",
                                multiple = FALSE
@@ -211,12 +212,13 @@ mod_body_performance_summary_server <- function(id) {
       # Define goals for different project types
       goals <- list(
         "Emergency Shelter – Entry Exit" = 40,
+        "PH – Rapid Re-Housing" = 150,
         "Transitional Housing" = 240
         # Add other project types and their respective goals here
       )
       
-      qpr_plotly(measure_1, title = "Average Length of Stay", xaxis_title = "",
-                 yaxis_title = "Average Length of Stay", project_type = input$project_type_1,
+      qpr_plotly(measure_1, title = "Average Length of Stay", xaxis_title = "Number of Clients",
+                 yaxis_title = "Number of Days", project_type = input$project_type_1,
                  goals = goals)
     })
     
@@ -226,12 +228,13 @@ mod_body_performance_summary_server <- function(id) {
       # Define goals for different project types
       goals <- list(
         "Emergency Shelter – Entry Exit" = 40,
+        "PH – Rapid Re-Housing" = 150,
         "Transitional Housing" = 240
         # Add other project types and their respective goals here
       )
       
       qpr_plotly(measure_1, title = "Median Length of Stay", xaxis_title = "Number of Clients",
-                 y_col = "Median", yaxis_title = "Median Length of Stay", 
+                 y_col = "Median", yaxis_title = "Number of Daysy", 
                  project_type = input$project_type_1,
                  goals = goals)
     })

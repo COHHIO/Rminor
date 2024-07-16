@@ -41,10 +41,14 @@ qpr_expr$length_of_stay$details <- rlang::expr({
     ProjectType = c("Emergency Shelter", "Emergency Shelter", "Transitional Housing", "Transitional Housing"),
     Goal = c("Emergency Shelter (ES) projects will have a household average length of stay of no more than 40 days",
              "ES projects will have a household median length of stay of no more than 40 days",
+             "Rapid Re-housing (RRH) projects will have a household average length of stay of no more than 150 days",
+             "RRH projects will have a household median length of stay of no more than 150 days",
              "Transitional Housing (TH) projects will have a household average length of stay of no more than 240 days",
              "TH projects will have a household median length of stay of no more than 240 days"),
     HowCalculated = c("Average length of stay for households who have exited",
                       "Median length of stay for households who have exited",
+                      "Average length of stay for households who have exited from Housing Move-In Date to Exit",
+                      "Median length of stay for households who have exited from Housing Move-In Date to Exit",
                       "Average length of stay for households who have exited",
                       "Median length of stay for households who have exited")
   ) |> 
