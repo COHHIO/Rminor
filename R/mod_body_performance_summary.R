@@ -25,7 +25,13 @@ mod_body_performance_summary_ui <- function(id) {
                                             end = end_date
                              ),
                              plotly::plotlyOutput(ns("ps_plot_1a")),
+                             br(),
                              plotly::plotlyOutput(ns("ps_plot_1b")),
+                             br(),
+                             DT::dataTableOutput(ns("ps_bos_table_1")),
+                             br(),
+                             br(),
+                             br(),
                              DT::dataTableOutput(ns("ps_table_1"))
                            )
                   ),
@@ -48,10 +54,12 @@ mod_body_performance_summary_ui <- function(id) {
                                             end = end_date
                              ),
                              plotly::plotlyOutput(ns("ps_plot_2")),
-                             ui_row(
-                               DT::dataTableOutput(ns("ps_table_2")),
-                               title = "Measure 2: Exits"
-                             )
+                             br(),
+                             DT::dataTableOutput(ns("ps_bos_table_2")),
+                             br(),
+                             br(),
+                             br(),
+                             DT::dataTableOutput(ns("ps_table_2"))
                            )
                   ),
                   tabPanel("Exits to Temporary or Permanent Housing",
@@ -182,28 +190,54 @@ mod_body_performance_summary_server <- function(id) {
     ns <- session$ns
     
     #### Measure 1: Length of Stay
+    
+    # Define a helper function
+    calculate_measure_1 <- function(data, project_type, date_range, group_by_project_name = TRUE) {
+      start_date <- as.Date(date_range[1])
+      end_date <- as.Date(date_range[2])
+      
+      filtered_data <- data |>
+        dplyr::filter(ProgramCoC == "OH-507") |>
+        HMIS::exited_between(start_date, end_date) |> 
+        dplyr::filter(((!is.na(MoveInDateAdjust) & ProjectType == 13) |
+                         (!is.na(ExitDate) & ProjectType %in% c(0, 1, 2, 8))))
+      
+      if (group_by_project_name) {
+        grouped_data <- filtered_data |>
+          dplyr::group_by(ProjectName, ProjectType) |>
+          dplyr::summarise(Average = round(mean(DaysinProject), 1),
+                           Median = median(DaysinProject), clients = dplyr::n(), .groups = "drop_last")
+      } else {
+        grouped_data <- filtered_data |>
+          dplyr::group_by(ProjectType) |>
+          dplyr::summarise(Average = round(mean(DaysinProject), 1),
+                           Median = median(DaysinProject), clients = dplyr::n(), .groups = "drop_last") |> 
+          tibble::add_column(ProjectName = "Balance of State (OH-507)")
+      }
+      
+      final_data <- grouped_data |>
+        dplyr::mutate(ProjectType = HMIS::hud_translations$`2.02.6 ProjectType`(ProjectType)) |> 
+        dplyr::filter(ProjectType == project_type)
+      
+      return(final_data)
+    }
+    
     length_of_stay <- eventReactive({
       list(input$project_type_1, input$date_range_1)
     }, {
       req(input$project_type_1, input$date_range_1)
-      # Debugging: Print input to ensure it is available
-      cat("Selected project type in eventReactive:", input$project_type_1, "\n")
-      cat("Selected date range in eventReactive:", input$date_range_1, "\n")
       
-      start_date <- as.Date(input$date_range_1[1])
-      end_date <- as.Date(input$date_range_1[2])
+      data <- qpr_leavers()
+      calculate_measure_1(data, input$project_type_1, input$date_range_1, group_by_project_name = TRUE)
+    })
+    
+    length_of_stay_bos <- eventReactive({
+      list(input$project_type_1, input$date_range_1)
+    }, {
+      req(input$project_type_1, input$date_range_1)
       
-      data <- qpr_leavers() |> 
-        HMIS::exited_between(start_date, end_date) |> 
-        dplyr::filter(((!is.na(MoveInDateAdjust) & ProjectType == 13) |
-                         (!is.na(ExitDate) & ProjectType %in% c(0, 1, 2, 8)))) |> 
-        dplyr::group_by(ProjectName, ProjectType) |>
-        dplyr::summarise(Average = round(mean(DaysinProject), 1),
-                         Median = median(DaysinProject), clients = dplyr::n(), .groups = "drop_last") |>
-        dplyr::mutate(ProjectType = HMIS::hud_translations$`2.02.6 ProjectType`(ProjectType)) |> 
-        dplyr::filter(ProjectType == input$project_type_1)
-      
-      data
+      data <- qpr_leavers()
+      calculate_measure_1(data, input$project_type_1, input$date_range_1, group_by_project_name = FALSE)
     })
     
     output$ps_plot_1a <- plotly::renderPlotly({
@@ -214,12 +248,37 @@ mod_body_performance_summary_server <- function(id) {
         "Emergency Shelter – Entry Exit" = 40,
         "PH – Rapid Re-Housing" = 150,
         "Transitional Housing" = 240
-        # Add other project types and their respective goals here
       )
       
-      qpr_plotly(measure_1, title = "Average Length of Stay", xaxis_title = "Number of Clients",
+      # Extract the goal for the selected project type
+      selected_goal <- goals[[input$project_type_1]]
+      
+      # Calculate the number of projects meeting the goal
+      num_points_total <- nrow(measure_1)
+      num_points_outside <- sum(measure_1$Average <= selected_goal)
+      
+      # Add annotation
+      annotation_text <- paste0("Number of Projects Meeting Goal: ", num_points_outside, "/", num_points_total)
+      
+      plot <- qpr_plotly(measure_1, title = "Average Length of Stay", xaxis_title = "Number of Clients",
                  yaxis_title = "Number of Days", project_type = input$project_type_1,
                  goals = goals)
+      
+      plot |> 
+        plotly::layout(
+          annotations = list(
+            x = 1, 
+            y = 1.1, 
+            text = annotation_text, 
+            showarrow = FALSE, 
+            xref = 'paper', 
+            yref = 'paper',
+            xanchor = 'right',
+            yanchor = 'top',
+            font = list(size = 14, color = "black")
+          ),
+          margin = list(t = 60) # Adjust top margin if needed
+        )
     })
     
     output$ps_plot_1b <- plotly::renderPlotly({
@@ -230,13 +289,38 @@ mod_body_performance_summary_server <- function(id) {
         "Emergency Shelter – Entry Exit" = 40,
         "PH – Rapid Re-Housing" = 150,
         "Transitional Housing" = 240
-        # Add other project types and their respective goals here
       )
       
-      qpr_plotly(measure_1, title = "Median Length of Stay", xaxis_title = "Number of Clients",
-                 y_col = "Median", yaxis_title = "Number of Daysy", 
+      # Extract the goal for the selected project type
+      selected_goal <- goals[[input$project_type_1]]
+      
+      # Calculate the number of projects meeting the goal
+      num_points_total <- nrow(measure_1)
+      num_points_outside <- sum(measure_1$Median <= selected_goal)
+      
+      # Add annotation
+      annotation_text <- paste0("Number of Projects Meeting Goal: ", num_points_outside, "/", num_points_total)
+      
+      plot <- qpr_plotly(measure_1, title = "Median Length of Stay", xaxis_title = "Number of Clients",
+                 y_col = "Median", yaxis_title = "Number of Days", 
                  project_type = input$project_type_1,
                  goals = goals)
+      
+      plot |> 
+        plotly::layout(
+          annotations = list(
+            x = 1, 
+            y = 1.1, 
+            text = annotation_text, 
+            showarrow = FALSE, 
+            xref = 'paper', 
+            yref = 'paper',
+            xanchor = 'right',
+            yanchor = 'top',
+            font = list(size = 14, color = "black")
+          ),
+          margin = list(t = 60) # Adjust top margin if needed
+        )
     })
     
     output$ps_table_1 <- DT::renderDT(server = FALSE, {
@@ -246,17 +330,35 @@ mod_body_performance_summary_server <- function(id) {
         dplyr::rename("Project Name" = ProjectName,
                       "Project Type" = ProjectType,
                       "Number of Clients" = clients) |> 
-        datatable_default()
+        datatable_default(caption = htmltools::tags$caption( style = 'caption-side: 
+                                                         top; text-align: center; 
+                                                         color:black;  font-size:125% ;',
+                                                             'Performance by Project'))
+    })
+    
+    output$ps_bos_table_1 <- DT::renderDT(server = FALSE, {
+      bos_measure_1 <- length_of_stay_bos()
+      
+      bos_measure_1 |>
+        dplyr::select(ProjectName, ProjectType, Average, Median, clients) |> 
+        dplyr::rename("Project Name" = ProjectName,
+                      "Project Type" = ProjectType,
+                      "Number of Clients" = clients) |>
+        DT::datatable(options = list(dom = 't'),
+                      caption = htmltools::tags$caption( style = 'caption-side: 
+                                                         top; text-align: center; 
+                                                         color:black;  font-size:125% ;',
+                                                         'Overall Balance of State Performance'))
     })
     
     #### Measure 2: Exits to Permanent Housing
-    exits <- eventReactive({
-      list(input$project_type_2, input$date_range_2)
-    },{
-      start_date <- as.Date(input$date_range_2[1])
-      end_date <- as.Date(input$date_range_2[2])
+    calculate_measure_2 <- function(data, project_type, date_range, group_by_project_name = TRUE) {
+      start_date <- as.Date(date_range[1])
+      end_date <- as.Date(date_range[2])
+
+      qpr_leavers <- data |> 
+        dplyr::filter(ProgramCoC == "OH-507")
       
-      qpr_leavers <- qpr_leavers()
       .exited <- qpr_leavers |> 
         HMIS::exited_between(start_date, end_date, lgl = TRUE)
       .served <- qpr_leavers |> 
@@ -292,23 +394,60 @@ mod_body_performance_summary_server <- function(id) {
                         (.exited & .es_th_sh_out_rrh) # ES, TH, SH, OUT, RRH
         )
       
-      TotalCount <- TotalHHsSuccessfulPlacement |> 
-        dplyr::count(ProjectName, ProjectType) |> 
-        dplyr::rename(clients = n)
+      if (group_by_project_name) {
+        TotalCount <- TotalHHsSuccessfulPlacement |> 
+          dplyr::count(ProjectName, ProjectType) |> 
+          dplyr::rename(clients = n)
+        
+        SuccessCount <- SuccessfullyPlaced |>
+          dplyr::count(ProjectName, ProjectType) |>
+          dplyr::rename(success_clients = n)
+        
+        data <- TotalCount |> 
+          dplyr::left_join(SuccessCount, c("ProjectName","ProjectType")) |>
+          {\(.) {replace(.,is.na(.),0)}}() |>
+          dplyr::mutate(Percent = success_clients / clients) |> 
+          dplyr::mutate(ProjectType = HMIS::hud_translations$`2.02.6 ProjectType`(ProjectType)) |> 
+          dplyr::filter(ProjectType == project_type)
+      } else {
+        TotalCount <- TotalHHsSuccessfulPlacement |> 
+          dplyr::count(ProjectType) |> 
+          dplyr::rename(clients = n)
+        
+        SuccessCount <- SuccessfullyPlaced |>
+          dplyr::count(ProjectType) |>
+          dplyr::rename(success_clients = n)
+        
+        data <- TotalCount |> 
+          dplyr::left_join(SuccessCount, by = "ProjectType") |>
+          {\(.) {replace(.,is.na(.),0)}}() |>
+          dplyr::mutate(Percent = success_clients / clients) |> 
+          dplyr::mutate(ProjectType = HMIS::hud_translations$`2.02.6 ProjectType`(ProjectType)) |> 
+          dplyr::filter(ProjectType == project_type) |> 
+          tibble::add_column(ProjectName = "Balance of State (OH-507)")
+      }
       
-      SuccessCount <- SuccessfullyPlaced |>
-        dplyr::count(ProjectName, ProjectType) |>
-        dplyr::rename(success_clients = n)
       
-      data <- TotalCount |> 
-        dplyr::left_join(SuccessCount, by = c("ProjectName","ProjectType")) |>
-        {\(.) {replace(.,is.na(.),0)}}() |>
-        dplyr::mutate(Percent = success_clients/clients) |> 
-        dplyr::mutate(ProjectType = HMIS::hud_translations$`2.02.6 ProjectType`(ProjectType)) |>
-        dplyr::filter(ProjectType == input$project_type_2)
       
       data
+    }
+    
+    exits <- eventReactive({
+      list(input$project_type_2, input$date_range_2)
+    }, {
+      req(input$project_type_2, input$date_range_2)
+      data <- qpr_leavers()
+      calculate_measure_2(data, input$project_type_2, input$date_range_2, group_by_project_name = TRUE)
     })
+    
+    exits_bos <- eventReactive({
+      list(input$project_type_2, input$date_range_2)
+    }, {
+      req(input$project_type_2, input$date_range_2)
+      data <- qpr_leavers()
+      calculate_measure_2(data, input$project_type_2, input$date_range_2, group_by_project_name = FALSE)
+    })
+    
 
     output$ps_plot_2 <-
       plotly::renderPlotly({
@@ -322,24 +461,74 @@ mod_body_performance_summary_server <- function(id) {
             "Street Outreach" = 0.30
         )
         
-        qpr_plotly(measure_2, title = "Exits to Permanent Housing", x_col = "clients",
+        # Extract the goal for the selected project type
+        selected_goal <- goals[[input$project_type_2]]
+        
+        # Calculate the number of projects meeting the goal
+        num_points_total <- nrow(measure_2)
+        num_points_outside <- sum(measure_2$Percent >= selected_goal)
+        
+        # Add annotation
+        annotation_text <- paste0("Number of Projects Meeting Goal: ", num_points_outside, "/", num_points_total)
+        
+        plot <- qpr_plotly(measure_2, title = "Exits to Permanent Housing", x_col = "clients",
                    xaxis_title = "Number of Clients", 
                    y_col = "Percent", yaxis_title = "Percent to Permanent Housing",
                    y_label = "Percent to PH",
                    project_type = input$project_type_2,
                    goals = goals, rect_above_line = FALSE, percent_format = TRUE)
+        
+        plot |> 
+          plotly::layout(
+            annotations = list(
+              x = 1, 
+              y = 1.1, 
+              text = annotation_text, 
+              showarrow = FALSE, 
+              xref = 'paper', 
+              yref = 'paper',
+              xanchor = 'right',
+              yanchor = 'top',
+              font = list(size = 14, color = "black")
+            ),
+            margin = list(t = 60) # Adjust top margin if needed
+          )
       })
     
     
     output$ps_table_2 <- DT::renderDT(server = FALSE, {
       measure_2 <- exits()
-      measure_2 |> 
+      
+      measure_2 |>
+        dplyr::select(ProjectName, ProjectType, Percent, clients) |> 
         dplyr::rename("Project Name" = ProjectName,
                       "Project Type" = ProjectType,
-                      "Clients Exiting to PH" = success_clients,
-                      "Total Clients" = clients,
-                      "Percent to PH" = Percent) |> 
-        datatable_default() |> 
+                      "Percent to PH" = Percent,
+                      "Number of Clients" = clients
+        ) |>
+        DT::datatable(options = list(dom = 't'),
+                      caption = htmltools::tags$caption( style = 'caption-side: 
+                                                         top; text-align: center; 
+                                                         color:black;  font-size:125% ;',
+                                                         'Performance by Project')) |> 
+        DT::formatPercentage('Percent to PH', 1)
+    })
+    
+    output$ps_bos_table_2 <- DT::renderDT(server = FALSE, {
+      bos_measure_2 <- exits_bos()
+      
+      bos_measure_2 |>
+        dplyr::select(ProjectName, ProjectType, Percent, clients) |> 
+        dplyr::rename("Project Name" = ProjectName,
+                      "Project Type" = ProjectType,
+                      "Percent to PH" = Percent,
+                      "Number of Clients" = clients
+                      ) |>
+        DT::datatable(options = list(dom = 't'),
+                      caption = htmltools::tags$caption( style = 'caption-side: 
+                                                         top; text-align: center; 
+                                                         color:black;  font-size:125% ;',
+                                                         'Overall Balance of State Performance')) |> 
         DT::formatPercentage('Percent to PH', 1)
     })
     
@@ -350,7 +539,7 @@ mod_body_performance_summary_server <- function(id) {
       start_date <- as.Date(input$date_range_3[1])
       end_date <- as.Date(input$date_range_3[2])
       
-      qpr_leavers <- qpr_leavers()
+      qpr_leavers <- qpr_leavers() |> dplyr::filter(ProgramCoC == "OH-507")
       
       .so <- qpr_leavers$ProjectType %in% c(4)
       .exited <- qpr_leavers |> 
@@ -421,6 +610,7 @@ mod_body_performance_summary_server <- function(id) {
       end_date <- as.Date(input$date_range_4[2])
       
       qpr_benefits <- qpr_benefits() |>
+        dplyr::filter(ProgramCoC == "OH-507") |>
         HMIS::exited_between(start_date, end_date)
       
       data <- dplyr::left_join(
@@ -486,6 +676,7 @@ mod_body_performance_summary_server <- function(id) {
       end_date <- as.Date(input$date_range_5[2])
       
       qpr_benefits <- qpr_benefits() |>
+        dplyr::filter(ProgramCoC == "OH-507") |>
         HMIS::exited_between(start_date, end_date)
       
       data <- dplyr::left_join(
@@ -550,6 +741,7 @@ mod_body_performance_summary_server <- function(id) {
       end_date <- as.Date(input$date_range_6[2])
       
       qpr_income <- qpr_income() |>
+        dplyr::filter(ProgramCoC == "OH-507") |>
         HMIS::exited_between(start_date, end_date)
       
       data <- dplyr::left_join(
@@ -618,6 +810,7 @@ mod_body_performance_summary_server <- function(id) {
       end_date <- as.Date(input$date_range_7[2])
       
       qpr_rrh_enterers <- qpr_rrh_enterers() |>
+        dplyr::filter(ProgramCoC == "OH-507") |>
         HMIS::entered_between(start_date, end_date) |> 
         dplyr::filter(!is.na(MoveInDateAdjust))
       
