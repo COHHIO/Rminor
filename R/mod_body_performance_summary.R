@@ -159,10 +159,12 @@ mod_body_performance_summary_ui <- function(id) {
                                             end = end_date
                              ),
                              plotly::plotlyOutput(ns("ps_plot_6")),
-                             ui_row(
-                               DT::dataTableOutput(ns("ps_table_6")),
-                               title = "Measure 6: Households Increasing Their Income"
-                             )
+                             br(),
+                             DT::dataTableOutput(ns("ps_bos_table_6")),
+                             br(),
+                             br(),
+                             br(),
+                             DT::dataTableOutput(ns("ps_table_6"))
                            )
                   ),
                   tabPanel("Rapid Placement for RRH",
@@ -984,36 +986,69 @@ mod_body_performance_summary_server <- function(id) {
     })
     
     #### Measure 6: Increase in Income
-    increase_income <- eventReactive({
-      list(input$project_type_6, input$date_range_6)
-    }, {
-      start_date <- as.Date(input$date_range_6[1])
-      end_date <- as.Date(input$date_range_6[2])
+    calculate_measure_6 <- function(data, project_type, date_range, group_by_project_name = TRUE) {
+      start_date <- as.Date(date_range[1])
+      end_date <- as.Date(date_range[2])
       
-      qpr_income <- qpr_income() |>
+      qpr_income <- data |>
         dplyr::filter(ProgramCoC == "OH-507") |>
         HMIS::exited_between(start_date, end_date)
       
-      data <- dplyr::left_join(
-        # all_hhs
-        qpr_income |>
-          dplyr::group_by(ProjectName, ProjectType, ProjectCounty, ProjectRegion) |>
-          dplyr::summarise(TotalHHs = dplyr::n(), .groups = "drop_last"),
-        # meeting_objective
-        qpr_income |>
-          dplyr::filter(Difference > 0) |> 
-          dplyr::group_by(ProjectName, ProjectType, ProjectCounty, ProjectRegion) |>
-          dplyr::summarise(Increased = dplyr::n(), .groups = "drop_last"),
-        by = c("ProjectName", "ProjectType", "ProjectCounty", "ProjectRegion")
-      ) |>
-        dplyr::mutate(dplyr::across(where(is.numeric), tidyr::replace_na, 0)) |>
-        dplyr::filter(ProjectType == input$project_type_6) |>
-        dplyr::mutate(Percent = Increased / TotalHHs)
+      if (group_by_project_name) {
+        # By Program
+        data <- dplyr::left_join(
+          # all_hhs
+          qpr_income |>
+            dplyr::group_by(ProjectName, ProjectType, ProjectCounty, ProjectRegion) |>
+            dplyr::summarise(TotalHHs = dplyr::n(), .groups = "drop_last"),
+          # meeting_objective
+          qpr_income |>
+            dplyr::filter(Difference > 0) |> 
+            dplyr::group_by(ProjectName, ProjectType, ProjectCounty, ProjectRegion) |>
+            dplyr::summarise(Increased = dplyr::n(), .groups = "drop_last"),
+          by = c("ProjectName", "ProjectType", "ProjectCounty", "ProjectRegion")
+        ) |>
+          dplyr::mutate(dplyr::across(where(is.numeric), tidyr::replace_na, 0)) |>
+          dplyr::filter(ProjectType == project_type) |>
+          dplyr::mutate(Percent = Increased / TotalHHs)
+      } else {
+        # Balance of State
+        data <- dplyr::left_join(
+          # all_hhs
+          qpr_income |>
+            dplyr::group_by(ProjectType) |>
+            dplyr::summarise(TotalHHs = dplyr::n(), .groups = "drop_last"),
+          # meeting_objective
+          qpr_income |>
+            dplyr::filter(Difference > 0) |> 
+            dplyr::group_by(ProjectType) |>
+            dplyr::summarise(Increased = dplyr::n(), .groups = "drop_last"),
+          by = c("ProjectType")
+        ) |>
+          dplyr::mutate(dplyr::across(where(is.numeric), tidyr::replace_na, 0)) |>
+          dplyr::filter(ProjectType == project_type) |>
+          dplyr::mutate(Percent = Increased / TotalHHs) |> 
+          tibble::add_column(ProjectName = "Balance of State (OH-507)")
+      }
       
       data
+    }
+    
+    increase_income <- eventReactive({
+      list(input$project_type_6, input$date_range_6)
+    }, {
+      req(input$project_type_6, input$date_range_6)
+      data <- qpr_income()
+      calculate_measure_6(data, input$project_type_6, input$date_range_6, group_by_project_name = TRUE)
     })
     
-    
+    increase_income_bos <- eventReactive({
+      list(input$project_type_6, input$date_range_6)
+    }, {
+      req(input$project_type_6, input$date_range_6)
+      data <- qpr_income()
+      calculate_measure_6(data, input$project_type_6, input$date_range_6, group_by_project_name = FALSE)
+    })
     
     output$ps_plot_6 <-
       plotly::renderPlotly({
@@ -1027,11 +1062,37 @@ mod_body_performance_summary_server <- function(id) {
           "PH – Permanent Supportive Housing" = 0.30
         )
         
-        qpr_plotly(measure_6, title = "Households Increasing Their Income",
+        # Extract the goal for the selected project type
+        selected_goal <- goals[[input$project_type_6]]
+        
+        # Calculate the number of projects meeting the goal
+        num_points_total <- nrow(measure_6)
+        num_points_outside <- sum(measure_6$Percent >= selected_goal)
+        
+        # Add annotation
+        annotation_text <- paste0("Number of Projects Meeting Goal: ", num_points_outside, "/", num_points_total)
+        
+        plot <- qpr_plotly(measure_6, title = "Households Increasing Their Income",
                    x_col = "TotalHHs", y_col = "Percent",
                    xaxis_title = "Number of Clients Exiting", yaxis_title = "Percent of Clients with Increased Income",
                    project_type = input$project_type_6,
                    goals = goals, rect_above_line = FALSE, percent_format = TRUE)
+        
+        plot |> 
+          plotly::layout(
+            annotations = list(
+              x = 1, 
+              y = 1.1, 
+              text = annotation_text, 
+              showarrow = FALSE, 
+              xref = 'paper', 
+              yref = 'paper',
+              xanchor = 'right',
+              yanchor = 'top',
+              font = list(size = 14, color = "black")
+            ),
+            margin = list(t = 60) # Adjust top margin if needed
+          )
       })
     
     
@@ -1048,7 +1109,30 @@ mod_body_performance_summary_server <- function(id) {
           "Total that Increased Income" = Increased,
           "Percent that Increased Income" = Percent
         ) |>
-        datatable_default() |> 
+        datatable_default(caption = htmltools::tags$caption( style = 'caption-side: 
+                                                         top; text-align: center; 
+                                                         color:black;  font-size:125% ;',
+                                                             'Performance by Project')) |> 
+        DT::formatPercentage('Percent that Increased Income', 1)
+    })
+    
+    output$ps_bos_table_6 <- DT::renderDT(server = FALSE, {
+      bos_measure_6 <- increase_income_bos()
+      
+      bos_measure_6 |>
+        dplyr::select(ProjectName, ProjectType, TotalHHs, Increased, Percent) |> 
+        dplyr::rename(
+          "Project Name" = ProjectName,
+          "Project Type" = ProjectType,
+          "Total Clients" = TotalHHs,
+          "Total that Increased Income" = Increased,
+          "Percent that Increased Income" = Percent
+        ) |>
+        DT::datatable(options = list(dom = 't'),
+                      caption = htmltools::tags$caption( style = 'caption-side: 
+                                                         top; text-align: center; 
+                                                         color:black;  font-size:125% ;',
+                                                         'Overall Balance of State Performance')) |> 
         DT::formatPercentage('Percent that Increased Income', 1)
     })
     
