@@ -78,10 +78,12 @@ mod_body_performance_summary_ui <- function(id) {
                                             end = end_date
                              ),
                              plotly::plotlyOutput(ns("ps_plot_3")),
-                             ui_row(
-                               DT::dataTableOutput(ns("ps_table_3")),
-                               title = "Measure 3: Exits to Temporary or Permanent Housing"
-                             )
+                             br(),
+                             DT::dataTableOutput(ns("ps_bos_table_3")),
+                             br(),
+                             br(),
+                             br(),
+                             DT::dataTableOutput(ns("ps_table_3"))
                            )
                   ),
                   tabPanel("Non-Cash Benefits at Exit",
@@ -506,8 +508,7 @@ mod_body_performance_summary_server <- function(id) {
                       "Percent to PH" = Percent,
                       "Number of Clients" = clients
         ) |>
-        DT::datatable(options = list(dom = 't'),
-                      caption = htmltools::tags$caption( style = 'caption-side: 
+        datatable_default(caption = htmltools::tags$caption( style = 'caption-side: 
                                                          top; text-align: center; 
                                                          color:black;  font-size:125% ;',
                                                          'Performance by Project')) |> 
@@ -533,13 +534,12 @@ mod_body_performance_summary_server <- function(id) {
     })
     
     #### Measure 3: Exits to Temp or Permanent Housing
-    exits_temp <- eventReactive({
-      list(input$project_type_3, input$date_range_3)
-    },{
-      start_date <- as.Date(input$date_range_3[1])
-      end_date <- as.Date(input$date_range_3[2])
+    calculate_measure_3 <- function(data, project_type, date_range, group_by_project_name = TRUE) {
+      start_date <- as.Date(date_range[1])
+      end_date <- as.Date(date_range[2])
       
-      qpr_leavers <- qpr_leavers() |> dplyr::filter(ProgramCoC == "OH-507")
+      qpr_leavers <- data |>
+        dplyr::filter(ProgramCoC == "OH-507")
       
       .so <- qpr_leavers$ProjectType %in% c(4)
       .exited <- qpr_leavers |> 
@@ -555,24 +555,58 @@ mod_body_performance_summary_server <- function(id) {
                       (.exited & .so)
         )
       
-      TotalCountTemp <- TotalHHsSuccessfulPlacementTemp |> 
-        dplyr::count(ProjectName, ProjectType) |> 
-        dplyr::rename(clients = n)
-      
-      SuccessCountTemp <- SuccessfullyPlacedTemp |>
-        dplyr::count(ProjectName, ProjectType) |>
-        dplyr::rename(success_clients = n)
-      
-      data <- TotalCountTemp |> 
-        dplyr::left_join(SuccessCountTemp, by = c("ProjectName","ProjectType")) |>
-        {\(.) {replace(.,is.na(.),0)}}() |>
-        dplyr::mutate(ProjectType = HMIS::hud_translations$`2.02.6 ProjectType`(ProjectType)) |>
-        dplyr::filter(ProjectType == input$project_type_3) |> 
-        dplyr::mutate(Average = success_clients/clients)
+      if (group_by_project_name) {
+        TotalCountTemp <- TotalHHsSuccessfulPlacementTemp |> 
+          dplyr::count(ProjectName, ProjectType) |> 
+          dplyr::rename(clients = n)
+        
+        SuccessCountTemp <- SuccessfullyPlacedTemp |>
+          dplyr::count(ProjectName, ProjectType) |>
+          dplyr::rename(success_clients = n)
+        
+        data <- TotalCountTemp |> 
+          dplyr::left_join(SuccessCountTemp, by = c("ProjectName","ProjectType")) |>
+          {\(.) {replace(.,is.na(.),0)}}() |>
+          dplyr::mutate(ProjectType = HMIS::hud_translations$`2.02.6 ProjectType`(ProjectType)) |>
+          dplyr::filter(ProjectType == input$project_type_3) |> 
+          dplyr::mutate(Average = success_clients/clients)
+      } else {
+        TotalCountTemp <- TotalHHsSuccessfulPlacementTemp |> 
+          dplyr::count(ProjectType) |> 
+          dplyr::rename(clients = n)
+        
+        SuccessCountTemp <- SuccessfullyPlacedTemp |>
+          dplyr::count(ProjectType) |>
+          dplyr::rename(success_clients = n)
+        
+        data <- TotalCountTemp |> 
+          dplyr::left_join(SuccessCountTemp, by = c("ProjectType")) |>
+          {\(.) {replace(.,is.na(.),0)}}() |>
+          dplyr::mutate(ProjectType = HMIS::hud_translations$`2.02.6 ProjectType`(ProjectType)) |>
+          dplyr::filter(ProjectType == input$project_type_3) |> 
+          dplyr::mutate(Average = success_clients/clients) |> 
+          tibble::add_column(ProjectName = "Balance of State (OH-507)")
+      }
       
       data
+      
+    }
+    
+    exits_temp <- eventReactive({
+      list(input$project_type_3, input$date_range_3)
+    }, {
+      req(input$project_type_3, input$date_range_3)
+      data <- qpr_leavers()
+      calculate_measure_3(data, input$project_type_3, input$date_range_3, group_by_project_name = TRUE)
     })
     
+    exits_temp_bos <- eventReactive({
+      list(input$project_type_3, input$date_range_3)
+    }, {
+      req(input$project_type_3, input$date_range_3)
+      data <- qpr_leavers()
+      calculate_measure_3(data, input$project_type_3, input$date_range_3, group_by_project_name = FALSE)
+    })
     
     output$ps_plot_3 <-
       plotly::renderPlotly({
@@ -583,10 +617,36 @@ mod_body_performance_summary_server <- function(id) {
           "Street Outreach" = 0.6
         )
         
-        qpr_plotly(measure_3, title = "Exits to Temporary or Permanent Housing", 
+        # Extract the goal for the selected project type
+        selected_goal <- goals[[input$project_type_3]]
+        
+        # Calculate the number of projects meeting the goal
+        num_points_total <- nrow(measure_3)
+        num_points_outside <- sum(measure_3$Average >= selected_goal)
+        
+        # Add annotation
+        annotation_text <- paste0("Number of Projects Meeting Goal: ", num_points_outside, "/", num_points_total)
+        
+        plot <- qpr_plotly(measure_3, title = "Exits to Temporary or Permanent Housing", 
                    xaxis_title = "Number of Clients", yaxis_title = "Percent to Housing",
                    project_type = input$project_type_3,
                    goals = goals, rect_above_line = FALSE, percent_format = TRUE)
+        
+        plot |> 
+          plotly::layout(
+            annotations = list(
+              x = 1, 
+              y = 1.1, 
+              text = annotation_text, 
+              showarrow = FALSE, 
+              xref = 'paper', 
+              yref = 'paper',
+              xanchor = 'right',
+              yanchor = 'top',
+              font = list(size = 14, color = "black")
+            ),
+            margin = list(t = 60) # Adjust top margin if needed
+          ) 
       })
     
     
@@ -598,8 +658,29 @@ mod_body_performance_summary_server <- function(id) {
                       "Clients to Housing" = success_clients,
                       "Total Clients" = clients,
                       "Percent to Housing" = Average) |> 
-        datatable_default() |> 
+        datatable_default(caption = htmltools::tags$caption( style = 'caption-side: 
+                                                         top; text-align: center; 
+                                                         color:black;  font-size:125% ;',
+                                                         'Performance by Project')) |> 
         DT::formatPercentage('Percent to Housing', 1)
+    })
+    
+    output$ps_bos_table_3 <- DT::renderDT(server = FALSE, {
+      bos_measure_3 <- exits_temp_bos()
+      
+      bos_measure_3 |>
+        dplyr::select(ProjectName, ProjectType, Percent, clients) |> 
+        dplyr::rename("Project Name" = ProjectName,
+                      "Project Type" = ProjectType,
+                      "Percent to PH" = Percent,
+                      "Number of Clients" = clients
+        ) |>
+        DT::datatable(options = list(dom = 't'),
+                      caption = htmltools::tags$caption( style = 'caption-side: 
+                                                         top; text-align: center; 
+                                                         color:black;  font-size:125% ;',
+                                                         'Overall Balance of State Performance')) |> 
+        DT::formatPercentage('Percent to PH', 1)
     })
     
     #### Measure 4: Non-cash Benefits at Exit
