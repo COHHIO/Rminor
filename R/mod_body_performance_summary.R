@@ -105,10 +105,12 @@ mod_body_performance_summary_ui <- function(id) {
                                             end = end_date
                              ),
                              plotly::plotlyOutput(ns("ps_plot_4")),
-                             ui_row(
-                               DT::dataTableOutput(ns("ps_table_4")),
-                               title = "Measure 4: Non-Cash Benefits at Exit"
-                             )
+                             br(),
+                             DT::dataTableOutput(ns("ps_bos_table_4")),
+                             br(),
+                             br(),
+                             br(),
+                             DT::dataTableOutput(ns("ps_table_4"))
                            )
                   ),
                   tabPanel("Health Insurance at Exit",
@@ -568,7 +570,7 @@ mod_body_performance_summary_server <- function(id) {
           dplyr::left_join(SuccessCountTemp, by = c("ProjectName","ProjectType")) |>
           {\(.) {replace(.,is.na(.),0)}}() |>
           dplyr::mutate(ProjectType = HMIS::hud_translations$`2.02.6 ProjectType`(ProjectType)) |>
-          dplyr::filter(ProjectType == input$project_type_3) |> 
+          dplyr::filter(ProjectType == project_type) |> 
           dplyr::mutate(Average = success_clients/clients)
       } else {
         TotalCountTemp <- TotalHHsSuccessfulPlacementTemp |> 
@@ -583,7 +585,7 @@ mod_body_performance_summary_server <- function(id) {
           dplyr::left_join(SuccessCountTemp, by = c("ProjectType")) |>
           {\(.) {replace(.,is.na(.),0)}}() |>
           dplyr::mutate(ProjectType = HMIS::hud_translations$`2.02.6 ProjectType`(ProjectType)) |>
-          dplyr::filter(ProjectType == input$project_type_3) |> 
+          dplyr::filter(ProjectType == project_type) |> 
           dplyr::mutate(Average = success_clients/clients) |> 
           tibble::add_column(ProjectName = "Balance of State (OH-507)")
       }
@@ -684,36 +686,69 @@ mod_body_performance_summary_server <- function(id) {
     })
     
     #### Measure 4: Non-cash Benefits at Exit
-    benefits_at_exit <- eventReactive({
-      list(input$project_type_4, input$date_range_4)
-    }, {
-      start_date <- as.Date(input$date_range_4[1])
-      end_date <- as.Date(input$date_range_4[2])
+    calculate_measure_4 <- function(data, project_type, date_range, group_by_project_name = TRUE) {
+      start_date <- as.Date(date_range[1])
+      end_date <- as.Date(date_range[2])
       
-      qpr_benefits <- qpr_benefits() |>
+      qpr_benefits <- data |>
         dplyr::filter(ProgramCoC == "OH-507") |>
         HMIS::exited_between(start_date, end_date)
       
-      data <- dplyr::left_join(
-        # all_hhs
-        qpr_benefits |> 
-          dplyr::group_by(ProjectName, ProjectType) |>
-          dplyr::summarise(TotalHHs = dplyr::n(), .groups = "drop_last"),
-        # meeting_objective
-        qpr_benefits |> 
-          dplyr::filter(BenefitsFromAnySource == 1) |> 
-          dplyr::group_by(ProjectName, ProjectType) |>
-          dplyr::summarise(BenefitsAtExit = dplyr::n(), .groups = "drop_last"),
-        by = c("ProjectName","ProjectType")
-      ) |> 
-        dplyr::mutate(dplyr::across(where(is.numeric), tidyr::replace_na, 0)) |>
-        dplyr::filter(ProjectType == input$project_type_4) |> 
-        dplyr::mutate(Percent = BenefitsAtExit / TotalHHs)
+      if (group_by_project_name) {
+        data <- dplyr::left_join(
+          # all_hhs
+          qpr_benefits |> 
+            dplyr::group_by(ProjectName, ProjectType) |>
+            dplyr::summarise(TotalHHs = dplyr::n(), .groups = "drop_last"),
+          # meeting_objective
+          qpr_benefits |> 
+            dplyr::filter(BenefitsFromAnySource == 1) |> 
+            dplyr::group_by(ProjectName, ProjectType) |>
+            dplyr::summarise(BenefitsAtExit = dplyr::n(), .groups = "drop_last"),
+          by = c("ProjectName","ProjectType")
+        ) |> 
+          dplyr::mutate(dplyr::across(where(is.numeric), tidyr::replace_na, 0)) |>
+          dplyr::filter(ProjectType == project_type) |> 
+          dplyr::mutate(Percent = BenefitsAtExit / TotalHHs)
+      } else {
+        data <- dplyr::left_join(
+          # all_hhs
+          qpr_benefits |> 
+            dplyr::group_by(ProjectType) |>
+            dplyr::summarise(TotalHHs = dplyr::n(), .groups = "drop_last"),
+          # meeting_objective
+          qpr_benefits |> 
+            dplyr::filter(BenefitsFromAnySource == 1) |> 
+            dplyr::group_by(ProjectType) |>
+            dplyr::summarise(BenefitsAtExit = dplyr::n(), .groups = "drop_last"),
+          by = c("ProjectType")
+        ) |> 
+          dplyr::mutate(dplyr::across(where(is.numeric), tidyr::replace_na, 0)) |>
+          dplyr::filter(ProjectType == project_type) |> 
+          dplyr::mutate(Percent = BenefitsAtExit / TotalHHs) |> 
+          tibble::add_column(ProjectName = "Balance of State (OH-507)")
+      }
       
       data
+      
+    }
+    
+    benefits_at_exit <- eventReactive({
+      list(input$project_type_4, input$date_range_4)
+    }, {
+      req(input$project_type_4, input$date_range_4)
+      data <- qpr_benefits()
+      calculate_measure_4(data, input$project_type_4, input$date_range_4, group_by_project_name = TRUE)
     })
     
-    
+    benefits_at_exit_bos <- eventReactive({
+      list(input$project_type_4, input$date_range_4)
+    }, {
+      req(input$project_type_4, input$date_range_4)
+      data <- qpr_benefits()
+      calculate_measure_4(data, input$project_type_4, input$date_range_4, group_by_project_name = FALSE)
+    })
+      
     
     output$ps_plot_4 <-
       plotly::renderPlotly({
@@ -727,17 +762,44 @@ mod_body_performance_summary_server <- function(id) {
           "PH – Permanent Supportive Housing" = 0.30
         )
         
-        qpr_plotly(measure_4, title = "Non-Cash Benefits at Exit",
+        # Extract the goal for the selected project type
+        selected_goal <- goals[[input$project_type_4]]
+        
+        # Calculate the number of projects meeting the goal
+        num_points_total <- nrow(measure_4)
+        num_points_outside <- sum(measure_4$Percent >= selected_goal)
+        
+        # Add annotation
+        annotation_text <- paste0("Number of Projects Meeting Goal: ", num_points_outside, "/", num_points_total)
+        
+        plot <- qpr_plotly(measure_4, title = "Non-Cash Benefits at Exit",
                    x_col = "TotalHHs", y_col = "Percent",
                    xaxis_title = "Number of Clients Exiting", yaxis_title = "Percent of Clients with Benefits",
                    project_type = input$project_type_4,
                    goals = goals, rect_above_line = FALSE, percent_format = TRUE)
+        
+        plot |> 
+          plotly::layout(
+            annotations = list(
+              x = 1, 
+              y = 1.1, 
+              text = annotation_text, 
+              showarrow = FALSE, 
+              xref = 'paper', 
+              yref = 'paper',
+              xanchor = 'right',
+              yanchor = 'top',
+              font = list(size = 14, color = "black")
+            ),
+            margin = list(t = 60) # Adjust top margin if needed
+          )
       })
     
     
     output$ps_table_4 <- DT::renderDT(server = FALSE, {
       measure_4 <- benefits_at_exit()
       measure_4 |>
+        dplyr::select(ProjectName, ProjectType, BenefitsAtExit, TotalHHs, Percent) |>
         dplyr::rename(
           "Project Name" = ProjectName,
           "Project Type" = ProjectType,
@@ -745,7 +807,29 @@ mod_body_performance_summary_server <- function(id) {
           "Total Clients" = TotalHHs,
           "Percent with Benefits" = Percent
         ) |> 
-        datatable_default() |> 
+        datatable_default(caption = htmltools::tags$caption( style = 'caption-side: 
+                                                         top; text-align: center; 
+                                                         color:black;  font-size:125% ;',
+                                                             'Performance by Project')) |> 
+        DT::formatPercentage('Percent with Benefits', 1)
+    })
+    
+    output$ps_bos_table_4 <- DT::renderDT(server = FALSE, {
+      bos_measure_4 <- benefits_at_exit_bos()
+      
+      bos_measure_4 |>
+        dplyr::select(ProjectName, ProjectType, BenefitsAtExit, TotalHHs, Percent) |> 
+        dplyr::rename("Project Name" = ProjectName,
+                      "Project Type" = ProjectType,
+                      "Clients with Benefits" = BenefitsAtExit,
+                      "Total Clients" = TotalHHs,
+                      "Percent with Benefits" = Percent
+        ) |>
+        DT::datatable(options = list(dom = 't'),
+                      caption = htmltools::tags$caption( style = 'caption-side: 
+                                                         top; text-align: center; 
+                                                         color:black;  font-size:125% ;',
+                                                         'Overall Balance of State Performance')) |> 
         DT::formatPercentage('Percent with Benefits', 1)
     })
     
