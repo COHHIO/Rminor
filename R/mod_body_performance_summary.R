@@ -183,10 +183,12 @@ mod_body_performance_summary_ui <- function(id) {
                                             end = end_date
                              ),
                              plotly::plotlyOutput(ns("ps_plot_7")),
-                             ui_row(
-                               DT::dataTableOutput(ns("ps_table_7")),
-                               title = "Measure 7: Rapid Placement for RRH"
-                             )
+                             br(),
+                             DT::dataTableOutput(ns("ps_bos_table_7")),
+                             br(),
+                             br(),
+                             br(),
+                             DT::dataTableOutput(ns("ps_table_7"))
                            )
                   )
   )
@@ -1137,39 +1139,95 @@ mod_body_performance_summary_server <- function(id) {
     })
     
     #### Measure 7: Rapid Placement RRH
-    rrh_enterers <- eventReactive({
-      list(input$date_range_7)
-    }, {
-      start_date <- as.Date(input$date_range_7[1])
-      end_date <- as.Date(input$date_range_7[2])
+    calculate_measure_7 <- function(data, date_range, group_by_project_name = TRUE) {
+      start_date <- as.Date(date_range[1])
+      end_date <- as.Date(date_range[2])
       
-      qpr_rrh_enterers <- qpr_rrh_enterers() |>
-        dplyr::filter(ProgramCoC == "OH-507") |>
-        HMIS::entered_between(start_date, end_date) |> 
-        dplyr::filter(!is.na(MoveInDateAdjust))
-      
+      if (group_by_project_name) {
+        qpr_rrh_enterers <- data |>
+          dplyr::filter(ProgramCoC == "OH-507") |>
+          HMIS::entered_between(start_date, end_date) |> 
+          dplyr::filter(!is.na(MoveInDateAdjust))
+        
         data <- qpr_rrh_enterers |>
           dplyr::group_by(ProjectName, ProjectType, ProjectCounty, ProjectRegion) |>
           dplyr::mutate(DaysToHouse = difftime(MoveInDateAdjust, EntryDate, units = "days")) |>
           dplyr::summarise(AvgDaysToHouse = round(mean(DaysToHouse), 0), .groups = "drop_last",
                            clients = dplyr::n()) |>
           dplyr::mutate(ProjectType = HMIS::hud_translations$`2.02.6 ProjectType`(ProjectType))
+      } else {
+        qpr_rrh_enterers <- data |>
+          dplyr::filter(ProgramCoC == "OH-507") |>
+          HMIS::entered_between(start_date, end_date) |> 
+          dplyr::filter(!is.na(MoveInDateAdjust))
+        
+        data <- qpr_rrh_enterers |>
+          dplyr::group_by(ProjectType) |>
+          dplyr::mutate(DaysToHouse = difftime(MoveInDateAdjust, EntryDate, units = "days")) |>
+          dplyr::summarise(AvgDaysToHouse = round(mean(DaysToHouse), 0), .groups = "drop_last",
+                           clients = dplyr::n()) |>
+          dplyr::mutate(ProjectType = HMIS::hud_translations$`2.02.6 ProjectType`(ProjectType)) |> 
+          tibble::add_column(ProjectName = "Balance of State (OH-507)")
+      }
       
       data
+    }
+    
+    rrh_enterers <- eventReactive({
+      list(input$date_range_7)
+    }, {
+      req(input$date_range_7)
+      data <- qpr_rrh_enterers()
+      calculate_measure_7(data, input$date_range_7, group_by_project_name = TRUE)
     })
-      
+    
+    rrh_enterers_bos <- eventReactive({
+      list(input$date_range_7)
+    }, {
+      req(input$date_range_7)
+      data <- qpr_rrh_enterers()
+      calculate_measure_7(data, input$date_range_7, group_by_project_name = FALSE)
+    })
       
     output$ps_plot_7 <-
       plotly::renderPlotly({
         measure_7 <- rrh_enterers()
         
-        goals <- list("PH – Rapid Re-Housing" = 21)
+        goals <- list(
+          "PH – Rapid Re-Housing" = 21
+          )
         
-        qpr_plotly(measure_7, title = "RRH Placement",
+        # Extract the goal for the selected project type
+        selected_goal <- goals[["PH – Rapid Re-Housing"]]
+        
+        # Calculate the number of projects meeting the goal
+        num_points_total <- nrow(measure_7)
+        num_points_outside <- sum(measure_7$AvgDaysToHouse <= selected_goal)
+        
+        # Add annotation
+        annotation_text <- paste0("Number of Projects Meeting Goal: ", num_points_outside, "/", num_points_total)
+        
+        plot <- qpr_plotly(measure_7, title = "RRH Placement",
                    x_col = "clients", y_col = "AvgDaysToHouse",
                    xaxis_title = "Number of Clients", yaxis_title = "Average Days to House",
                    project_type = "PH – Rapid Re-Housing",
                    goals = goals, rect_above_line = TRUE)
+        
+        plot |> 
+          plotly::layout(
+            annotations = list(
+              x = 1,
+              y = 1.1,
+              text = annotation_text,
+              showarrow = FALSE,
+              xref = 'paper',
+              yref = 'paper',
+              xanchor = 'right',
+              yanchor = 'top',
+              font = list(size = 14, color = "black")
+            ),
+            margin = list(t = 60) # Adjust top margin if needed
+          )
       })
     
     
@@ -1185,7 +1243,28 @@ mod_body_performance_summary_server <- function(id) {
           "Average Days to House" = AvgDaysToHouse,
           "Total Clients" = clients
         ) |>
-        datatable_default()
+        datatable_default(caption = htmltools::tags$caption( style = 'caption-side: 
+                                                         top; text-align: center; 
+                                                         color:black;  font-size:125% ;',
+                                                             'Performance by Project'))
+    })
+    
+    output$ps_bos_table_7 <- DT::renderDT(server = FALSE, {
+      bos_measure_7 <- rrh_enterers_bos()
+      
+      bos_measure_7 |>
+        dplyr::select(ProjectName, ProjectType, AvgDaysToHouse, clients) |> 
+        dplyr::rename(
+          "Project Name" = ProjectName,
+          "Project Type" = ProjectType,
+          "Average Days to House" = AvgDaysToHouse,
+          "Total Clients" = clients
+        ) |>
+        DT::datatable(options = list(dom = 't'),
+                      caption = htmltools::tags$caption( style = 'caption-side: 
+                                                         top; text-align: center; 
+                                                         color:black;  font-size:125% ;',
+                                                         'Overall Balance of State Performance'))
     })
   })
 }
