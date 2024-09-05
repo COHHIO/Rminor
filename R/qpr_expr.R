@@ -688,5 +688,106 @@ qpr_expr <- list(
       ) |>
         DT::datatable(escape = FALSE)
     })
+  ),
+  #### RRH Placement
+  rrh_placement = list(
+    expr = rlang::expr({
+      qpr_rrh_enterers() |>
+        HMIS::entered_between(input$date_range[1], input$date_range[2]) |> 
+        dplyr::filter(!is.na(MoveInDateAdjust) & ProjectName %in% input$region) 
+    }),
+    infobox = rlang::expr({
+      data_env() |>
+        dplyr::mutate(DaysToHouse = difftime(MoveInDateAdjust, EntryDate, units = "days")) |>
+        dplyr::summarise(AvgDaysToHouse = round(mean(DaysToHouse), 0), .groups = "drop_last") |> 
+        qpr_infobox(
+          title = "Average Days to House",
+          color = "indigo",
+          icon = "hourglass-half",
+          value = .data$AvgDaysToHouse,
+        )
+    }),
+    details = rlang::expr({
+      tibble::tibble(
+        ProjectType = c("Rapid Re-housing"),
+        Goal = c("RRH projects will place households into permanent housing within 21 days of project entry"),
+        HowCalculated = c("Average number of days between leavers' RRH entry date and Housing Move-in Date")
+      ) |>
+        DT::datatable(escape = FALSE)
+    })
+  ),
+  #### RRH Placement Youth
+  rrh_placement_youth = list(
+    expr = rlang::expr({
+      qpr_rrh_enterers() |>
+        HMIS::entered_between(input$date_range[1], input$date_range[2]) |> 
+        dplyr::filter(!is.na(MoveInDateAdjust) & ProjectName %in% input$region) 
+    }),
+    infobox = rlang::expr({
+      data_env() |>
+        dplyr::mutate(DaysToHouse = difftime(MoveInDateAdjust, EntryDate, units = "days")) |>
+        dplyr::summarise(AvgDaysToHouse = round(mean(DaysToHouse), 0), .groups = "drop_last") |> 
+        qpr_infobox(
+          title = "Average Days to House",
+          color = "indigo",
+          icon = "hourglass-half",
+          value = .data$AvgDaysToHouse,
+        )
+    }),
+    details = rlang::expr({
+      tibble::tibble(
+        ProjectType = c("Rapid Re-housing"),
+        Goal = c("RRH projects will place households into permanent housing within 30 days of project entry"),
+        HowCalculated = c("Average number of days between leavers' RRH entry date and Housing Move-in Date")
+      ) |>
+        DT::datatable(escape = FALSE)
+    })
+  ),
+  #### Re-entries
+  reentries = list(
+    expr = rlang::expr({
+      ExitsFromHP <- qpr_reentries() |>
+        dplyr::filter(LatestPermanentProject12 >= (input$date_range[1] - lubridate::years(1)) &
+                        LatestPermanentProject12 <= input$date_range[2]) |> 
+        dplyr::filter(ExitingHP %in% input$region) |> 
+        dplyr::group_by(UniqueID) |>
+        dplyr::mutate(min_entry_date = min(EntryDate, na.rm = TRUE)) |> 
+        dplyr::filter(EntryDate == min_entry_date | is.na(EntryDate)) |> 
+        dplyr::ungroup() |> 
+        dplyr::select(-min_entry_date)
+      Reentries <- qpr_reentries() |> 
+        HMIS::entered_between(input$date_range[1], input$date_range[2]) |> 
+        dplyr::filter(ExitingHP %in% input$region) |> 
+        dplyr::group_by(UniqueID) |> 
+        dplyr::filter(EntryDate == min(EntryDate)) |> 
+        dplyr::ungroup()
+      
+      list(ExitsFromHP = ExitsFromHP,
+           Reentries = Reentries)
+    }),
+    infobox = rlang::expr({
+      req(data_env())
+      qpr_infobox(
+        data_env(),
+        title = "Number of Re-entries",
+        color = "info",
+        value = scales::percent(nrow(.data$Reentries) / nrow(.data$ExitsFromHP)),
+        icon = shiny::icon("key"),
+        subtitle = paste(
+          nrow(.data$Reentries),
+          "/",
+          nrow(.data$ExitsFromHP),
+          "households"
+        )
+      )
+    }),
+    details = qpr_expr$reentries$details <- rlang::expr({
+      tibble::tibble(
+        ProjectType = c("Homelessness Prevention"),
+        Goal = c("HP Projects will have no more than 25% of households who exited to PH enter into the Ohio BoSCoC homeless system within 12 months of HP assistance"),
+        HowCalculated = c("Number of households who returned to ES, SH, TH, or Outreach within 12 months of exit / number of household leavers to permanent housing")
+      ) |> 
+        DT::datatable(escape = FALSE)
+    })
   )
 )
