@@ -21,6 +21,7 @@ app_server <- function( input, output, session ) {
   mod_navbar_server("navbar")
   mod_sidebar_server("sidebar")
   mod_body_server("body", active$is_youth)
+  mod_body_qpr_server("health_insurance", "health_insurance", qpr_expr$health_insurance$expr, qpr_expr$health_insurance$infobox, qpr_expr$health_insurance$details)
   mod_theme_server("color_theme")
   
 }
