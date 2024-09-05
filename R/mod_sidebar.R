@@ -43,11 +43,6 @@ mod_sidebar_ui <- function(id){
          tabName = "ceaps", #ceAPs-Tab
          icon = shiny::icon("door-open")
        ),
-       # bs4Dash::bs4SidebarMenuItem(
-       #   text = "COVID-19",
-       #   tabName = "covid19", #covid19-Tab
-       #   icon = shiny::icon("virus")
-       # ),
        bs4Dash::bs4SidebarMenuItem(
          text = "Bed & Unit Utilization",
          tabName = "utilization", #utilization-Tab
