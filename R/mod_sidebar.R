@@ -107,12 +107,6 @@ mod_sidebar_ui <- function(id){
          tabName = "about",
          icon = shiny::icon("info-circle")
        ),
-       # actionButton(
-       #   inputId = "logOut",
-       #   label = "Log Out",
-       #   onclick =
-       #     "window.open(window.location.href + '__logout__/', '_self')"
-       # ),
        bs4Alert(
          tags$strong("Data refreshed: ",tags$br(), refreshed),
          id = "data_refresh",
