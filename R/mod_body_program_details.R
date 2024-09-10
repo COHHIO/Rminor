@@ -10,7 +10,7 @@ mod_body_program_details_ui <- function(id) {
   
   bs4Dash::bs4TabItem(
     tabName = "program_details",
-    bs4Dash::bs4TabSetPanel(
+    bs4Dash::tabsetPanel(
       id = ns("program_details_tabs"),
       type = "tabs",
       tabPanel(
