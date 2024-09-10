@@ -17,29 +17,41 @@ mod_body_ui <- function(id){
 #' body Server Functions
 #'
 #' @noRd 
-mod_body_server <- function(id, is_youth){
-  moduleServer( id, function(input, output, session){
+mod_body_server <- function(id, is_youth) {
+  moduleServer(id, function(input, output, session) {
     ns <- session$ns
-  
     
     e <- environment()
-      
+    
+    # Render the appropriate UI based on the active tab
     output$bodyui <- renderUI({
       req(active$ui)
       message("Tab: ", active$tab)
-
-      if (exists(active$server))
-        rlang::exec(active$server, id = paste0("body_", active$tab), .env = e)
-      # Render the body UIs here
-      if (exists(active$ui)) {
-        rlang::exec(active$ui, id = paste0(ns("body_"), active$tab))
+      
+      if (active$tab == "program_details") {
+        # Render the Program Performance UI when this tab is active
+        mod_body_program_performance_ui(ns("program_details"))
       } else {
-        rlang::exec("mod_coming_soon_ui", id = "coming_soon")
+        # Handle other tabs
+        if (exists(active$server))
+          rlang::exec(active$server, id = paste0("body_", active$tab), .env = e)
+        if (exists(active$ui)) {
+          rlang::exec(active$ui, id = paste0(ns("body_"), active$tab))
+        } else {
+          rlang::exec("mod_coming_soon_ui", id = "coming_soon")
+        }
       }
-        
+    })
+    
+    # Handle the server logic for the Program Performance tab
+    observeEvent(active$tab == "program_details", {
+      if (active$tab == "program_details") {
+        mod_body_program_performance_server("program_details")
+      }
     })
   })
 }
+
     
 ## To be copied in the UI
 # mod_body_ui("body_1")
