@@ -63,7 +63,7 @@ mod_sidebar_ui <- function(id){
          bs4Dash::bs4SidebarMenuSubItem(
            text = "Program Details",
            tabName = "program_details"
-         ),
+         )
        ),
        bs4Dash::bs4SidebarMenuItem(
          text = "Ohio Youth Performance",
