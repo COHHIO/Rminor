@@ -127,6 +127,10 @@ qpr_expr <- list(
       data
     }),
     infobox = rlang::expr({
+      df <- data_env() # Store data for debugging
+      print(dim(df)) # Print dimensions of df to the console
+      print(head(df)) # Print first few rows of df
+      
       data_env() |> 
         dplyr::group_by(ProjectName) |>
         dplyr::summarise(Average = round(mean(DaysinProject), 1),
@@ -143,7 +147,7 @@ qpr_expr <- list(
     }),
     details = rlang::expr({
       tibble::tibble(
-        ProjectType = c("Emergency Shelter", "Emergency Shelter", "Transitional Housing", "Transitional Housing"),
+        ProjectType = c("Emergency Shelter", "Emergency Shelter", "Rapid Re-housing", "Rapid Re-housing", "Transitional Housing", "Transitional Housing"),
         Goal = c("Emergency Shelter (ES) projects will have a household average length of stay of no more than 40 days",
                  "ES projects will have a household median length of stay of no more than 40 days",
                  "Rapid Re-housing (RRH) projects will have a household average length of stay of no more than 150 days",

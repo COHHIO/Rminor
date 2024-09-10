@@ -35,10 +35,13 @@ mod_body_qpr_server <- function(id, measure_name, calculate_expr, infobox_expr, 
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
-    # Placeholder for calculation expressions
+    # Evaluate the calculation expression and ensure it's reactive
     data <- reactive({
-      eval(calculate_expr)
+      req(input$date_range)  # Ensure date range is available
+      req(input$region)      # Ensure region is available
+      eval(calculate_expr)  # Make sure this evaluates to a data frame
     })
+    
     
     # Infobox generation
     output[[paste0("infobox_", measure_name)]] <- renderUI({
@@ -52,6 +55,7 @@ mod_body_qpr_server <- function(id, measure_name, calculate_expr, infobox_expr, 
     
     # Plot outputs (example, adjust as necessary)
     output[[paste0("plot_", measure_name)]] <- plotly::renderPlotly({
+      req(data())
       plotly::plot_ly(data(), x = ~var1, y = ~var2)  # Adjust plot as necessary
     })
   })

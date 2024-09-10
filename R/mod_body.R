@@ -28,13 +28,15 @@ mod_body_server <- function(id, is_youth) {
       req(active$ui)
       message("Tab: ", active$tab)
       
+      # Render Program Details tab
       if (active$tab == "program_details") {
-        # Render the Program Performance UI when this tab is active
         mod_body_program_details_ui(ns("program_details"))
-      } else {
-        # Handle other tabs
-        if (exists(active$server))
+      } 
+      # Handle other tabs
+      else {
+        if (exists(active$server)) {
           rlang::exec(active$server, id = paste0("body_", active$tab), .env = e)
+        }
         if (exists(active$ui)) {
           rlang::exec(active$ui, id = paste0(ns("body_"), active$tab))
         } else {
@@ -43,7 +45,7 @@ mod_body_server <- function(id, is_youth) {
       }
     })
     
-    # Handle the server logic for the Program Performance tab
+    # Server logic for the Program Details tab, separated from UI rendering
     observeEvent(active$tab == "program_details", {
       if (active$tab == "program_details") {
         mod_body_program_details_server("program_details")
@@ -51,6 +53,7 @@ mod_body_server <- function(id, is_youth) {
     })
   })
 }
+
 
     
 ## To be copied in the UI
