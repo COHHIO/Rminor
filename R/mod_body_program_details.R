@@ -48,7 +48,7 @@ mod_body_program_details_ui <- function(id) {
 #' Program Performance Server Function
 #'
 #' @noRd 
-mod_body_program_performance_server <- function(id) {
+mod_body_program_details_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     

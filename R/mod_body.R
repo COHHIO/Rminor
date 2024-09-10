@@ -30,7 +30,7 @@ mod_body_server <- function(id, is_youth) {
       
       if (active$tab == "program_details") {
         # Render the Program Performance UI when this tab is active
-        mod_body_program_performance_ui(ns("program_details"))
+        mod_body_program_details_ui(ns("program_details"))
       } else {
         # Handle other tabs
         if (exists(active$server))
@@ -46,7 +46,7 @@ mod_body_server <- function(id, is_youth) {
     # Handle the server logic for the Program Performance tab
     observeEvent(active$tab == "program_details", {
       if (active$tab == "program_details") {
-        mod_body_program_performance_server("program_details")
+        mod_body_program_details_server("program_details")
       }
     })
   })
