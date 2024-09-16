@@ -7,6 +7,7 @@ qpr_expr <- list(
         dplyr::filter(ProjectName == input$region)
   }),
     infobox = rlang::expr({
+      req(data_env())
       .data <- dplyr::left_join(
         # all_hhs
         data_env() |> 
@@ -113,7 +114,7 @@ qpr_expr <- list(
   length_of_stay = list(
     expr = rlang::expr({
       req(input$date_range, input$region)
-      data <- qpr_leavers() |> 
+      qpr_leavers() |> 
         HMIS::exited_between(input$date_range[1], input$date_range[2]) |> 
         dplyr::filter(((
           !is.na(MoveInDateAdjust) & ProjectType == 13
@@ -123,8 +124,6 @@ qpr_expr <- list(
           )) &
           ProjectName == input$region
         )
-      
-      data
     }),
     infobox = rlang::expr({
       df <- data_env() # Store data for debugging

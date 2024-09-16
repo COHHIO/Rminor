@@ -57,7 +57,7 @@ mod_sidebar_ui <- function(id){
            tabName = "spm"# SPM-Tab
          ),
          bs4Dash::bs4SidebarMenuSubItem(
-           text = "Performance Summary",
+           text = "System Summary",
            tabName = "performance_summary"
          ),
          bs4Dash::bs4SidebarMenuSubItem(
@@ -70,36 +70,12 @@ mod_sidebar_ui <- function(id){
          tabName = "qpr", # quarterly performance tab
          icon = shiny::icon("child"),
          bs4Dash::bs4SidebarMenuSubItem(
-           text = "Youth Performance Summary",
+           text = "System Summary",
            tabName = "performance_summary_youth"
          ),
          bs4Dash::bs4SidebarMenuSubItem(
-           text = "Length of Stay",
-           tabName = "qpr_length_of_stay_youth" # LoS-Tab
-         ),
-         bs4Dash::bs4SidebarMenuSubItem(
-           text = "Exits to Permanent Housing",
-           tabName = "qpr_permanent_housing_youth" # PHTab
-         ),
-         bs4Dash::bs4SidebarMenuSubItem(
-           text = "Exits to Temp or Permanent Housing",
-           tabName = "qpr_temp_permanent_housing_youth" # PHTab
-         ),
-         bs4Dash::bs4SidebarMenuSubItem(
-           text = "Non-Cash Benefits at Exit",
-           tabName = "qpr_noncash_benefits_youth" # NCB-Tab
-         ),
-         bs4Dash::bs4SidebarMenuSubItem(
-           text = "Health Insurance at Exit",
-           tabName = "qpr_health_insurance_youth" # HI-Tab
-         ),
-         bs4Dash::bs4SidebarMenuSubItem(
-           text = "Income Growth",
-           tabName = "qpr_income_growth_youth" # Income-Tab
-         ),
-         bs4Dash::bs4SidebarMenuSubItem(
-           text = "Rapid Placement for RRH",
-           tabName = "qpr_rrh_placement_youth" # RRH-Tab
+           text = "Program Details",
+           tabName = "youth_program_details"
          )
        ),
        bs4Dash::bs4SidebarMenuItem(

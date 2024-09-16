@@ -299,38 +299,50 @@ ui_list <- function(x, ..., l_style = NULL, ordered = FALSE) {
 #' @return \code{(shiny.tag.list)}
 #' @export
 
-iterate <- function(x, fn, outputId, env = rlang::caller_env(), output, ..., rc = shiny::getDefaultReactiveDomain()) {
-  is_ui <- missing(output)
+iterate <- function(x, fn, outputId, env = rlang::caller_env(), ..., rc = shiny::getDefaultReactiveDomain()) {
+  # Check if we are generating UI or dealing with server-side output
+  is_ui <- missing(rc)  
+
+  out <- list()  # Initialize out at the beginning
+  
   if (UU::is_legit(x)) {
-    if (rlang::is_list(x))
+    if (rlang::is_list(x)) {
       .x <- x
-    else
+    } else {
       .x <- list(x)
+    }
     
     if (is_ui) {
-      out <- list()
+      out <- list()  # Initialize an empty list for UI elements
     } else {
-      out <- output
+      out <- rc$output  # Use the reactive context's output for server-side output
     }
-      
-    
+
     for (i in seq_along(.x)) {
-      if (UU::is_legit(names(.x)))
-        out[[paste0("header", i)]] <- h4(names(.x[i]))
+      # Create headers if names of the list are valid
+      if (UU::is_legit(names(.x))) {
+        out[[paste0("header", i)]] <- h4(names(.x[i]))  # Add a header for each item
+      }
+      
+      # Prepare arguments for the function to call (for UI or server-side handling)
       .args <- list(
-        purrr::when(is_ui, . ~ env$ns(paste0(outputId, i)), ~ .x[[i]]),
+        purrr::when(is_ui, ~ env$ns(paste0(outputId, i)), ~ .x[[i]]),  # Either generate UI ID or pass the data
         ...
       )
       
+      # Call the output function `fn` and store the result in `out`
       out[[paste0(outputId, i)]] <- do.call(fn, .args, envir = env)
     }
   }
   
-  if (is_ui)
-    do.call(tagList, out)
-  else
-    out
+  # If generating UI, return the UI elements as a tag list; otherwise, return `out` (server-side)
+  if (is_ui) {
+    return(do.call(tagList, out))
+  } else {
+    return(out)
+  }
 }
+
 
 #' @title Iterative generation of icons
 #'

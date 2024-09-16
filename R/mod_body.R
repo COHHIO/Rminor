@@ -32,6 +32,9 @@ mod_body_server <- function(id, is_youth) {
       if (active$tab == "program_details") {
         mod_body_program_details_ui(ns("program_details"))
       } 
+      else if (active$tab == "youth_program_details") {
+        mod_body_program_details_ui(ns("youth_program_details"))
+      }
       # Handle other tabs
       else {
         if (exists(active$server)) {
@@ -49,6 +52,13 @@ mod_body_server <- function(id, is_youth) {
     observeEvent(active$tab == "program_details", {
       if (active$tab == "program_details") {
         mod_body_program_details_server("program_details")
+      }
+    })
+    
+    # Server logic for the Program Details tab, separated from UI rendering
+    observeEvent(active$tab == "youth_program_details", {
+      if (active$tab == "youth_program_details") {
+        mod_body_program_details_server("youth_program_details", is_youth = TRUE)
       }
     })
   })
