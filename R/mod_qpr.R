@@ -1,6 +1,13 @@
 .qbegin <- lubridate::floor_date(Sys.Date(), "quarter")
-strip_id <- function(id) {
-  stringr::str_remove(id, "^body\\-program_details\\-")
+strip_id <- function(id, is_youth = is_youth) {
+  if (is_youth == FALSE) {
+    # First remove the "body-program_details-" prefix
+    base_id <- stringr::str_remove(id, "^body\\-program_details\\-")
+  } else {
+    base_id <- stringr::str_remove(id, "^body-youth\\_program_details\\-")
+  }
+  
+  return(base_id)
 }
 
 #' @family QPR
@@ -17,9 +24,10 @@ strip_id <- function(id) {
 #' @param radio_mean \code{(logical)} whether to show the Mean/Median based
 #'   average radio UI.
 
-mod_qpr_ui <- function(id, choices = NULL, date_choices = NULL, ns = rlang::caller_env()$ns) {
+mod_qpr_ui <- function(id, choices = NULL, date_choices = NULL, ns = rlang::caller_env()$ns,
+                       is_youth = is_youth) {
   force(ns)
-  .id <- strip_id(id)
+  .id <- strip_id(id, is_youth = is_youth)
   .defaults <- purrr::compact(list(
     Dates = if (!isFALSE(date_choices)) list(
       inputId = ns("date_range"),
