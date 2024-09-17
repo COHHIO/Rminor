@@ -33,7 +33,7 @@ mod_body_server <- function(id, is_youth) {
         mod_body_program_details_ui(ns("program_details"))
       } 
       else if (active$tab == "youth_program_details") {
-        mod_body_program_details_ui(ns("youth_program_details"))
+        mod_body_program_details_ui(ns("youth_program_details"), is_youth = TRUE)
       }
       # Handle other tabs
       else {
