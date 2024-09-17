@@ -179,13 +179,11 @@ qpr_expr <- list(
         ) |> 
         dplyr::filter(stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp"))
       
-      message("length_of_stay_youth data processed: ", nrow(data), " rows")
       data
     }),
     infobox = rlang::expr({
       data <- data_env()
-      message("length_of_stay infobox data: ", nrow(data), " rows")
-      
+
       data_env() |> 
         dplyr::group_by(ProjectName) |>
         dplyr::summarise(Average = round(mean(DaysinProject), 1),
