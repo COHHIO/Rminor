@@ -131,36 +131,107 @@ if (exists("Regions")) {
         choices = x
       ),
       length_of_stay = list(
-        choices = unique(qpr_leavers()$ProjectName[qpr_leavers()$ProjectType %in% c(0, 1, 2, 8, 13)])
+        choices = qpr_leavers() |>
+          dplyr::filter(ProgramCoC == "OH-507") |>
+          dplyr::filter(!stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp") & ProjectType %in% c(0, 1, 2, 8, 13)) |> 
+          dplyr::pull(ProjectName) |> unique()
+      ),
+      length_of_stay_youth = list(
+        choices = qpr_leavers() |>
+          dplyr::filter(ProgramCoC == "OH-507") |> 
+          dplyr::filter(stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp") & ProjectType %in% c(0, 1, 2, 8, 13)) |> 
+          dplyr::pull(ProjectName) |> unique()
       ),
       permanent_housing = list(
-        choices = unique(qpr_leavers()$ProjectName[qpr_leavers()$ProjectType %in% c(0:4, 8:9, 12:13)])
+        choices = qpr_leavers() |>
+          dplyr::filter(ProgramCoC == "OH-507") |>
+          dplyr::filter(!stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp") &
+                          ProjectType %in% c(0:4, 8:9, 12:13)) |> 
+          dplyr::pull(ProjectName) |> unique()
+      ),
+      permanent_housing_youth = list(
+        choices = qpr_leavers() |>
+          dplyr::filter(ProgramCoC == "OH-507") |>
+          dplyr::filter(stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp") &
+                          ProjectType %in% c(0:4, 8:9, 12:13)) |> 
+          dplyr::pull(ProjectName) |> unique()
       ),
       temp_permanent_housing = list(
-        choices = unique(qpr_leavers()$ProjectName[qpr_leavers()$ProjectType %in% c(4)])
+        choices = qpr_leavers() |>
+          dplyr::filter(ProgramCoC == "OH-507") |>
+          dplyr::filter(!stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp") &
+                          ProjectType == 4) |>
+          dplyr::pull(ProjectName) |> unique()
+      ),
+      temp_permanent_housing_youth = list(
+        choices = qpr_leavers() |>
+          dplyr::filter(ProgramCoC == "OH-507") |>
+          dplyr::filter(stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp") &
+                    ProjectType == 4) |>
+          dplyr::pull(ProjectName) |> unique()
       ),
       noncash_benefits = list(
-        choices = unique(qpr_benefits()$ProjectName)
+        choices = qpr_benefits() |>
+          dplyr::filter(ProgramCoC == "OH-507") |>
+          dplyr::filter(!stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp")) |>
+          dplyr::pull(ProjectName) |> unique()
       ),
+      noncash_benefits_youth = list(
+        choices = qpr_benefits() |>
+          dplyr::filter(ProgramCoC == "OH-507") |>
+          dplyr::filter(stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp")) |>
+                          dplyr::pull(ProjectName) |> unique()
+          ),
       health_insurance = list(
-        choices = unique(qpr_benefits()$ProjectName)
+        choices = qpr_benefits() |>
+          dplyr::filter(ProgramCoC == "OH-507") |>
+          dplyr::filter(!stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp")) |>
+          dplyr::pull(ProjectName) |> unique()
+      ),
+      health_insurance_youth = list(
+        choices = qpr_benefits() |>
+          dplyr::filter(ProgramCoC == "OH-507") |>
+          dplyr::filter(stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp")) |>
+          dplyr::pull(ProjectName) |> unique()
       ),
       income_growth = list(
-        choices = unique(qpr_income()$ProjectName)
+        choices = qpr_income() |>
+          dplyr::filter(ProgramCoC == "OH-507") |>
+          dplyr::filter(!stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp")) |>
+          dplyr::pull(ProjectName) |> unique()
+      ),
+      income_growth_youth = list(
+        choices = qpr_income() |> 
+          dplyr::filter(ProgramCoC == "OH-507") |>
+          dplyr::filter(stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp")) |>
+          dplyr::pull(ProjectName) |> unique()
       ),
       rrh_placement = list(
-        choices = unique(sort(
-          qpr_rrh_enterers()$ProjectName
-        ))
+        choices = qpr_rrh_enterers() |>
+          dplyr::filter(ProgramCoC == "OH-507") |>
+          dplyr::filter(!stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp")) |>
+          dplyr::pull(ProjectName) |> unique()
+      ),
+      rrh_placement_youth = list(
+        choices = qpr_rrh_enterers() |>
+          dplyr::filter(ProgramCoC == "OH-507") |>
+          dplyr::filter(stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp")) |>
+          dplyr::pull(ProjectName) |> unique()
       ),
       reentries = list(
         choices = unique(sort(
-          qpr_reentries()$ExitingHP
+          qpr_reentries() |>
+            dplyr::filter(ProgramCoC == "OH-507") |>
+            dplyr::filter(!stringr::str_detect(tolower(ExitingHP), "odh|youth|yhdp")) |> 
+            dplyr::pull(ExitingHP) |> unique()
         ))
       ),
       rrh_spending = list(
         choices = unique(sort(
-          qpr_spending()$OrganizationName
+          qpr_spending() |>
+            dplyr::filter(ProgramCoC == "OH-507") |>
+            dplyr::filter(!stringr::str_detect(tolower(OrganizationName), "odh|youth|yhdp")) |> 
+            dplyr::pull(OrganizationName) |> unique()
         ))
       )
     )}}()
