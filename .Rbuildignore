@@ -18,3 +18,6 @@ $run_dev.*
 ^log$
 ^CODE_OF_CONDUCT\.md$
 ^\.httr-oauth$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
