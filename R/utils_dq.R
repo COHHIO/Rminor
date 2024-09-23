@@ -41,7 +41,8 @@ dq_filter_between <- function(x,
 #' @export
 #'
 #' @examples
-#' dq_select_cols(data.frame(UniqueID = 1:3, Issue = letters[1:3], EntryDate = 1:3, blah = 1:3), blah)
+#' dq_select_cols(data.frame(UniqueID = 1:3, Issue = letters[1:3], EnrollmentID = 2:4, Type = letters[4:6],
+#' EntryDate = 1:3, blah = 1:3), blah)
 dq_select_cols <- function(x, ..., default = list("UniqueID",
                                                   "EnrollmentID",
                                                   `Entry Date` = "EntryDate",

@@ -24,5 +24,6 @@ dq_select_cols(
 Select default display columns for Data Quality Tables
 }
 \examples{
-dq_select_cols(data.frame(UniqueID = 1:3, Issue = letters[1:3], EntryDate = 1:3, blah = 1:3), blah)
+dq_select_cols(data.frame(UniqueID = 1:3, Issue = letters[1:3], EnrollmentID = 2:4, Type = letters[4:6],
+EntryDate = 1:3, blah = 1:3), blah)
 }

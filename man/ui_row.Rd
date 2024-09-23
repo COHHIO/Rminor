@@ -134,5 +134,5 @@ A full-width \link[bs4Dash]{box} nested in a row
 A default full width row box.
 }
 \examples{
-ui_row(tags$p("Hi"))
+ui_row(shiny::tags$p("Hi"))
 }

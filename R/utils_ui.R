@@ -130,7 +130,7 @@ make_columns <- function(x, max_cols = TRUE, fn = list(bs4Dash::box, bs4Dash::co
 #' @export
 #'
 #' @examples
-#' ui_row(tags$p("Hi"))
+#' ui_row(shiny::tags$p("Hi"))
 ui_row <- function(...,
                        title = NULL,
                        footer = NULL,
