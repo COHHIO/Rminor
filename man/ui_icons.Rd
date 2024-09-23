@@ -23,6 +23,11 @@ supported styles).}
 
 \item{...}{Arguments passed to the \verb{<i>} tag of \link[htmltools:builder]{htmltools::tags}.}
 }
+\value{
+`ui_icons`: A list of shiny icon objects created from the `name`, `class`, and `lib` arguments.
+
+`simpleCard`: A `div` element representing a Bootstrap card layout with optional custom content and style.
+}
 \description{
 Iterative generation of icons
 }

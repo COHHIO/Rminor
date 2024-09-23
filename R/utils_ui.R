@@ -349,6 +349,9 @@ iterate <- function(x, fn, outputId, env = rlang::caller_env(), ..., rc = shiny:
 #' @inheritParams shiny::icon
 #'
 #' @return
+#' `ui_icons`: A list of shiny icon objects created from the `name`, `class`, and `lib` arguments.
+#' 
+#' `simpleCard`: A `div` element representing a Bootstrap card layout with optional custom content and style.
 #' @export
 
 ui_icons <- function(name, class = NULL, lib = "font-awesome", ...) {
