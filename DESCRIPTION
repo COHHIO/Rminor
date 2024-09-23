@@ -1,6 +1,6 @@
 Package: Rminor
 Title: R minor
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: c(person('Stephen', 'Holsenbeck', email =
        'hmisdataanalyst@cohhio.org', role = c('cre', 'aut')),
        person('Genelle', 'Denzin', email =
