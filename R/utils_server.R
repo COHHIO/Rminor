@@ -227,12 +227,11 @@ server_debounce <-
 
 
 #' @title Style DT divergent color bar
-#'
-#' Style DT color bars for values that diverge from 0. From \href{https://github.com/federicomarini/GeneTonic}{federicomarini/GeneTonic}
-#'
 #' @details This function draws background color bars behind table cells in a column,
 #' width the width of bars being proportional to the column values *and* the color
 #' dependent on the sign of the value.
+#' 
+#' Style DT color bars for values that diverge from 0. From \href{https://github.com/federicomarini/GeneTonic}{federicomarini/GeneTonic}
 #'
 #' A typical usage is for values such as `log2FoldChange` for tables resulting from
 #' differential expression analysis.
