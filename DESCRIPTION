@@ -2,9 +2,9 @@ Package: Rminor
 Title: R minor
 Version: 0.1.0
 Authors@R: c(
-    person("Stephen", "Holsenbeck", "hmisdataanalyst@cohhio.org", role = "aut"),
-    person("Genelle", "Denzin", "genelledenzin@cohhio.org", role = "aut"),
-    person("Trevin", "Flickinger", "trevinflickinger@cohhio.org", role = c("aut", "cre"))
+    person(given = "Stephen", family = "Holsenbeck", role = "aut"),
+    person(given = "Genelle", family = "Denzin", role = "aut"),
+    person(given = "Trevin",  family = "Flickinger", email = "trevinflickinger@cohhio.org", role = c("aut", "cre"))
   )
 Description: HMIS Data Analysis for the Ohio Balance of State
        and Youngstown CoCs
