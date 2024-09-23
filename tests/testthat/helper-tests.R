@@ -11,7 +11,7 @@ data_ui$choices_month <-
     length.out = 24
   ), "%b %Y")
 
-data_ui$choices_service_areas <- sort(unique(APs()$ProjectAreaServed))
+# data_ui$choices_service_areas <- sort(unique(APs()$ProjectAreaServed))
 
 data_ui$choices_regions <- unique(Regions()$RegionName[Regions()$County != "Mahoning"])
 

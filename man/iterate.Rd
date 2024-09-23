@@ -9,7 +9,6 @@ iterate(
   fn,
   outputId,
   env = rlang::caller_env(),
-  output,
   ...,
   rc = shiny::getDefaultReactiveDomain()
 )

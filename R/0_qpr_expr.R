@@ -1,3 +1,8 @@
+qpr_expr <- list()
+#' @title qpr_expr
+#' @description List to hold all module dependency expressions
+#' @importFrom rlang expr
+#' @export
 qpr_expr <- list(
   #### Health Insurance Measure
   health_insurance = list(

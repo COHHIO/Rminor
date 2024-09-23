@@ -41,12 +41,13 @@ Imports:
 Remotes: yogat3ch/maleta, yogat3ch/rdrop2, yogat3ch/UU, COHHIO/HMIS
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 URL: https://github.com/COHHIO/Rminor
 BugReports: https://github.com/COHHIO/Rminor/issues
 Depends: R (>= 3.5.0)
 Suggests: testthat, callr
 Collate: 
+    '0_qpr_expr.R'
     '0_utils-pipe.R'
     '0_utils_helpers.R'
     '_disable_autoload.R'
@@ -59,13 +60,10 @@ Collate:
     'golem_utils_ui.R'
     'mod_body.R'
     'mod_body_client_counts.R'
-    'mod_body_qpr_health_insurance.R'
-    'mod_body_qpr_income_growth.R'
-    'mod_body_qpr_length_of_stay.R'
-    'mod_body_qpr_noncash_benefits.R'
-    'mod_body_qpr_permanent_housing.R'
-    'mod_body_qpr_rrh_placement.R'
-    'mod_body_qpr_temp_permanent_housing.R'
+    'mod_body_performance_summary.R'
+    'mod_body_performance_summary_youth.R'
+    'mod_body_program_details.R'
+    'mod_body_qpr.R'
     'mod_body_spm.R'
     'mod_body_utilization.R'
     'mod_body_welcome.R'
@@ -76,14 +74,6 @@ Collate:
     'mod_sidebar.R'
     'mod_theme.R'
     'notes.R'
-    'qpr_expr_0.R'
-    'qpr_expr_health_insurance.R'
-    'qpr_expr_income_growth.R'
-    'qpr_expr_length_of_stay.R'
-    'qpr_expr_noncash_benefits.R'
-    'qpr_expr_permanent_housing.R'
-    'qpr_expr_rrh_placement.R'
-    'qpr_expr_temp_permanent_housing.R'
     'run_app.R'
     'utils_dq.R'
     'utils_helpers.R'

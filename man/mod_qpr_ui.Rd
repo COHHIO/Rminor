@@ -8,22 +8,25 @@ mod_qpr_ui(
   id,
   choices = NULL,
   date_choices = NULL,
-  ns = rlang::caller_env()$ns
+  ns = rlang::caller_env()$ns,
+  is_youth = is_youth
 )
 }
 \arguments{
 \item{id}{Internal parameters for {shiny}.}
 
-\item{project_choices}{\code{(named list)} of choices of program types for
+\item{choices}{\code{(named list)} of choices of program types for
 the radio picker. Default does not show the UI item - choices must be
 provided for the picker to show.}
 
+\item{date_choices}{\code{(named list)} of choices of date ranges for
+the date picker.}
+
 \item{region_choices}{\code{(named list)} of choices of regions for the
-region drop-down selector. Default does not show the UI item - choices must
-be provided for the picker to show options}
+region drop-down selector.}
 
 \item{radio_mean}{\code{(logical)} whether to show the Mean/Median based
-average radio UI}
+average radio UI.}
 }
 \description{
 A shiny Module to generate the QPR tabitems.
