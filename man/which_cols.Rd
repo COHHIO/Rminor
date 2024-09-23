@@ -9,6 +9,11 @@ which_cols(x, .data)
 \arguments{
 \item{x}{\code{(character/numeric)} Column numbers or names}
 }
+\value{
+A numeric vector representing column positions in the dataset `.data`.
+For numeric input, it returns the input as-is. For character input, it returns
+the positions of the matching column names.
+}
 \description{
 Give DT ready column numbers from names or numbers
 }

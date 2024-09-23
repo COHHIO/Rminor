@@ -92,7 +92,9 @@ datatable_default <- function(data,
 #'
 #' @param x \code{(character/numeric)} Column numbers or names
 #'
-#' @return
+#' @return A numeric vector representing column positions in the dataset `.data`.
+#' For numeric input, it returns the input as-is. For character input, it returns
+#' the positions of the matching column names.
 #' @export
 
 which_cols <- function(x, .data) {
