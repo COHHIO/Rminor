@@ -50,7 +50,6 @@ Collate:
     '0_qpr_expr.R'
     '0_utils-pipe.R'
     '0_utils_helpers.R'
-    '_disable_autoload.R'
     'aaa_imports.R'
     'app_config.R'
     'app_server.R'
