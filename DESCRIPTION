@@ -16,6 +16,7 @@ Imports:
     dplyr,
     DT,
     feather,
+    fs,
     glue,
     golem,
     HMIS,
@@ -23,7 +24,6 @@ Imports:
     htmlwidgets,
     lubridate,
     magrittr,
-    maleta,
     plotly,
     purrr,
     rlang,
@@ -39,7 +39,8 @@ Imports:
     tidyr,
     UU,
     zoo
-Remotes: yogat3ch/maleta, yogat3ch/rdrop2, yogat3ch/UU, COHHIO/HMIS
+Remotes: yogat3ch/UU, 
+         COHHIO/HMIS
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.1
