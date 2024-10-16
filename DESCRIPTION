@@ -25,6 +25,7 @@ Imports:
     maleta,
     plotly,
     purrr,
+    readr,
     rlang,
     sass,
     scales,

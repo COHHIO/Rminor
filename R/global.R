@@ -16,10 +16,33 @@
 
 # Create accessor functions
 Sys.setenv(TZ = "America/New_York")
+# List of data files in the data directory (handles feather, csv, rds)
+data_files <- list.files("data", pattern = "\\.(feather|csv|rds)$", full.names = TRUE)
 
-.time <- system.time({
-  maleta::create_accessors("data")
-})
+# Function to create an accessor for each file based on its extension
+create_accessor <- function(file_path) {
+  file_ext <- tools::file_ext(file_path)
+  
+  function() {
+    if (file_ext == "feather") {
+      data <- arrow::read_feather(file_path)
+    } else if (file_ext == "csv") {
+      data <- readr::read_csv(file_path)
+    } else if (file_ext == "rds") {
+      data <- readRDS(file_path)
+    } else {
+      stop("Unsupported file type: ", file_ext)
+    }
+    return(data)
+  }
+}
+
+# Create accessors and assign them to the global environment
+for (file_path in data_files) {
+  func_name <- fs::path_ext_remove(basename(file_path))
+  assign(func_name, create_accessor(file_path), envir = .GlobalEnv)
+}
+
 
   
   # Run only if in production mode or testing
