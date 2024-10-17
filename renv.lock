@@ -34,7 +34,6 @@
       "RemoteHost": "api.github.com",
       "RemoteRepo": "HMIS",
       "RemoteUsername": "COHHIO",
-      "RemoteRef": "HEAD",
       "RemoteSha": "45b14ece4d6326ebd212461930ba8d6c8455c6e2",
       "Requirements": [
         "dplyr",
@@ -47,7 +46,7 @@
     },
     "MASS": {
       "Package": "MASS",
-      "Version": "7.3-60",
+      "Version": "7.3-61",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -58,11 +57,11 @@
         "stats",
         "utils"
       ],
-      "Hash": "a56a6365b3fa73293ea8d084be0d9bb0"
+      "Hash": "0cafd6f0500e5deba33be22c46bf6055"
     },
     "Matrix": {
       "Package": "Matrix",
-      "Version": "1.6-4",
+      "Version": "1.7-0",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -75,7 +74,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "d9c655b30a2edc6bb2244c1d1e8d549d"
+      "Hash": "1920b2f11133b12350024297d8a4ff4a"
     },
     "R6": {
       "Package": "R6",
@@ -116,7 +115,6 @@
       "RemoteHost": "api.github.com",
       "RemoteRepo": "UU",
       "RemoteUsername": "yogat3ch",
-      "RemoteRef": "HEAD",
       "RemoteSha": "bab19ed0a5b881f39996e2e1dcf47575671035c4",
       "Requirements": [
         "cli",
@@ -376,7 +374,7 @@
     },
     "credentials": {
       "Package": "credentials",
-      "Version": "2.0.1",
+      "Version": "2.0.2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -386,7 +384,7 @@
         "openssl",
         "sys"
       ],
-      "Hash": "c7844b32098dcbd1c59cbd8dddb4ecc6"
+      "Hash": "09fd631e607a236f8cc7f9604db32cb8"
     },
     "crosstalk": {
       "Package": "crosstalk",
@@ -582,7 +580,7 @@
     },
     "gert": {
       "Package": "gert",
-      "Version": "2.1.2",
+      "Version": "2.1.4",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -593,7 +591,7 @@
         "sys",
         "zip"
       ],
-      "Hash": "347d104ed332650b737f509a703c9c7f"
+      "Hash": "ae855ad6d7be20dd7b05d43d25700398"
     },
     "ggplot2": {
       "Package": "ggplot2",
@@ -887,7 +885,7 @@
     },
     "lattice": {
       "Package": "lattice",
-      "Version": "0.22-5",
+      "Version": "0.22-6",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -898,7 +896,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "7c5e89f04e72d6611c77451f6331a091"
+      "Hash": "cc5ac1ba4c238c7ca9fa6a87ca11a7e2"
     },
     "lazyeval": {
       "Package": "lazyeval",
@@ -951,11 +949,9 @@
       "Version": "0.0.0.9000",
       "Source": "GitHub",
       "RemoteType": "github",
-      "Remotes": "yogat3ch/UU, yogat3ch/rdrop2",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "maleta",
       "RemoteUsername": "yogat3ch",
-      "RemoteRef": "HEAD",
       "RemoteSha": "712e476df50b2a39435d9266c769f91afa6a6071",
       "Requirements": [
         "R",
@@ -984,7 +980,7 @@
     },
     "mgcv": {
       "Package": "mgcv",
-      "Version": "1.9-0",
+      "Version": "1.9-1",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -997,7 +993,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "086028ca0460d0c368028d3bda58f31b"
+      "Hash": "110ee9d83b496279960e162ac97764ce"
     },
     "mime": {
       "Package": "mime",
@@ -1255,7 +1251,6 @@
       "RemoteHost": "api.github.com",
       "RemoteRepo": "rdrop2",
       "RemoteUsername": "karthik",
-      "RemoteRef": "HEAD",
       "RemoteSha": "81bedd2f0fbd0ee55dd163230c1a0b26a80162cc",
       "Requirements": [
         "R",
@@ -1304,13 +1299,13 @@
     },
     "renv": {
       "Package": "renv",
-      "Version": "1.0.7",
+      "Version": "1.0.11",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "utils"
       ],
-      "Hash": "397b7b2a265bc5a7a06852524dabae20"
+      "Hash": "47623f66b4e80b3b0587bc5d7b309888"
     },
     "rlang": {
       "Package": "rlang",
@@ -1358,10 +1353,10 @@
     },
     "rstudioapi": {
       "Package": "rstudioapi",
-      "Version": "0.16.0",
+      "Version": "0.17.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "96710351d642b70e8f02ddeb237c46a7"
+      "Hash": "fb9f5fce8f609e9b66f0bea5c783f88a"
     },
     "sass": {
       "Package": "sass",
