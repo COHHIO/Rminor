@@ -498,15 +498,17 @@ qpr_expr <- list(
     }),
     details = rlang::expr({
       tibble::tibble(
-        ProjectType = c("Street Outreach", "Emergency Shelter", "Transitional Housing", "Rapid Re-housing"),
+        ProjectType = c("Street Outreach", "Emergency Shelter", "Transitional Housing", "Rapid Re-housing", "Permanent Supportive Housing"),
         Goal = c("At least 30% of households in Outreach projects will move into permanent housing at exit",
                  "At least 40% of households in ES projects will move into permanent housing at exit",
                  "At least 83% of households in TH projects will move into permanent housing at exit",
-                 "At least 83% of households in RRH projects will move into permanent housing at exit"),
+                 "At least 83% of households in RRH projects will move into permanent housing at exit",
+                 "At least 90% of housed households in PSH projects or exit to PH as of the end of the reporting period or at program exit"),
         HowCalculated = c("Number of households who moved to PH upon exit / number of participants who exited project",
                           "Number of households who moved to PH upon exit / number of participants who exited ES project",
                           "Number of households who moved to PH upon exit / number of participants who exited TH project",
-                          "Number of households who moved to PH upon exit / number of participants who exited RRH project")
+                          "Number of households who moved to PH upon exit / number of participants who exited RRH project",
+                          "Number of households who moved to PH upon exit + number of households who have been housed and remain in PSH project / number of participants housed by PSH project")
       ) |> 
         DT::datatable(escape = FALSE)
     })
@@ -576,15 +578,17 @@ qpr_expr <- list(
     }),
     details = rlang::expr({
       tibble::tibble(
-        ProjectType = c("Street Outreach", "Emergency Shelter", "Transitional Housing", "Rapid Re-housing"),
+        ProjectType = c("Street Outreach", "Emergency Shelter", "Transitional Housing", "Rapid Re-housing", "Permanent Supportive Housing"),
         Goal = c("At least 30% of households in Youth Outreach projects will move into permanent housing at exit",
                  "At least 25% of households in Youth ES projects will move into permanent housing at exit",
                  "At least 50% of households in Youth TH projects will move into permanent housing at exit",
-                 "At least 83% of households in Youth RRH projects will move into permanent housing at exit"),
+                 "At least 83% of households in Youth RRH projects will move into permanent housing at exit",
+                 "At least 90% of housed households in PSH projects or exit to PH as of the end of the reporting period or at program exit"),
         HowCalculated = c("Number of households who moved to PH upon exit / number of participants who exited project",
                           "Number of households who moved to PH upon exit / number of participants who exited ES project",
                           "Number of households who moved to PH upon exit / number of participants who exited TH project",
-                          "Number of households who moved to PH upon exit / number of participants who exited RRH project")
+                          "Number of households who moved to PH upon exit / number of participants who exited RRH project",
+                          "Number of households who moved to PH upon exit + number of households who have been housed and remain in PSH project / number of participants housed by PSH project")
       ) |> 
         DT::datatable(escape = FALSE)
     })

@@ -37,7 +37,8 @@ mod_body_performance_summary_youth_ui <- function(id) {
                                choices = c("Emergency Shelter – Entry Exit",
                                            "PH – Rapid Re-Housing",
                                            "Transitional Housing",
-                                           "Street Outreach"),
+                                           "Street Outreach",
+                                           "PH – Permanent Supportive Housing"),
                                selected = "Emergency Shelter – Entry Exit",
                                multiple = FALSE
                              ),
@@ -318,7 +319,8 @@ mod_body_performance_summary_youth_server <- function(id) {
             "Emergency Shelter – Entry Exit" = 0.25,
             "PH – Rapid Re-Housing" = 0.83,
             "Transitional Housing" = 0.50,
-            "Street Outreach" = 0.30
+            "Street Outreach" = 0.30,
+            "PH - Permanent Supportive Housing" = 0.90
         )
         
         qpr_plotly(measure_2, title = "Exits to Permanent Housing", x_col = "clients",
