@@ -35,7 +35,7 @@ mod_body_qpr_ui <- function(id, choices = NULL, date_choices = NULL, ns = rlang:
         id = "about",
         bs4Dash::bs4AccordionItem(
           title = "Ohio BoS Performance Management Plan",
-          tags$p(a("Ohio BoS 2024 Performance Management Plan", href = "https://cohhio.org/wp-content/uploads/2024/04/Ohio-BoSCoC-2024-PMP_Final.pdf")),
+          tags$p(a("Ohio BoS 2025 Performance Management Plan", href = "https://cohhioorg.sharepoint.com/:b:/r/sites/HRDocuments/Shared%20Documents/HMIS%20%26%20BoSCoC/HMIS%20%26%20BoSCoC%20Planning/Performance%20and%20Outcomes/2025%20PMP/Ohio%20BoSCoC%202025%20PMP.pdf?csf=1&web=1&e=8v7708")),
           collapsed = TRUE
         ),
         bs4Dash::bs4AccordionItem(
