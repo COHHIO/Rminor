@@ -219,9 +219,35 @@ mod_body_performance_summary_youth_server <- function(id) {
         # Add other project types and their respective goals here
       )
       
-      qpr_plotly(measure_1, title = "Average Length of Stay", xaxis_title = "",
-                 yaxis_title = "Average Length of Stay", project_type = input$project_type_1,
-                 goals = goals)
+      # Extract the goal for the selected project type
+      selected_goal <- goals[[input$project_type_1]]
+      
+      # Calculate the number of projects meeting the goal
+      num_points_total <- nrow(measure_1)
+      num_points_outside <- sum(measure_1$Average <= selected_goal)
+      
+      # Add annotation
+      annotation_text <- paste0("Number of Projects Meeting Goal: ", num_points_outside, "/", num_points_total)
+      
+      plot <- qpr_plotly(measure_1, title = "Average Length of Stay", xaxis_title = "Number of Clients",
+                         yaxis_title = "Number of Days", project_type = input$project_type_1,
+                         goals = goals)
+      
+      plot |> 
+        plotly::layout(
+          annotations = list(
+            x = 1, 
+            y = 1.1, 
+            text = annotation_text, 
+            showarrow = FALSE, 
+            xref = 'paper', 
+            yref = 'paper',
+            xanchor = 'right',
+            yanchor = 'top',
+            font = list(size = 14, color = "black")
+          ),
+          margin = list(t = 60) # Adjust top margin if needed
+        )
     })
     
     output$ps_plot_1b <- plotly::renderPlotly({
@@ -235,10 +261,36 @@ mod_body_performance_summary_youth_server <- function(id) {
         # Add other project types and their respective goals here
       )
       
-      qpr_plotly(measure_1, title = "Median Length of Stay", xaxis_title = "Number of Clients",
-                 y_col = "Median", yaxis_title = "Median Length of Stay", 
-                 project_type = input$project_type_1,
-                 goals = goals)
+      # Extract the goal for the selected project type
+      selected_goal <- goals[[input$project_type_1]]
+      
+      # Calculate the number of projects meeting the goal
+      num_points_total <- nrow(measure_1)
+      num_points_outside <- sum(measure_1$Median <= selected_goal)
+      
+      # Add annotation
+      annotation_text <- paste0("Number of Projects Meeting Goal: ", num_points_outside, "/", num_points_total)
+      
+      plot <- qpr_plotly(measure_1, title = "Median Length of Stay", xaxis_title = "Number of Clients",
+                         y_col = "Median", yaxis_title = "Number of Days", 
+                         project_type = input$project_type_1,
+                         goals = goals)
+      
+      plot |> 
+        plotly::layout(
+          annotations = list(
+            x = 1, 
+            y = 1.1, 
+            text = annotation_text, 
+            showarrow = FALSE, 
+            xref = 'paper', 
+            yref = 'paper',
+            xanchor = 'right',
+            yanchor = 'top',
+            font = list(size = 14, color = "black")
+          ),
+          margin = list(t = 60) # Adjust top margin if needed
+        )
     })
     
     output$ps_table_1 <- DT::renderDT(server = FALSE, {
@@ -326,12 +378,38 @@ mod_body_performance_summary_youth_server <- function(id) {
             "PH - Permanent Supportive Housing" = 0.90
         )
         
-        qpr_plotly(measure_2, title = "Exits to Permanent Housing", x_col = "clients",
-                   xaxis_title = "Number of Clients", 
-                   y_col = "Percent", yaxis_title = "Percent to Permanent Housing",
-                   y_label = "Percent to PH",
-                   project_type = input$project_type_2,
-                   goals = goals, rect_above_line = FALSE, percent_format = TRUE)
+        # Extract the goal for the selected project type
+        selected_goal <- goals[[input$project_type_2]]
+        
+        # Calculate the number of projects meeting the goal
+        num_points_total <- nrow(measure_2)
+        num_points_outside <- sum(measure_2$Percent >= selected_goal)
+        
+        # Add annotation
+        annotation_text <- paste0("Number of Projects Meeting Goal: ", num_points_outside, "/", num_points_total)
+        
+        plot <- qpr_plotly(measure_2, title = "Exits to Permanent Housing", x_col = "clients",
+                           xaxis_title = "Number of Clients", 
+                           y_col = "Percent", yaxis_title = "Percent to Permanent Housing",
+                           y_label = "Percent to PH",
+                           project_type = input$project_type_2,
+                           goals = goals, rect_above_line = FALSE, percent_format = TRUE)
+        
+        plot |> 
+          plotly::layout(
+            annotations = list(
+              x = 1, 
+              y = 1.1, 
+              text = annotation_text, 
+              showarrow = FALSE, 
+              xref = 'paper', 
+              yref = 'paper',
+              xanchor = 'right',
+              yanchor = 'top',
+              font = list(size = 14, color = "black")
+            ),
+            margin = list(t = 60) # Adjust top margin if needed
+          )
       })
     
     
@@ -399,10 +477,36 @@ mod_body_performance_summary_youth_server <- function(id) {
           "Street Outreach" = 0.6
         )
         
-        qpr_plotly(measure_3, title = "Exits to Temporary or Permanent Housing", 
-                   xaxis_title = "Number of Clients", yaxis_title = "Percent to Housing",
-                   project_type = input$project_type_3,
-                   goals = goals, rect_above_line = FALSE, percent_format = TRUE)
+        # Extract the goal for the selected project type
+        selected_goal <- goals[[input$project_type_3]]
+        
+        # Calculate the number of projects meeting the goal
+        num_points_total <- nrow(measure_3)
+        num_points_outside <- sum(measure_3$Average >= selected_goal)
+        
+        # Add annotation
+        annotation_text <- paste0("Number of Projects Meeting Goal: ", num_points_outside, "/", num_points_total)
+        
+        plot <- qpr_plotly(measure_3, title = "Exits to Temporary or Permanent Housing", 
+                           xaxis_title = "Number of Clients", yaxis_title = "Percent to Housing",
+                           project_type = input$project_type_3,
+                           goals = goals, rect_above_line = FALSE, percent_format = TRUE)
+        
+        plot |> 
+          plotly::layout(
+            annotations = list(
+              x = 1, 
+              y = 1.1, 
+              text = annotation_text, 
+              showarrow = FALSE, 
+              xref = 'paper', 
+              yref = 'paper',
+              xanchor = 'right',
+              yanchor = 'top',
+              font = list(size = 14, color = "black")
+            ),
+            margin = list(t = 60) # Adjust top margin if needed
+          ) 
       })
     
     
@@ -462,11 +566,37 @@ mod_body_performance_summary_youth_server <- function(id) {
           "PH – Permanent Supportive Housing" = 0.75
         )
         
-        qpr_plotly(measure_4, title = "Non-Cash Benefits at Exit",
-                   x_col = "TotalHHs", y_col = "Percent",
-                   xaxis_title = "Number of Clients Exiting", yaxis_title = "Percent of Clients with Benefits",
-                   project_type = input$project_type_4,
-                   goals = goals, rect_above_line = FALSE, percent_format = TRUE)
+        # Extract the goal for the selected project type
+        selected_goal <- goals[[input$project_type_4]]
+        
+        # Calculate the number of projects meeting the goal
+        num_points_total <- nrow(measure_4)
+        num_points_outside <- sum(measure_4$Percent >= selected_goal)
+        
+        # Add annotation
+        annotation_text <- paste0("Number of Projects Meeting Goal: ", num_points_outside, "/", num_points_total)
+        
+        plot <- qpr_plotly(measure_4, title = "Non-Cash Benefits at Exit",
+                           x_col = "TotalHHs", y_col = "Percent",
+                           xaxis_title = "Number of Clients Exiting", yaxis_title = "Percent of Clients with Benefits",
+                           project_type = input$project_type_4,
+                           goals = goals, rect_above_line = FALSE, percent_format = TRUE)
+        
+        plot |> 
+          plotly::layout(
+            annotations = list(
+              x = 1, 
+              y = 1.1, 
+              text = annotation_text, 
+              showarrow = FALSE, 
+              xref = 'paper', 
+              yref = 'paper',
+              xanchor = 'right',
+              yanchor = 'top',
+              font = list(size = 14, color = "black")
+            ),
+            margin = list(t = 60) # Adjust top margin if needed
+          )
       })
     
     
@@ -526,11 +656,37 @@ mod_body_performance_summary_youth_server <- function(id) {
           "PH – Permanent Supportive Housing" = 0.85
         )
         
-        qpr_plotly(measure_5, title = "Health Insurance at Exit",
-                   x_col = "TotalHHs", y_col = "Percent",
-                   xaxis_title = "Number of Clients Exiting", yaxis_title = "Percent of Clients with Benefits",
-                   project_type = input$project_type_5,
-                   goals = goals, rect_above_line = FALSE, percent_format = TRUE)
+        # Extract the goal for the selected project type
+        selected_goal <- goals[[input$project_type_5]]
+        
+        # Calculate the number of projects meeting the goal
+        num_points_total <- nrow(measure_5)
+        num_points_outside <- sum(measure_5$Percent >= selected_goal)
+        
+        # Add annotation
+        annotation_text <- paste0("Number of Projects Meeting Goal: ", num_points_outside, "/", num_points_total)
+        
+        plot <- qpr_plotly(measure_5, title = "Health Insurance at Exit",
+                           x_col = "TotalHHs", y_col = "Percent",
+                           xaxis_title = "Number of Clients Exiting", yaxis_title = "Percent of Clients with Benefits",
+                           project_type = input$project_type_5,
+                           goals = goals, rect_above_line = FALSE, percent_format = TRUE)
+        
+        plot |> 
+          plotly::layout(
+            annotations = list(
+              x = 1, 
+              y = 1.1, 
+              text = annotation_text, 
+              showarrow = FALSE, 
+              xref = 'paper', 
+              yref = 'paper',
+              xanchor = 'right',
+              yanchor = 'top',
+              font = list(size = 14, color = "black")
+            ),
+            margin = list(t = 60) # Adjust top margin if needed
+          )
       })
     
     
@@ -593,11 +749,37 @@ mod_body_performance_summary_youth_server <- function(id) {
           "PH – Permanent Supportive Housing" = 0.14
         )
         
-        qpr_plotly(measure_6, title = "Households Increasing Their Income",
-                   x_col = "TotalHHs", y_col = "Percent",
-                   xaxis_title = "Number of Clients Exiting", yaxis_title = "Percent of Clients with Increased Income",
-                   project_type = input$project_type_6,
-                   goals = goals, rect_above_line = FALSE, percent_format = TRUE)
+        # Extract the goal for the selected project type
+        selected_goal <- goals[[input$project_type_6]]
+        
+        # Calculate the number of projects meeting the goal
+        num_points_total <- nrow(measure_6)
+        num_points_outside <- sum(measure_6$Percent >= selected_goal)
+        
+        # Add annotation
+        annotation_text <- paste0("Number of Projects Meeting Goal: ", num_points_outside, "/", num_points_total)
+        
+        plot <- qpr_plotly(measure_6, title = "Households Increasing Their Income",
+                           x_col = "TotalHHs", y_col = "Percent",
+                           xaxis_title = "Number of Clients Exiting", yaxis_title = "Percent of Clients with Increased Income",
+                           project_type = input$project_type_6,
+                           goals = goals, rect_above_line = FALSE, percent_format = TRUE)
+        
+        plot |> 
+          plotly::layout(
+            annotations = list(
+              x = 1, 
+              y = 1.1, 
+              text = annotation_text, 
+              showarrow = FALSE, 
+              xref = 'paper', 
+              yref = 'paper',
+              xanchor = 'right',
+              yanchor = 'top',
+              font = list(size = 14, color = "black")
+            ),
+            margin = list(t = 60) # Adjust top margin if needed
+          )
       })
     
     
@@ -647,11 +829,37 @@ mod_body_performance_summary_youth_server <- function(id) {
         
         goals <- list("PH – Rapid Re-Housing" = 30)
         
-        qpr_plotly(measure_7, title = "RRH Placement",
-                   x_col = "clients", y_col = "AvgDaysToHouse",
-                   xaxis_title = "Number of Clients", yaxis_title = "Average Days to House",
-                   project_type = "PH – Rapid Re-Housing",
-                   goals = goals, rect_above_line = TRUE)
+        # Extract the goal for the selected project type
+        selected_goal <- goals[["PH – Rapid Re-Housing"]]
+        
+        # Calculate the number of projects meeting the goal
+        num_points_total <- nrow(measure_7)
+        num_points_outside <- sum(measure_7$AvgDaysToHouse <= selected_goal)
+        
+        # Add annotation
+        annotation_text <- paste0("Number of Projects Meeting Goal: ", num_points_outside, "/", num_points_total)
+        
+        plot <- qpr_plotly(measure_7, title = "RRH Placement",
+                           x_col = "clients", y_col = "AvgDaysToHouse",
+                           xaxis_title = "Number of Clients", yaxis_title = "Average Days to House",
+                           project_type = "PH – Rapid Re-Housing",
+                           goals = goals, rect_above_line = TRUE)
+        
+        plot |> 
+          plotly::layout(
+            annotations = list(
+              x = 1,
+              y = 1.1,
+              text = annotation_text,
+              showarrow = FALSE,
+              xref = 'paper',
+              yref = 'paper',
+              xanchor = 'right',
+              yanchor = 'top',
+              font = list(size = 14, color = "black")
+            ),
+            margin = list(t = 60) # Adjust top margin if needed
+          )
       })
     
     
