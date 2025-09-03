@@ -2,9 +2,9 @@
 mod_body_performance_summary_ui <- function(id) {
   ns <- NS(id)
   
-  # Calculate the start and end dates for the previous calendar year
-  start_date <- lubridate::floor_date(Sys.Date(), "year") - lubridate::years(1)
-  end_date <- lubridate::floor_date(Sys.Date(), "year") - lubridate::days(1)
+  # Calculate the start and end dates for the current calendar year
+  start_date <- lubridate::floor_date(Sys.Date(), "year")
+  end_date <- lubridate::today() - lubridate::days(1)
   
   bs4Dash::tabBox(width = 12,
                   tabPanel("Length of Stay",
@@ -666,7 +666,7 @@ mod_body_performance_summary_server <- function(id) {
         dplyr::rename("Project Name" = ProjectName,
                       "Project Type" = ProjectType,
                       "Clients to Housing" = success_clients,
-                      "Total Clients" = clients,
+                      "Total Clients Exiting" = clients,
                       "Percent to Housing" = Average) |> 
         datatable_default(caption = htmltools::tags$caption( style = 'caption-side: 
                                                          top; text-align: center; 
@@ -812,7 +812,7 @@ mod_body_performance_summary_server <- function(id) {
           "Project Name" = ProjectName,
           "Project Type" = ProjectType,
           "Clients with Benefits" = BenefitsAtExit,
-          "Total Clients" = TotalHHs,
+          "Total Clients Exiting" = TotalHHs,
           "Percent with Benefits" = Percent
         ) |> 
         datatable_default(caption = htmltools::tags$caption( style = 'caption-side: 
@@ -830,7 +830,7 @@ mod_body_performance_summary_server <- function(id) {
         dplyr::rename("Project Name" = ProjectName,
                       "Project Type" = ProjectType,
                       "Clients with Benefits" = BenefitsAtExit,
-                      "Total Clients" = TotalHHs,
+                      "Total Clients Exiting" = TotalHHs,
                       "Percent with Benefits" = Percent
         ) |>
         DT::datatable(options = list(dom = 't'),
@@ -960,7 +960,7 @@ mod_body_performance_summary_server <- function(id) {
           "Project Name" = ProjectName,
           "Project Type" = ProjectType,
           "Clients with Insurance" = InsuranceAtExit,
-          "Total Clients" = TotalHHs,
+          "Total Clients Exiting" = TotalHHs,
           "Percent with Insurance" = Percent
         ) |>
         datatable_default(caption = htmltools::tags$caption( style = 'caption-side: 
@@ -978,7 +978,7 @@ mod_body_performance_summary_server <- function(id) {
         dplyr::rename("Project Name" = ProjectName,
                       "Project Type" = ProjectType,
                       "Clients with Insurance" = InsuranceAtExit,
-                      "Total Clients" = TotalHHs,
+                      "Total Clients Exiting" = TotalHHs,
                       "Percent with Insurance" = Percent
         ) |>
         DT::datatable(options = list(dom = 't'),
@@ -1243,7 +1243,7 @@ mod_body_performance_summary_server <- function(id) {
           "Project County" = ProjectCounty,
           "Project Region" = ProjectRegion,
           "Average Days to House" = AvgDaysToHouse,
-          "Total Clients" = clients
+          "Total Clients Exiting" = clients
         ) |>
         datatable_default(caption = htmltools::tags$caption( style = 'caption-side: 
                                                          top; text-align: center; 
@@ -1260,7 +1260,7 @@ mod_body_performance_summary_server <- function(id) {
           "Project Name" = ProjectName,
           "Project Type" = ProjectType,
           "Average Days to House" = AvgDaysToHouse,
-          "Total Clients" = clients
+          "Total Clients Exiting" = clients
         ) |>
         DT::datatable(options = list(dom = 't'),
                       caption = htmltools::tags$caption( style = 'caption-side: 

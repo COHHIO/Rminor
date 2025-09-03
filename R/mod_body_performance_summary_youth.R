@@ -338,7 +338,7 @@ mod_body_performance_summary_youth_server <- function(id) {
         dplyr::rename("Project Name" = ProjectName,
                       "Project Type" = ProjectType,
                       "Clients Exiting to PH" = success_clients,
-                      "Total Clients" = clients,
+                      "Total Clients Exiting" = clients,
                       "Percent to PH" = Percent) |> 
         datatable_default() |> 
         DT::formatPercentage('Percent to PH', 1)
@@ -409,7 +409,7 @@ mod_body_performance_summary_youth_server <- function(id) {
         dplyr::rename("Project Name" = ProjectName,
                       "Project Type" = ProjectType,
                       "Clients to Housing" = success_clients,
-                      "Total Clients" = clients,
+                      "Total Clients Exiting" = clients,
                       "Percent to Housing" = Average) |> 
         datatable_default() |> 
         DT::formatPercentage('Percent to Housing', 1)
@@ -474,7 +474,7 @@ mod_body_performance_summary_youth_server <- function(id) {
           "Project Name" = ProjectName,
           "Project Type" = ProjectType,
           "Clients with Benefits" = BenefitsAtExit,
-          "Total Clients" = TotalHHs,
+          "Total Clients Exiting" = TotalHHs,
           "Percent with Benefits" = Percent
         ) |> 
         datatable_default() |> 
@@ -539,7 +539,7 @@ mod_body_performance_summary_youth_server <- function(id) {
           "Project Name" = ProjectName,
           "Project Type" = ProjectType,
           "Clients with Insurance" = InsuranceAtExit,
-          "Total Clients" = TotalHHs,
+          "Total Clients Exiting" = TotalHHs,
           "Percent with Insurance" = Percent
         ) |>
         datatable_default() |> 
@@ -662,7 +662,7 @@ mod_body_performance_summary_youth_server <- function(id) {
           "Project County" = ProjectCounty,
           "Project Region" = ProjectRegion,
           "Average Days to House" = AvgDaysToHouse,
-          "Total Clients" = clients
+          "Total Clients Exiting" = clients
         ) |>
         datatable_default()
     })
