@@ -14,6 +14,7 @@ mod_body_performance_summary_youth_ui <- function(id) {
                                inputId = ns("project_type_1"),
                                label = "Select your Project Type",
                                choices = c("Emergency Shelter – Entry Exit",
+                                           "PH – Rapid Re-Housing",
                                            "Transitional Housing"),
                                selected = "Emergency Shelter – Entry Exit",
                                multiple = FALSE
@@ -213,6 +214,7 @@ mod_body_performance_summary_youth_server <- function(id) {
       # Define goals for different project types
       goals <- list(
         "Emergency Shelter – Entry Exit" = 20,
+        "PH – Rapid Re-Housing" = 200,
         "Transitional Housing" = 240
         # Add other project types and their respective goals here
       )
@@ -228,6 +230,7 @@ mod_body_performance_summary_youth_server <- function(id) {
       # Define goals for different project types
       goals <- list(
         "Emergency Shelter – Entry Exit" = 40,
+        "PH – Rapid Re-Housing" = 200,
         "Transitional Housing" = 240
         # Add other project types and their respective goals here
       )
