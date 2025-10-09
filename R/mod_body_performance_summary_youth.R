@@ -198,14 +198,26 @@ mod_body_performance_summary_youth_server <- function(id) {
         dplyr::filter(stringr::str_detect(tolower(ProjectName), "odh|youth|yhdp")) |>
         HMIS::exited_between(start_date, end_date) |> 
         dplyr::filter(((!is.na(MoveInDateAdjust) & ProjectType == 13) |
-                         (!is.na(ExitDate) & ProjectType %in% c(0, 1, 2, 8)))) |> 
+                         (!is.na(ExitDate) & ProjectType %in% c(0, 1, 2, 8))))
+      
+      grouped_data <- data |> 
         dplyr::group_by(ProjectName, ProjectType) |>
         dplyr::summarise(Average = round(mean(DaysinProject), 1),
                          Median = median(DaysinProject), clients = dplyr::n(), .groups = "drop_last") |>
         dplyr::mutate(ProjectType = HMIS::hud_translations$`2.02.6 ProjectType`(ProjectType)) |> 
         dplyr::filter(ProjectType == input$project_type_1)
       
-      data
+      summary_row <- data |>
+        dplyr::mutate(ProjectType = HMIS::hud_translations$`2.02.6 ProjectType`(ProjectType)) |> 
+        dplyr::filter(ProjectType == input$project_type_1) |> 
+        dplyr::summarise(ProjectName = "All Projects",
+                         ProjectType = input$project_type_1,
+                         Average = round(mean(DaysinProject), 1),
+                         Median = median(DaysinProject),
+                         clients = dplyr::n())
+      final_data <- dplyr::bind_rows(summary_row, grouped_data)
+      
+      final_data
     })
     
     output$ps_plot_1a <- plotly::renderPlotly({
