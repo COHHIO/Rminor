@@ -38,6 +38,7 @@ server_header <- function(title, ..., program, date_range, region, county) {
 
 datatable_default <- function(data,
                               rownames = FALSE,
+                              style_first_row = TRUE,
                               options = list(
                                 dom = 'Blfrtip',
                                 buttons = list(
@@ -73,7 +74,23 @@ datatable_default <- function(data,
   if (!missing(add_extensions))
     extensions <- c(extensions, add_extensions)
   
-  DT::datatable(
+  if (style_first_row) {
+    options$rowCallback <- DT::JS(
+      "function(row, data, index) {",
+      "  if (index === 0) {",
+      "    $(row).css({",
+      "      'font-weight': 'bold',",
+      "      'background-color': '#f8f9fa',",
+      "      'border': '2px solid #007bff',",
+      "      'border-radius': '4px',",
+      "      'box-shadow': '0 2px 4px rgba(0,0,0,0.1)'",
+      "    });",
+      "  }",
+      "}"
+    )
+  }
+  
+  dt <- DT::datatable(
     data,
     rownames = rownames,
     filter = filter,
@@ -84,7 +101,13 @@ datatable_default <- function(data,
     width = width,
     height = height,
     ...
-  )
+  ) |>
+    DT::formatStyle(1, border = DT::styleInterval(20, c('auto', '1px solid #ddd'))) |> 
+    DT::formatStyle(columns = 1:ncol(data), 
+                    target = 'row',
+                    fontWeight = DT::styleRow(1, "bold"))
+  
+  return(dt)
 }
 
 
